@@ -1,4 +1,4 @@
-﻿# 🪜Sadari
+﻿# 🪜SADARI
 
 ## Commit 접두어
 
