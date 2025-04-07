@@ -14,15 +14,22 @@
         <div class="card" style="width: 100%">
           <div class="card-body">
             <h5 class="card-title mb-4">로그인</h5>
-            <form>
-              <div class="form-group">
-                <label for="exampleInputEmail1">이메일</label>
-                <input
-                  type="email"
-                  class="form-control"
-                  id="exampleInputEmail1"
-                  placeholder="Enter email"
-                />
+            <!-- 제출하면 로그인! -->
+            <form @submit="handleLogin">
+              <label for="exampleInputEmail">이메일</label>
+              <input
+                type="email"
+                class="form-control"
+                id="exampleInputEmail1"
+                placeholder="이메일 입력"
+                v-model="loginEmail"
+                @blur="loginEmailTouched = true"
+                :class="{
+                  'is-invalid': loginEmailTouched && !isLoginEmailValid,
+                }"
+              />
+              <div class="invalid-feedback">
+                올바른 이메일 형식을 입력해주세요.
               </div>
               <div class="form-group mt-3">
                 <label for="exampleInputPassword1">비밀번호</label>
@@ -30,7 +37,8 @@
                   type="password"
                   class="form-control"
                   id="exampleInputPassword1"
-                  placeholder="Password"
+                  placeholder="비밀번호 입력"
+                  v-model="loginPassword"
                 />
               </div>
               <div class="d-flex gap-2 mt-4">
@@ -64,17 +72,26 @@
           <div class="modal-body">
             <form>
               <div class="mb-3">
-                <label for="email" class="form-label">이메일</label>
+                <label for="email" class="form-label"
+                  >이메일 <span class="text-danger">(필수)</span></label
+                >
                 <input
                   type="email"
                   class="form-control"
+                  :class="{ 'is-invalid': regEmailTouched && !isEmailValid }"
                   id="email"
                   placeholder="이메일 입력"
                   v-model="regEmail"
+                  @blur="regEmailTouched = true"
                 />
+                <div class="invalid-feedback">
+                  올바른 이메일 형식을 입력해주세요.
+                </div>
               </div>
               <div class="mb-3">
-                <label for="password" class="form-label">비밀번호</label>
+                <label for="password" class="form-label"
+                  >비밀번호 <span class="text-danger">(필수)</span></label
+                >
                 <input
                   type="password"
                   class="form-control"
@@ -84,13 +101,34 @@
                 />
               </div>
               <div class="mb-3">
-                <label for="confirm" class="form-label">비밀번호 확인</label>
+                <label for="confirm" class="form-label"
+                  >비밀번호 확인 <span class="text-danger">(필수)</span></label
+                >
                 <input
                   type="password"
                   class="form-control"
                   id="confirm"
                   placeholder="비밀번호 확인"
                   v-model="regConfirm"
+                  :class="{
+                    'is-invalid': regConfirmTouched && !isPasswordMatch,
+                  }"
+                  @blur="regConfirmTouched = true"
+                />
+                <div class="invalid-feedback">
+                  비밀번호가 일치하지 않습니다.
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="name" class="form-label"
+                  >이름 <span class="text-muted">(선택)</span></label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="name"
+                  placeholder="이름 입력"
+                  v-model="regName"
                 />
               </div>
             </form>
@@ -111,7 +149,8 @@
 import { ref, onMounted } from "vue";
 import { Modal } from "bootstrap";
 import { useAuthStore } from "@/stores/auth";
-import { useRouter } from 'vue-router'
+import { useRouter } from "vue-router";
+import { computed } from "vue";
 
 const modalRef = ref(null);
 let modalInstance = null;
@@ -119,9 +158,11 @@ let modalInstance = null;
 const regEmail = ref("");
 const regPassword = ref("");
 const regConfirm = ref("");
-// const regName = ref('') 이름은 아직
+const loginEmail = ref("");
+const loginPassword = ref("");
+const regName = ref("");
 
-const router = useRouter()
+const router = useRouter();
 const authStore = useAuthStore();
 
 onMounted(() => {
@@ -134,34 +175,83 @@ function openModal() {
 
 function closeModal() {
   modalInstance.hide();
+
+  // 초기화
+  regEmail.value = "";
+  regPassword.value = "";
+  regConfirm.value = "";
+  regName.value = "";
+
+  regEmailTouched.value = false;
+  regConfirmTouched.value = false;
 }
+
+// 로그인 버튼 핸들러
+async function handleLogin(e) {
+  e.preventDefault(); // form 제출 기본 동작 방지
+
+  try {
+    await authStore.login(loginEmail.value, loginPassword.value);
+    alert("로그인 성공!");
+    router.push("/dashboard");
+  } catch (err) {
+    alert("이메일 또는 비밀번호가 올바르지 않습니다.");
+  }
+}
+
+// 로그인 즉각 유효성 검사
+const loginEmailTouched = ref(false);
+
+const isLoginEmailValid = computed(() => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(loginEmail.value);
+});
 
 //  회원가입 버튼 핸들러
 async function handleRegister() {
-  if (regPassword.value !== regConfirm.value) {
+  regEmailTouched.value = true;
+  regConfirmTouched.value = true;
+
+  if (!isEmailValid.value) {
+    alert("이메일 형식을 다시 확인해주세요.");
+    return;
+  }
+
+  if (!isPasswordMatch.value) {
     alert("비밀번호가 일치하지 않습니다.");
     return;
   }
 
   try {
-    // 1. 회원가입
-    await authStore.register(regEmail.value, regPassword.value); // regName.value 일단 이름은 빼고
-
-    // 2. 바로 로그인
+    await authStore.register(
+      regName.value.trim(),
+      regEmail.value.trim(),
+      regPassword.value.trim()
+    );
     await authStore.login(regEmail.value, regPassword.value);
-
-    // 3. 모달 닫기
+    // 로그인 정보는 지우고, 로그인 email 가져다가 ㄱ
+    loginEmail.value = regEmail.value;
+    loginPassword.value = "";
     closeModal();
-
-    // 4. 리다이렉트 or 알림
-    alert("회원가입 및 로그인 완료!");
-    // 메인 페이지로 이동
-    router.push("/dashboard");
   } catch (e) {
-    alert("회원가입 또는 로그인 중 오류가 발생했습니다.");
+    alert("회원가입 중 오류가 발생했습니다.");
     console.error(e);
   }
 }
+
+// 회원 가입 유효성 검사
+const regEmailTouched = ref(false);
+
+const isEmailValid = computed(() => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(regEmail.value);
+});
+
+const regConfirmTouched = ref(false);
+
+const isPasswordMatch = computed(() => {
+  return regPassword.value === regConfirm.value;
+});
 </script>
 
 <style scoped>
