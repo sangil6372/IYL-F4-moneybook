@@ -1,10 +1,15 @@
 {
   "users": [
     {
-      "id": "1234",
-      "name": "sangil",
+      "id": "3245",
+      "name": "박상일",
       "email": "sangil6372@naver.com",
-      "password": "1234"
+      "password": "123",
+      "profileImage": null,
+      "settings": {
+        "language": "kor",
+        "theme": "light"
+      }
     }
   ]
 }
