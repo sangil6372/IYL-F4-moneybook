@@ -72,20 +72,53 @@
           <div class="modal-body">
             <form>
               <div class="mb-3">
-                <label for="email" class="form-label"
+                <label class="form-label"
                   >이메일 <span class="text-danger">(필수)</span></label
                 >
-                <input
-                  type="email"
-                  class="form-control"
-                  :class="{ 'is-invalid': regEmailTouched && !isEmailValid }"
-                  id="email"
-                  placeholder="이메일 입력"
-                  v-model="regEmail"
-                  @blur="regEmailTouched = true"
-                />
-                <div class="invalid-feedback">
-                  올바른 이메일 형식을 입력해주세요.
+                <div class="row g-2">
+                  <div class="col-8">
+                    <input
+                      type="email"
+                      class="form-control"
+                      :class="{
+                        'is-invalid':
+                          regEmailTouched &&
+                          (!isEmailValid || isDuplicateEmail),
+                      }"
+                      v-model="regEmail"
+                      placeholder="이메일 입력"
+                      @blur="regEmailTouched = true"
+                    />
+                    <div
+                      class="invalid-feedback"
+                      v-if="regEmailTouched && !isEmailValid"
+                    >
+                      올바른 이메일 형식을 입력해주세요.
+                    </div>
+                    <div
+                      class="invalid-feedback"
+                      v-else-if="regEmailTouched && isDuplicateEmail"
+                    >
+                      이미 등록된 이메일입니다.
+                    </div>
+                    <!-- 파란 안내 문구 -->
+                    <div
+                      class="valid-feedback"
+                      v-if="isEmailValid && !isDuplicateEmail"
+                    >
+                      사용 가능한 이메일입니다.
+                    </div>
+                  </div>
+
+                  <div class="col-4">
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary w-100"
+                      @click="checkEmailExists"
+                    >
+                      중복 확인
+                    </button>
+                  </div>
                 </div>
               </div>
               <div class="mb-3">
@@ -135,7 +168,11 @@
           </div>
           <div class="modal-footer">
             <button class="btn btn-secondary" @click="closeModal">닫기</button>
-            <button class="btn btn-primary" @click="handleRegister">
+            <button
+              class="btn btn-primary"
+              @click="handleRegister"
+              :disabled="!isEmailValid || isDuplicateEmail"
+            >
               회원가입
             </button>
           </div>
@@ -151,6 +188,7 @@ import { Modal } from "bootstrap";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import { computed } from "vue";
+import axios from "axios";
 
 const modalRef = ref(null);
 let modalInstance = null;
@@ -212,8 +250,8 @@ async function handleRegister() {
   regEmailTouched.value = true;
   regConfirmTouched.value = true;
 
-  if (!isEmailValid.value) {
-    alert("이메일 형식을 다시 확인해주세요.");
+  if (!isEmailValid.value || isDuplicateEmail.value) {
+    alert("이메일 형식이 잘못됐거나 이미 등록된 이메일입니다.");
     return;
   }
 
@@ -221,17 +259,13 @@ async function handleRegister() {
     alert("비밀번호가 일치하지 않습니다.");
     return;
   }
-
   try {
     await authStore.register(
       regName.value.trim(),
       regEmail.value.trim(),
       regPassword.value.trim()
     );
-    await authStore.login(regEmail.value, regPassword.value);
-    // 로그인 정보는 지우고, 로그인 email 가져다가 ㄱ
     loginEmail.value = regEmail.value;
-    loginPassword.value = "";
     closeModal();
   } catch (e) {
     alert("회원가입 중 오류가 발생했습니다.");
@@ -252,6 +286,27 @@ const regConfirmTouched = ref(false);
 const isPasswordMatch = computed(() => {
   return regPassword.value === regConfirm.value;
 });
+
+// 중복 이메일인지 체크
+const isDuplicateEmail = ref(false);
+const checkingEmail = ref(false);
+const emailChecked = ref(false); // 중복 확인 버튼 눌렀는지 여부
+
+async function checkEmailExists() {
+  checkingEmail.value = true;
+  emailChecked.value = true;
+
+  try {
+    const res = await axios.get(
+      `http://localhost:3000/users?email=${regEmail.value}`
+    );
+    isDuplicateEmail.value = res.data.length > 0;
+  } catch (err) {
+    console.error("이메일 확인 오류:", err);
+  } finally {
+    checkingEmail.value = false;
+  }
+}
 </script>
 
 <style scoped>
