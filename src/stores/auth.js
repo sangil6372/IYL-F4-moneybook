@@ -22,6 +22,7 @@ export const useAuthStore = defineStore("auth", {
           settings: {
             language: "kor", // 기본 언어 설정
             theme: "light", // 기본 테마 설정
+            currency: "won",
           },
         });
         if (response.status === 201) {
@@ -35,6 +36,9 @@ export const useAuthStore = defineStore("auth", {
       }
     },
     async login(email, password) {
+      if (!email || !password) {
+        throw new Error("이메일과 비밀번호를 모두 입력해주세요.");
+      }
       try {
         const response = await axios.get(
           `http://localhost:3000/users?email=${email}&password=${password}`
