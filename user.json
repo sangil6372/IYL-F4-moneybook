@@ -1,15 +1,41 @@
 {
   "users": [
     {
-      "id": "4ccd",
+      "id": "d3e6",
       "name": "박상일",
-      "email": "sangil6372@naver.com",
+      "email": "sangil@naver.com",
       "password": "123",
       "profileImage": null,
       "settings": {
         "language": "kor",
         "theme": "light",
         "currency": "won"
+      },
+      "goals": {
+        "month": {
+          "total": 10000,
+          "categories": {
+            "식비": 10000,
+            "의료": 0,
+            "교통": 0,
+            "여가": 0,
+            "통신": 0,
+            "급여": 0,
+            "기타": 0
+          }
+        },
+        "year": {
+          "total": 20000,
+          "categories": {
+            "식비": 0,
+            "의료": 0,
+            "교통": 0,
+            "여가": 0,
+            "통신": 0,
+            "급여": 0,
+            "기타": 0
+          }
+        }
       }
     },
     {

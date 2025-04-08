@@ -24,6 +24,33 @@ export const useAuthStore = defineStore("auth", {
             theme: "light", // 기본 테마 설정
             currency: "won",
           },
+          // 목표 초기화
+          goals: {
+            month: {
+              total: 0,
+              categories: {
+                식비: 0,
+                의료: 0,
+                교통: 0,
+                여가: 0,
+                통신: 0,
+                급여: 0,
+                기타: 0,
+              },
+            },
+            year: {
+              total: 0,
+              categories: {
+                식비: 0,
+                의료: 0,
+                교통: 0,
+                여가: 0,
+                통신: 0,
+                급여: 0,
+                기타: 0,
+              },
+            },
+          },
         });
         if (response.status === 201) {
           alert("회원가입이 완료되었습니다.");
@@ -77,6 +104,11 @@ export const useAuthStore = defineStore("auth", {
           this.user = null;
           sessionStorage.removeItem("userId");
         }
+      }
+    },
+    updateGoals(goals) {
+      if (this.user) {
+        this.user.goals = goals;
       }
     },
   },
