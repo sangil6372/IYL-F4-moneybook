@@ -107,6 +107,15 @@
       "type": "income",
       "memo": "",
       "userId": ""
+    },
+    {
+      "id": 10,
+      "date": "2025-04-06",
+      "category": "기타",
+      "amount": 10500,
+      "type": "expense",
+      "memo": "",
+      "userId": ""
     }
   ]   
 }
