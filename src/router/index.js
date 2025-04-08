@@ -35,12 +35,6 @@ const router = createRouter({
       component: () => import("../pages/AnalyticsPage.vue"),
     },
     {
-      path: "/goal",
-      name: "goal",
-      meta: { requiresAuth: true },
-      component: () => import("../pages/GoalPage.vue"),
-    },
-    {
       path: "/:pathMatch(.*)*",
       name: "not-found",
       component: () => import("../pages/NotFoundPage.vue"),
