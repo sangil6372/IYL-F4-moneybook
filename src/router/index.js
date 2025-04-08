@@ -10,9 +10,9 @@ const router = createRouter({
       component: Home,
     },
     {
-      path: "/calender",
-      name: "calender",
-      component: () => import("../pages/CalenderPage.vue"),
+      path: "/calendar",
+      name: "calendar",
+      component: () => import("../pages/CalendarPage.vue"),
     },
     {
       path: "/dashboard",

@@ -1,15 +1,17 @@
 <template>
-  <nav class="sidebar d-none d-lg-flex flex-column align-items-center justify-content-evenly">
+  <nav
+    class="sidebar d-none d-lg-flex flex-column align-items-center justify-content-evenly"
+  >
     <RouterLink to="/goal" class="menu-item" active-class="active">
       <i class="fas fa-bullseye fs-2"></i>
       <span>Goal</span>
     </RouterLink>
     <RouterLink to="/analytics" class="menu-item" active-class="active">
-      <i class="fa-solid fa-chart-simple fs-2"></i>      <span>Analytics</span>
+      <i class="fa-solid fa-chart-simple fs-2"></i> <span>Analytics</span>
     </RouterLink>
     <RouterLink to="/transaction" class="menu-item" active-class="active">
       <i class="fa-solid fa-money-bill-transfer fs-2"></i>
-            <span>Transaction</span>
+      <span>Transaction</span>
     </RouterLink>
     <RouterLink to="/dashboard" class="menu-item" active-class="active">
       <i class="fas fa-table fs-2"></i>
@@ -19,7 +21,6 @@
       <i class="fas fa-user fs-2"></i>
       <span>Profile</span>
     </RouterLink>
-    
   </nav>
 </template>
 
@@ -28,7 +29,7 @@ import { RouterLink } from "vue-router";
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap");
 
 .sidebar {
   width: 200px;
@@ -49,7 +50,7 @@ import { RouterLink } from "vue-router";
   justify-content: center;
   align-items: center;
   text-decoration: none;
-  font-family: 'Orbitron', sans-serif; /* ✅ Orbitron 적용 */
+  font-family: "Orbitron", sans-serif; /* ✅ Orbitron 적용 */
   font-size: 16px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
   transition: transform 0.2s ease;

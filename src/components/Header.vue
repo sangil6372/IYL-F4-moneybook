@@ -15,7 +15,7 @@
       </button>
 
       <!-- ✅ 로고 이미지 -->
-      <img src="@/assets/logo.png" alt="Sadari Logo" class="logo-img " />
+      <img src="@/assets/logo.png" alt="Sadari Logo" class="logo-img" />
     </header>
 
     <!-- ✅ 모바일용 Offcanvas 메뉴 -->
@@ -54,7 +54,6 @@ import { RouterLink } from "vue-router";
   height: 120px;
 }
 
-
 /* Offcanvas 설정 */
 .custom-offcanvas {
   --bs-offcanvas-width: auto;
@@ -64,8 +63,7 @@ import { RouterLink } from "vue-router";
 }
 
 img {
-width: 400px;
-height : auto;
+  width: 400px;
+  height: auto;
 }
-
 </style>

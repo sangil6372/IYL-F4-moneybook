@@ -90,7 +90,7 @@
                 class="form-check-input"
                 type="radio"
                 id="income"
-                value="수입"
+                value="income"
                 v-model="form.type"
               />
               <label class="form-check-label" for="income">수입</label>
@@ -100,7 +100,7 @@
                 class="form-check-input"
                 type="radio"
                 id="expense"
-                value="지출"
+                value="expense"
                 v-model="form.type"
               />
               <label class="form-check-label" for="expense">지출</label>
@@ -140,47 +140,89 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted, computed } from "vue";
 import FullCalendar from "@fullcalendar/vue3";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 
+import { useCalendar } from "@/stores/calendar";
+
+// pinia 연결
+const storeCalendar = useCalendar();
+onMounted(() => {
+  storeCalendar.fetchTransaction();
+});
+
+// 선택된 날짜 초기화
 const selectedDate = ref(null);
 
+// 날짜 클릭
 function handleDateClick(info) {
   selectedDate.value = info.dateStr;
 }
+
+// 입력 폼 상태
 const form = ref({
-  amout: "",
+  amount: "",
   type: "지출",
   category: "",
   memo: "",
 });
 
+// 입력 폼 닫기
 function closeForm() {
   selectedDate.value = null;
   form.value = {
-    amout: "",
-    type: "지출",
+    amount: "",
+    type: "expense",
     category: "",
-    memon: "",
+    memo: "",
   };
 }
-const calendarOptions = ref({
+
+const saveForm = async () => {
+  if (!form.value.amount || !form.value.type) {
+    alert("금액과 분류는 반드시 작성해주세요.");
+    return;
+  }
+
+  const newTransaction = {
+    ...form.value,
+    date: selectedDate.value,
+    amount: parseInt(form.value.amount),
+  };
+
+  try {
+    await storeCalendar.addTransaction(newTransaction);
+    closeForm();
+  } catch (error) {
+    alert("에러발생:" + error);
+  }
+};
+
+// 거래 필터링
+const selectedDateforEach = computed(() => {
+  storeCalendar.transaction.filter((item) => item.date === selectedDate.value);
+});
+
+// fullcalendar 사용
+const calendarOptions = computed(() => ({
   plugins: [dayGridPlugin, interactionPlugin],
   initialView: "dayGridMonth",
   eventColor: "transparent",
   dateClick: handleDateClick,
-  events: [
-    { title: "3000", date: "2025-04-05" },
-    { title: "커피", date: "2025-04-10" },
-    { title: "4500", date: "2025-04-26" },
-    { title: "3000", date: "2025-04-14" },
-  ],
+  events: storeCalendar.calendarEvents,
   eventContent(info) {
-    return {
-      html: `<span class="text-success fw-bold">${info.event.title}</span>`,
-    };
+    const { income, expense } = info.event.extendedProps;
+
+    const plus = income
+      ? `<div class="text-success fw-bold">+${income.toLocaleString()}원</div>`
+      : "";
+    const minus = expense
+      ? `<div class="text-danger fw-bold">-${expense.toLocaleString()}원</div>`
+      : "";
+
+    return { html: plus + minus };
   },
-});
+}));
 </script>
