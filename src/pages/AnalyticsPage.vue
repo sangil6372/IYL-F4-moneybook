@@ -4,13 +4,13 @@
 
     <!-- 상단 지표 카드 3개 -->
     <div class="d-flex justify-content-between mb-4">
-      <div class="flex-fill text-center bg-light mx-2 py-3 rounded shadow-sm">
+      <div class="flex-fill text-center bg-light mx-2 py-3 rounded shadow-sm card-hover">
         <h5>💸 지출 <strong>{{ expense.toLocaleString() }}원</strong></h5>
       </div>
-      <div class="flex-fill text-center bg-light mx-2 py-3 rounded shadow-sm">
+      <div class="flex-fill text-center bg-light mx-2 py-3 rounded shadow-sm card-hover">
         <h5>💵 수입 <strong>{{ income.toLocaleString() }}원</strong></h5>
       </div>
-      <div class="flex-fill text-center bg-light mx-2 py-3 rounded shadow-sm">
+      <div class="flex-fill text-center bg-light mx-2 py-3 rounded shadow-sm card-hover">
         <h5>🏦 이익 <strong>{{ net.toLocaleString() }}원</strong></h5>
       </div>
     </div>
@@ -269,4 +269,12 @@ const lineChartOptions = {
 
 
 <style scoped>
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
 </style>
