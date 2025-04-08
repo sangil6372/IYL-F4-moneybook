@@ -1,23 +1,33 @@
 <template>
-  <nav
-    class="sidebar d-none d-lg-flex flex-column align-items-center justify-content-evenly"
-  >
-    <RouterLink to="/analytics" class="menu-item" active-class="active">
-      <i class="fa-solid fa-chart-simple fs-2"></i> <span>Analytics</span>
-    </RouterLink>
-    <RouterLink to="/transaction" class="menu-item" active-class="active">
-      <i class="fa-solid fa-money-bill-transfer fs-2"></i>
-      <span>Calendar</span>
-    </RouterLink>
-    <RouterLink to="/dashboard" class="menu-item" active-class="active">
-      <i class="fas fa-table fs-2"></i>
-      <span>Dashboard</span>
-    </RouterLink>
-    <RouterLink to="/profile" class="menu-item" active-class="active">
-      <i class="fas fa-user fs-2"></i>
-      <span>Profile</span>
-    </RouterLink>
-  </nav>
+  <div class="layout">
+    <div id="sidebar">
+      <header>
+        <RouterLink to="/">SADARI</RouterLink>
+      </header>
+      <ul class="nav">
+        <li>
+          <RouterLink to="/analytics" class="nav-link" active-class="active">
+            <i class="fa-solid fa-chart-simple"></i> Analytics
+          </RouterLink>
+        </li>
+        <li>
+          <RouterLink to="/transaction" class="nav-link" active-class="active">
+            <i class="fa-solid fa-money-bill-transfer"></i> Calendar
+          </RouterLink>
+        </li>
+        <li>
+          <RouterLink to="/dashboard" class="nav-link" active-class="active">
+            <i class="fas fa-table"></i> Dashboard
+          </RouterLink>
+        </li>
+        <li>
+          <RouterLink to="/profile" class="nav-link" active-class="active">
+            <i class="fas fa-user"></i> Profile
+          </RouterLink>
+        </li>
+      </ul>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -25,41 +35,71 @@ import { RouterLink } from "vue-router";
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap");
+@import url("https://fonts.googleapis.com/css?family=Roboto:300,400,400i,500");
 
-.sidebar {
-  width: 200px;
-  background-color: #5b4f47;
-  min-height: 100vh;
-  padding: 20px 0;
-}
-
-.menu-item {
-  width: 128px;
-  height: 128px;
-  background-color: white;
-  color: #1f2b47;
-  border-radius: 8px;
-  text-align: center;
+.layout {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  min-height: 100vh;
+}
+
+#sidebar {
+  z-index: 1000;
+  width: 250px;
+  height: 100vh;
+  overflow-y: auto;
+  background: #37474f;
+  transition: all 0.5s ease;
+  font-family: "Roboto", sans-serif;
+  flex-shrink: 0;
+}
+
+#sidebar header {
+  background-color: #263238;
+  font-size: 20px;
+  line-height: 52px;
+  text-align: center;
+}
+
+#sidebar header a {
+  color: #fff;
+  display: block;
   text-decoration: none;
-  font-family: "Orbitron", sans-serif; /* ✅ Orbitron 적용 */
-  font-size: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-  transition: transform 0.2s ease;
-  gap: 10px;
 }
 
-.menu-item:hover {
-  background-color: #ced6eb;
-  transform: scale(1.15);
+#sidebar .nav {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-.menu-item.active {
-  background-color: #8893b1;
-  color: white;
+#sidebar .nav li {
+  display: block;
+  width: 100%;
+
+}
+
+#sidebar .nav .nav-link {
+  width: 100%;
+  display: block;
+  border-bottom: 1px solid #455a64;
+  color: #cfd8dc;
+  font-size: 14px;
+  padding: 16px 24px;
+  text-decoration: none;
+  transition: background 0.3s, color 0.3s;
+}
+
+#sidebar .nav .nav-link:hover {
+  background: #57bfb8;
+  color: #eceff1;
+}
+
+#sidebar .nav .nav-link.active {
+  background: #546e7a;
+  color: #fff;
+}
+
+#sidebar .nav .nav-link i {
+  margin-right: 16px;
 }
 </style>

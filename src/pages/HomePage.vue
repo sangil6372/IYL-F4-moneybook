@@ -1,58 +1,55 @@
 <template>
-  <div class="container">
-    <div class="row align-items-center min-vh-100">
-      <!-- 좌측 로고 -->
-      <div class="col-md-8 text-center mb-4 mb-md-0">
-        <div class="d-flex flex-column align-items-center">
-          <img src="@/assets/logo.png" alt="Logo" class="logo mb-3" />
-          <div class="desc">임시로 적은 상세 설명</div>
-        </div>
+  <div class="bg-img"></div>
+  <div
+    class="container content d-flex justify-content-center align-items-center min-vh-100"
+  >
+    <div class="main-card">
+      <!-- 로고 + 타이틀 -->
+      <div class="logo-box text-center mb-4">
+        <img src="@/assets/logo.png" alt="Logo" class="logo animate__animated animate__bounce" />
+        <div class="login-label mt-3">로그인</div>
       </div>
 
-      <!-- 로그인 카드 -->
-      <div class="col-md-4 d-flex justify-content-center">
-        <div class="card" style="width: 100%">
-          <div class="card-body">
-            <h5 class="card-title mb-4">로그인</h5>
-            <!-- 제출하면 로그인! -->
-            <form @submit="handleLogin">
-              <label for="exampleInputEmail">이메일</label>
-              <input
-                type="email"
-                class="form-control"
-                id="exampleInputEmail1"
-                placeholder="이메일 입력"
-                v-model="loginEmail"
-                @blur="loginEmailTouched = true"
-                :class="{
-                  'is-invalid': loginEmailTouched && !isLoginEmailValid,
-                }"
-              />
-              <div class="invalid-feedback">
-                올바른 이메일 형식을 입력해주세요.
-              </div>
-              <div class="form-group mt-3">
-                <label for="exampleInputPassword1">비밀번호</label>
-                <input
-                  type="password"
-                  class="form-control"
-                  id="exampleInputPassword1"
-                  placeholder="비밀번호 입력"
-                  v-model="loginPassword"
-                />
-              </div>
-              <div class="d-flex gap-2 mt-4">
-                <button type="submit" class="btn btn-primary">로그인</button>
-                <button
-                  type="button"
-                  class="btn btn-secondary"
-                  @click="openModal"
-                >
-                  회원가입
-                </button>
-              </div>
-            </form>
-          </div>
+      <!-- 로그인 입력 -->
+      <div class="login-card card">
+        <div class="card-body">
+          <h5 class="card-title mb-4">로그인</h5>
+          <form @submit="handleLogin">
+
+            <label >이메일</label>
+            <input
+              type="email"
+              class="form-control"
+              placeholder="이메일 입력"
+              v-model="loginEmail"
+              @blur="loginEmailTouched = true"
+              :class="{ 'is-invalid': loginEmailTouched && !isLoginEmailValid }"
+            />
+            <div class="invalid-feedback">
+              올바른 이메일 형식을 입력해주세요.
+            </div>
+
+            <label class="mt-3">비밀번호</label>
+            <input
+              type="password"
+              class="form-control"
+              placeholder="비밀번호 입력"
+              v-model="loginPassword"
+            />
+
+            <div class="d-flex gap-2 mt-4">
+              <button type="submit" class="btn btn-primary w-100">
+                로그인
+              </button>
+              <button
+                type="button"
+                class="btn btn-secondary w-100"
+                @click="openModal"
+              >
+                회원가입
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -101,7 +98,6 @@
                     >
                       이미 등록된 이메일입니다.
                     </div>
-                    <!-- 파란 안내 문구 -->
                     <div
                       class="valid-feedback"
                       v-if="isEmailValid && !isDuplicateEmail"
@@ -109,7 +105,6 @@
                       사용 가능한 이메일입니다.
                     </div>
                   </div>
-
                   <div class="col-4">
                     <button
                       type="button"
@@ -121,26 +116,26 @@
                   </div>
                 </div>
               </div>
+
               <div class="mb-3">
-                <label for="password" class="form-label"
+                <label class="form-label"
                   >비밀번호 <span class="text-danger">(필수)</span></label
                 >
                 <input
                   type="password"
                   class="form-control"
-                  id="password"
                   placeholder="비밀번호 입력"
                   v-model="regPassword"
                 />
               </div>
+
               <div class="mb-3">
-                <label for="confirm" class="form-label"
+                <label class="form-label"
                   >비밀번호 확인 <span class="text-danger">(필수)</span></label
                 >
                 <input
                   type="password"
                   class="form-control"
-                  id="confirm"
                   placeholder="비밀번호 확인"
                   v-model="regConfirm"
                   :class="{
@@ -152,14 +147,12 @@
                   비밀번호가 일치하지 않습니다.
                 </div>
               </div>
+
               <div class="mb-3">
-                <label for="name" class="form-label"
-                  >이름 <span class="text-muted">(선택)</span></label
-                >
+                <label class="form-label">이름 (선택)</label>
                 <input
                   type="text"
                   class="form-control"
-                  id="name"
                   placeholder="이름 입력"
                   v-model="regName"
                 />
@@ -311,12 +304,129 @@ async function checkEmailExists() {
 
 <style scoped>
 .logo {
-  width: 500px;
+  width: 400px;
   height: auto;
 }
 .desc {
   font-size: 2rem;
   color: #555;
   text-align: center;
+}
+.card-body {
+  padding: 2rem 2rem;
+}
+
+form label {
+  font-size: 1rem;
+  margin-bottom: 0.3rem;
+  display: block;
+  color: #333;
+}
+
+.form-control {
+  padding: 0.9rem 1rem;
+  font-size: 1rem;
+  margin-bottom: 1.2rem;
+  border-radius: 12px;
+}
+
+.btn {
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border-radius: 12px;
+}
+
+.d-flex.gap-2.mt-4 {
+  margin-top: 2rem !important;
+  gap: 1rem !important;
+}
+
+.invalid-feedback,
+.valid-feedback {
+  margin-top: -0.8rem;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  color: #d9534f;
+}
+
+.modal-body {
+  padding: 2rem 2rem;
+}
+
+.modal-body .form-label {
+  font-size: 1rem;
+  margin-bottom: 0.3rem;
+}
+
+.modal-body input.form-control {
+  padding: 0.8rem 1rem;
+  font-size: 0.95rem;
+  margin-bottom: 1.2rem;
+}
+
+.modal-footer {
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+}
+.modal {
+  z-index: 2000 !important;
+}
+
+.modal-backdrop.show {
+  z-index: 1500 !important;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+.bg-img {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: url("https://unsplash.it/1200x800") center center no-repeat;
+  background-size: cover;
+  z-index: 0;
+}
+
+.bg-img::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(to bottom right, #002f4b, #dc4225);
+  opacity: 0.6;
+  z-index: 0; /* 가장 낮게 유지 */
+}
+
+.content {
+  position: relative;
+}
+
+.main-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 24px;
+  padding: 3rem 6rem;
+  max-width: 800px;
+  width: 100%;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  z-index: 2;
+}
+
+.login-label {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #fff;
+  background-color: #129d72;
+  padding: 0.5rem 1.5rem;
+  border-radius: 50px;
+  margin-top: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 </style>

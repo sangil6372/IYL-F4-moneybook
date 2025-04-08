@@ -5,7 +5,7 @@
     <!-- 우측 콘텐츠 영역은 항상 flex-grow -->
     <div class="flex-grow-1 d-flex flex-column min-vh-100">
       <Header v-if="!isExcludedView" />
-      <main class="flex-grow-1 p-4 bg-light">
+      <main class="flex-grow-1 bg-light">
         <RouterView />
       </main>
       <!-- <Footer />  필요 없을 것 같기도도-->
