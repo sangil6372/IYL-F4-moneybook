@@ -1,5 +1,18 @@
 <template>
   <div class="container py-5">
+    <div class="container py-5 text-center">
+      <button class="btn btn-primary" @click="showModal = true">
+        목표 설정
+      </button>
+
+      <!-- 모달이 true일 때만 표시 -->
+      <GoalModal
+        v-if="showModal"
+        :initialGoals="user.goals"
+        @close="showModal = false"
+      />
+    </div>
+
     <!-- 상단 프로필 -->
     <div class="text-center mb-5">
       <!-- 이미지가 있으면 -->
@@ -134,6 +147,7 @@
 import { ref, onMounted } from "vue";
 import axios from "axios";
 import { useAuthStore } from "@/stores/auth";
+import GoalModal from "@/components/GoalModal.vue";
 
 const activeTab = ref("info");
 
@@ -217,4 +231,14 @@ async function deleteUser() {
     console.error(error);
   }
 }
+
+//  목표 설정
+const showModal = ref(false);
 </script>
+
+<style scoped>
+.modal {
+  background-color: rgba(0, 0, 0, 0.3);
+  transition: opacity 0.2s ease;
+}
+</style>
