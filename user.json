@@ -1,14 +1,15 @@
 {
   "users": [
     {
-      "id": "3245",
+      "id": "4ccd",
       "name": "박상일",
       "email": "sangil6372@naver.com",
       "password": "123",
       "profileImage": null,
       "settings": {
         "language": "kor",
-        "theme": "light"
+        "theme": "light",
+        "currency": "won"
       }
     }
   ]
