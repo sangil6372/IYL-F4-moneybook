@@ -2,47 +2,67 @@
     <!-- 컨테이너 -->
     <div class="container mt-4">
 
-    <!-- 선택 탭 버튼 -->
-    <!-- 지출 수입 이익을 골라서 종합과 차트 변경 -->
-    <div class="btn-group mb-3">
-      <button
-        class="btn"
-        :class="selectedTab === 'expense' ? 'btn-dark' : 'btn-outline-secondary'"
-        @click="selectedTab = 'expense'"
-      >
-        지출
-      </button>
-      <button
-        class="btn"
-        :class="selectedTab === 'income' ? 'btn-dark' : 'btn-outline-secondary'"
-        @click="selectedTab = 'income'"
-      >
-        수입
-      </button>
-      <button
-        class="btn"
-        :class="selectedTab === 'net' ? 'btn-dark' : 'btn-outline-secondary'"
-        @click="selectedTab = 'net'"
-      >
-        이익
-      </button>
-    </div>
-
-    <!-- 요약 -->
-    <div class="bg-light p-3 mb-4 text-center fw-bold fs-5">
-      이번 달 {{ tabLabel }}은 {{ tabAmount.toLocaleString() }}원 입니다.
+    <!-- 상단 지표 카드 3개 -->
+    <div class="d-flex justify-content-between mb-4">
+      <div class="flex-fill text-center bg-light mx-2 py-3 rounded shadow-sm">
+        <h5>💸 지출 <strong>{{ expense.toLocaleString() }}원</strong></h5>
+      </div>
+      <div class="flex-fill text-center bg-light mx-2 py-3 rounded shadow-sm">
+        <h5>💵 수입 <strong>{{ income.toLocaleString() }}원</strong></h5>
+      </div>
+      <div class="flex-fill text-center bg-light mx-2 py-3 rounded shadow-sm">
+        <h5>🏦 이익 <strong>{{ net.toLocaleString() }}원</strong></h5>
+      </div>
     </div>
 
     <div class="row">
       <!-- 라인 차트 -->
       <div class="col-md-8 mb-4">
-        <Line :data="lineChartData" :options="lineChartOptions" />
+        <div class="bg-white rounded shadow-sm p-3">
+          <Line :data="lineChartData" :options="lineChartOptions" />
+        </div>
       </div>
 
-      <!-- 파이 차트 -->
-      <div class="col-md-4 mb-4">
-        <h5 class="text-center">지출 비중</h5>
-        <Doughnut :data="pieChartData" :options="pieChartOptions" />
+      <!-- 도넛 차트 -->
+      <div class="col-md-4">
+        <div class="bg-white rounded shadow-sm p-3 h-100 d-flex flex-column justify-content-center align-items-center">
+          <!-- 클릭 가능한 지출과 수입 -->
+          <h6 class="mb-3">
+            <span @click="selectedTab = 'expense'" :class="{ 'fw-bold': selectedTab === 'expense' }" style="cursor: pointer;">지출</span>
+            <span> | </span>
+            <span @click="selectedTab = 'income'" :class="{ 'fw-bold': selectedTab === 'income' }" style="cursor: pointer;">수입</span>
+          </h6>
+          
+          <!-- 차트 -->
+          <div class="position-relative" style="width: 150px; height: 150px;">
+            <Doughnut :data="donutData" :options="donutOptions" />
+            <span
+              class="position-absolute text-center fw-bold"
+              style="
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -25px);
+              font-size: 0.8rem;"
+            >
+              {{ donutTotal }}
+            </span>
+          </div>
+
+          <!-- 카테고리 -->
+          <div class="d-flex flex-wrap justify-content-around w-100 mt-3">
+            <div
+              class="text-center px-2 py-1"
+              v-for="(item, i) in donutLegend"
+              :key="i"
+              style="min-width: 80px;">
+              <div :style="{ color: donutColors[i] }">
+                ●
+                <small>{{ item.label }}</small>
+              </div>
+              <small class="fw-bold">{{ item.value }}</small>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -66,9 +86,9 @@ import {
 
 // Chart.js 등록
 ChartJS.register(Title, Tooltip, Legend, ArcElement, LineElement, PointElement, CategoryScale, LinearScale);
+
 // pinia 등록
 const useStore = useTransaction();
-
 // db.json 으로 부터 axios.get
 const { fetchTransaction } = useStore;
 
@@ -78,22 +98,14 @@ const income = ref(0);
 const net = computed(() => income.value - expense.value);
 
 // 카테고리별 지출 반응형 설정
-const pieDataMap = ref({});
+const pieDataMap = ref({
+  expense: {},
+  income: {}
+});
 const lineDataMap = ref({});
  
 // 지출 탭을 디폴트로 설정!
 const selectedTab = ref('expense');
-
-// 그래프 탭 제목
-const tabLabel = computed(() =>
-  selectedTab.value === 'income' ? '수입' : // income -> 수입 표시
-  selectedTab.value === 'net' ? '이익' : '지출' // net -> 순이익 표시 | expense -> 지출 표시
-);
-
-// 그래프 양
-const tabAmount = computed(() =>
-  selectedTab.value === 'income' ? income.value : selectedTab.value === 'net' ? income.value + expense.value : expense.value
-)
 
 // 이번 달의 지출 수입 이익을 계산
 const analyzeThisMonth = async () => {
@@ -117,7 +129,7 @@ const analyzeThisMonth = async () => {
   let exp = 0;
   let inc = 0;
   // 임시 차트 자료
-  const categoryMap = {};
+  const categoryMap = { expense: {}, income: {} };
   const dailyMap = {};
 
   // 필터링된 거래들을 조건에 따라 정리
@@ -126,23 +138,29 @@ const analyzeThisMonth = async () => {
     const day = new Date(item.date).getDate();
     // 날짜에 따른 지출 수입 초기화
     if (!dailyMap[day]) dailyMap[day] = { income: 0, expense: 0 };
-    // 지출 카테고리에 따른 지출양 초기화
-    if (item.type === 'expense'){
-      if (!categoryMap[item.category]) categoryMap[item.category] = 0;
-    }
+    const type = item.type;
 
-    // 수입이라면 총수입과 날짜에 따른 수입 기록
-    if (item.type === 'income') {
-      inc += item.amount;
-      dailyMap[day].income += item.amount;
-    }
-    // 지출이라면 카테고리별 지출도 추가
-    else if (item.type === 'expense') {
-      exp += item.amount;
-      dailyMap[day].expense += item.amount;
-      // 카테고리별 지출
-      categoryMap[item.category] += item.amount;
-    }
+    // 카테고리 누적
+    if (!categoryMap[type][item.category]) categoryMap[type][item.category] = 0;
+    categoryMap[type][item.category] += item.amount;
+    // 일별 누적
+    dailyMap[day][type] += item.amount;
+    
+    if (type === 'expense') exp += item.amount;
+    else if (type === 'income') inc += item.amount;
+    
+    // // 수입이라면 총수입과 날짜에 따른 수입 기록
+    // // 지출이라면 카테고리별 지출도 추가
+    // if (item.type === 'expense') {
+    //   if (!categoryMap[item.category]) categoryMap[item.category] = 0
+    //   exp += item.amount
+    //   dailyMap[day].expense += item.amount
+    //   categoryMap[item.category] += item.amount
+    // }
+    // else if (item.type === 'income') {
+    //   inc += item.amount
+    //   dailyMap[day].income += item.amount
+    // }
   });
   // 반응형에 대입
   income.value = inc;
@@ -150,49 +168,57 @@ const analyzeThisMonth = async () => {
   // 차트 반응형 데이터에 대입
   pieDataMap.value = categoryMap;
   lineDataMap.value = dailyMap;
+  console.log(pieDataMap);
 }
 
 // 이번 달 계산 수행
 analyzeThisMonth();
 
-// 파이 차트 데이터 세팅
-const pieChartData = computed(() => ({
-  labels: Object.keys(pieDataMap.value),
+// 도넛 색상 정의
+const donutColors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40']
+
+const donutLegend = computed(() => {
+  const current = pieDataMap.value[selectedTab.value] || {};
+  return Object.entries(current).map(([label, value], i) => ({
+    label,
+    value: value.toLocaleString() + '원',
+    color: donutColors[i % donutColors.length]
+  }))
+})
+
+const donutData = computed(() => ({
+  labels: donutLegend.value.map(i => i.label),
   datasets: [
     {
-      label: `지출 비중`,
-      data: Object.values(pieDataMap.value),
-      backgroundColor: [
-        '#FF6384', '#36A2EB', '#FFCE56',
-        '#4BC0C0', '#9966FF', '#FF9F40'
-      ],
+      data: donutLegend.value.map(i => parseInt(i.value.replace(/[^0-9]/g, ''))),
+      backgroundColor: donutLegend.value.map(i => i.color),
       hoverOffset: 10
     }
   ]
 }))
 
-const pieChartOptions = {
+// 도넛 옵션
+const donutOptions = {
   responsive: true,
-  layout: {
-    padding: {
-      bottom: 30
-    }
-  },
+  layout: { padding: { bottom: 30 } },
   plugins: {
-    legend: {
-      position: 'bottom'
-    },
+    legend: { display: false }, // 커스텀 범례로 대체
     tooltip: {
       callbacks: {
-        label: function (context) {
-          return `${context.label}: ${context.parsed}원`
-        }
+        label: context => `${context.label}: ${context.parsed.toLocaleString()}원`
       }
-    },
-    centerText: true
+    }
   }
 }
 
+// 도넛 차트 금액 총합
+const donutTotal = computed(() => {
+  const current = pieDataMap.value[selectedTab.value] || {};
+  const total = Object.values(current).reduce((a, b) => a + b, 0)
+  return total.toLocaleString();
+})
+
+// 그래프 차트 데이터 세팅
 const lineChartData = computed(() => {
   const labels = Object.keys(lineDataMap.value).map(day => `${day}일`)
   const incomeData = Object.values(lineDataMap.value).map(item => item.income)
@@ -219,6 +245,7 @@ const lineChartData = computed(() => {
   }
 })
 
+// 그래프 옵션 세팅
 const lineChartOptions = {
   responsive: true,
   plugins: {
@@ -242,7 +269,4 @@ const lineChartOptions = {
 
 
 <style scoped>
-.btn-group .btn {
-  min-width: 80px;
-}
 </style>
