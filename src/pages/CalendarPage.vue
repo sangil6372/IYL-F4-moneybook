@@ -96,7 +96,7 @@
                 </button>
                 <button
                   class="btn btn-sm btn-outline-danger"
-                  @click="deleteTransaction(item.id)"
+                  @click="storeCalendar.deleteTransaction(item.id)"
                 >
                   삭제
                 </button>
@@ -306,15 +306,6 @@ const editTransaction = (item) => {
   selectedDate.value = item.date;
   editId.value = item.id;
   formView.value = true;
-};
-
-// 삭제
-const deleteTransaction = async (id) => {
-  try {
-    await storeCalendar.deleteTransaction(id);
-  } catch (error) {
-    alert("삭제 중 오류 발생: " + error);
-  }
 };
 
 // fullcalendar 사용
