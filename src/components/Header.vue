@@ -3,22 +3,19 @@
     <header
       class="header-bar d-flex justify-content-center align-items-center position-relative"
     >
-      <!-- ✅ 모바일 전용 햄버거 버튼 (왼쪽 위 고정) -->
-      <button
-        class="btn btn-outline-light d-lg-none position-absolute start-0 ms-3"
-        type="button"
-        data-bs-toggle="offcanvas"
-        data-bs-target="#mobileSidebar"
-        aria-controls="mobileSidebar"
-      >
-        ☰
-      </button>
+      <!-- 로고 -->
+      <img src="@/assets/logo.png" alt="Logo" class="logo-img" />
 
-      <!-- ✅ 로고 이미지 -->
-      <img src="@/assets/logo.png" alt="Sadari Logo" class="logo-img" />
+      <!-- 로그아웃 버튼 (우측 끝) -->
+      <button
+        class="btn btn-danger btn-outline-dark position-absolute end-0 me-3 fw-bold bg-gradient text-white"
+        @click="handleLogout"
+      >
+        로그아웃
+      </button>
     </header>
 
-    <!-- ✅ 모바일용 Offcanvas 메뉴 -->
+    <!-- 모바일용 Offcanvas 메뉴 -->
     <div
       class="offcanvas offcanvas-start text-white custom-offcanvas"
       tabindex="-1"
@@ -45,7 +42,16 @@
 </template>
 
 <script setup>
-import { RouterLink } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
+import { RouterLink, useRouter } from "vue-router";
+
+const authStore = useAuthStore();
+const router = useRouter();
+
+function handleLogout() {
+  authStore.logout();
+  router.push("/"); // 또는 { name: 'home' }
+}
 </script>
 
 <style scoped>

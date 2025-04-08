@@ -2,16 +2,12 @@
   <nav
     class="sidebar d-none d-lg-flex flex-column align-items-center justify-content-evenly"
   >
-    <RouterLink to="/goal" class="menu-item" active-class="active">
-      <i class="fas fa-bullseye fs-2"></i>
-      <span>Goal</span>
-    </RouterLink>
     <RouterLink to="/analytics" class="menu-item" active-class="active">
       <i class="fa-solid fa-chart-simple fs-2"></i> <span>Analytics</span>
     </RouterLink>
     <RouterLink to="/transaction" class="menu-item" active-class="active">
       <i class="fa-solid fa-money-bill-transfer fs-2"></i>
-      <span>Transaction</span>
+      <span>Calendar</span>
     </RouterLink>
     <RouterLink to="/dashboard" class="menu-item" active-class="active">
       <i class="fas fa-table fs-2"></i>
