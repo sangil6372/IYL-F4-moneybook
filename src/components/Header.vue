@@ -33,7 +33,7 @@
       </div>
       <div class="offcanvas-body">
         <RouterLink to="/" class="nav-link text-white mb-2">홈</RouterLink>
-        <RouterLink to="/transaction" class="nav-link text-white mb-2"
+        <RouterLink to="/calendar" class="nav-link text-white mb-2"
           >캘린더</RouterLink
         >
       </div>
