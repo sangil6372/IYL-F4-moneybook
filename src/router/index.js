@@ -49,9 +49,9 @@ const router = createRouter({
 });
 
 //  여기에 네비게이션 가드 추가
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
-  authStore.loadUserFromStorage();
+  await authStore.loadUserFromStorage(); // 반드시 실행되어야 로그인 상태 복원
 
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
     next({ name: "home" }); // 비로그인 시 접근 차단

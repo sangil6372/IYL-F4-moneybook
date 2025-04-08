@@ -44,7 +44,7 @@ export const useAuthStore = defineStore("auth", {
           // 정상적으로 반환하면
           const user = response.data[0];
           this.user = user;
-          localStorage.setItem("user", JSON.stringify(user)); // 사용자 정보도 저장
+          sessionStorage.setItem("userId", user.id); // user 전체 대신 id만 저장
 
           // settings 테이블을 추가하려고 했는데 그냥 속성으로 추가
         } else {
@@ -58,14 +58,21 @@ export const useAuthStore = defineStore("auth", {
     logout() {
       // 상태 초기화
       this.user = null;
-      localStorage.removeItem("user");
+      sessionStorage.removeItem("userId");
     },
     // Rotuer의 네비게이션 가드에서 체크함
-    loadUserFromStorage() {
-      const user = localStorage.getItem("user");
-      if (user) {
-        // 여기선 일단 단순히 user가 localStorage에 있으면 로그인 중이라고 체크
-        this.user = JSON.parse(user);
+    // 새로 고침 시 sessonID 로 재요청!
+    async loadUserFromStorage() {
+      const userId = sessionStorage.getItem("userId");
+      if (userId) {
+        try {
+          const res = await axios.get(`http://localhost:3000/users/${userId}`);
+          this.user = res.data;
+        } catch (err) {
+          console.error("유저 불러오기 실패", err);
+          this.user = null;
+          sessionStorage.removeItem("userId");
+        }
       }
     },
   },
