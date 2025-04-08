@@ -5,7 +5,7 @@
     <RouterLink to="/analytics" class="menu-item" active-class="active">
       <i class="fa-solid fa-chart-simple fs-2"></i> <span>Analytics</span>
     </RouterLink>
-    <RouterLink to="/transaction" class="menu-item" active-class="active">
+    <RouterLink to="/calendar" class="menu-item" active-class="active">
       <i class="fa-solid fa-money-bill-transfer fs-2"></i>
       <span>Calendar</span>
     </RouterLink>
