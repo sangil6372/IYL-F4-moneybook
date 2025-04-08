@@ -2,13 +2,25 @@
   <div class="container py-5">
     <!-- 상단 프로필 -->
     <div class="text-center mb-5">
+      <!-- 이미지가 있으면 -->
       <img
+        v-if="previewImage || user.profileImage"
         :src="previewImage || user.profileImage"
         class="rounded-circle mb-3"
         alt="프로필"
         width="360"
         height="360"
       />
+
+      <!-- 이미지가 없으면 아이콘 표시 -->
+      <div
+        v-else
+        class="rounded-circle d-flex align-items-center justify-content-center bg-secondary mb-3 mx-auto"
+        style="width: 360px; height: 360px"
+      >
+        <i style="font-size: 10rem" class="fas fa-user fa-7x text-white"></i>
+      </div>
+
       <p class="text-muted small">{{ user.name }}</p>
       <p class="text-muted small">{{ user.email }}</p>
     </div>
@@ -81,7 +93,7 @@
               </div>
 
               <button class="btn btn-success mt-2" @click="saveUserInfo">
-                저장
+                변경
               </button>
             </div>
 
@@ -97,12 +109,22 @@
                 <option value="light">라이트</option>
                 <option value="dark">다크</option>
               </select>
+
+              <select class="form-select mb-2" v-model="user.settings.currency">
+                <option value="won">원화</option>
+                <option value="usd">달러</option>
+              </select>
+
               <button class="btn btn-success mt-2" @click="saveUserSettings">
-                저장
+                변경
               </button>
             </div>
           </div>
         </div>
+      </div>
+      <!-- 하단 탈퇴 버튼 -->
+      <div class="text-center mt-4">
+        <button class="btn btn-danger" @click="deleteUser">회원 탈퇴</button>
       </div>
     </div>
   </div>
@@ -111,23 +133,37 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import axios from "axios";
+import { useAuthStore } from "@/stores/auth";
 
 const activeTab = ref("info");
-const user = ref({
-  name: "",
-  email: "",
-  password: "",
-  profileImage: "",
-  settings: { language: "kor", notifications: true, theme: "light" },
-});
+
+const authStore = useAuthStore();
+const user = ref(
+  authStore.user ?? {
+    name: "",
+    email: "",
+    password: "",
+    profileImage: "",
+    settings: { language: "kor", theme: "light", currency: "won" },
+  }
+);
 const previewImage = ref("");
 
 onMounted(() => {
-  const storedUser = localStorage.getItem("user");
-  if (storedUser) {
-    user.value = JSON.parse(storedUser);
-    previewImage.value = user.value.profileImage; // 현재 사진도 미리 보기로 세팅
+  if (!authStore.user) {
+    authStore.loadUserFromSession();
   }
+
+  // fallback 설정
+  user.value = authStore.user || {
+    name: "",
+    email: "",
+    password: "",
+    profileImage: "",
+    settings: { language: "kor", theme: "light", currency: "won" },
+  };
+
+  previewImage.value = user.value.profileImage || "";
 });
 
 function onFileChange(e) {
@@ -152,10 +188,6 @@ async function saveUserInfo() {
     password: user.value.password,
     profileImage: user.value.profileImage,
   });
-
-  // localStorage 업데이트
-  localStorage.setItem("user", JSON.stringify(user.value));
-
   alert("기본 정보가 저장되었습니다.");
 }
 
@@ -164,5 +196,25 @@ async function saveUserSettings() {
     settings: user.value.settings,
   });
   alert("설정이 저장되었습니다.");
+}
+
+async function deleteUser() {
+  const confirmed = confirm(
+    "정말로 회원 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다."
+  );
+  if (!confirmed) return;
+
+  try {
+    await axios.delete(`http://localhost:3000/users/${user.value.id}`);
+    localStorage.removeItem("user");
+    alert("회원 탈퇴가 완료되었습니다.");
+
+    // 선택: 페이지 이동 또는 새로고침
+    window.location.href = "/"; // 홈으로 이동하거나
+    // location.reload(); // 또는 그냥 새로고침
+  } catch (error) {
+    alert("회원 탈퇴 중 오류가 발생했습니다.");
+    console.error(error);
+  }
 }
 </script>
