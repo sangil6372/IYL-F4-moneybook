@@ -53,5 +53,30 @@ export const useCalendar = defineStore("transaction", () => {
     }
   };
 
-  return { transaction, fetchTransaction, calendarEvents, addTransaction };
+  const deleteTransaction = async (id) => {
+    try {
+      await axios.delete(`${BASEURI}/${id}`);
+      await fetchTransaction();
+    } catch (error) {
+      alert("에러발생:" + error);
+    }
+  };
+
+  const updateTransaction = async (id, updateData) => {
+    try {
+      await axios.put(`${BASEURI}/${id}`, updateData);
+      await fetchTransaction();
+    } catch (error) {
+      alert("에러발생:" + error);
+    }
+  };
+
+  return {
+    transaction,
+    fetchTransaction,
+    calendarEvents,
+    addTransaction,
+    deleteTransaction,
+    updateTransaction,
+  };
 });
