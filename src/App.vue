@@ -3,11 +3,13 @@
     <!-- 우측 콘텐츠 영역은 항상 flex-grow -->
     <div class="flex-grow-1 d-flex flex-column">
       <Header v-if="!isExcludedView" />
+
       <main class="flex-grow-1 bg-light">
         <RouterView />
       </main>
     </div>
   </div>
+
 </template>
 
 <script setup>

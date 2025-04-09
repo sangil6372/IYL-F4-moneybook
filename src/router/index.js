@@ -11,10 +11,10 @@ const router = createRouter({
       component: Home,
     },
     {
-      path: "/transaction",
-      name: "transaction",
+      path: "/calendar",
+      name: "calendar",
       meta: { requiresAuth: true },
-      component: () => import("../pages/TransactionPage.vue"),
+      component: () => import("../pages/CalendarPage.vue"),
     },
     {
       path: "/dashboard",
