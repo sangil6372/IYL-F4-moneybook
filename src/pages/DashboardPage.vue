@@ -1,6 +1,7 @@
 <template>
   <div class="p-8 pb-28">
     <div class="container">
+      
       <!-- 필터 바 전체 -->
       <div class="filter-bar">
         <!-- 유형 토글 버튼 -->
@@ -20,7 +21,7 @@
             수입
           </button>
         </div>
-
+        
         <!-- 날짜 선택 -->
         <div class="filter-group date-group">
           <label>시작일</label>
@@ -82,7 +83,7 @@
               </td>
               <td>
                 <button
-                  @click="editCheck(tx)"
+                  @click="updateCheck(tx)"
                   title="수정"
                   class="action-btn"
                 >
@@ -165,10 +166,6 @@ import { useCalendar } from '@/stores/calendar'
 
 // 🐷 스토어 등록
 const useStore = useCalendar();
-
-// 🐷 이름 나중에 바꾸기
-// db.json 으로 부터 axios.get
-const { fetchTransaction, addTransaction, deleteTransaction, updateTransaction } = useStore;
 
 // 지출 수입은 이걸로 관리 'all', 'expense', 'income'
 const selectedType = ref('');
@@ -297,9 +294,9 @@ const pagedTransaction = computed(() => {
 
 // 데이터 삭제 할지 물어보기 호출
 async function deleteCheck(tx) {
-  // if (confirm(`id:"${tx.id}",memo:"${tx.memo}" 항목을 삭제할까요?`)) {
   if (confirm('항목을 삭제할까요?')) {
     try {
+      // Store의 함수 사용
       await useStore.deleteTransaction(tx.id);
       await useStore.fetchTransaction();
     } catch (err) {
@@ -308,8 +305,21 @@ async function deleteCheck(tx) {
   }
 }
 
-onMounted(() => {
-  useStore.fetchTransaction();
+// 데이터 업데이트 할지 물어보기 호출
+async function updateCheck(tx) {
+  try {
+    // Store의 함수 사용
+    // update 위한 정보 입력 받기!!
+    await useStore.updateTransaction(tx.id, );
+    await useStore.fetchTransaction();
+  } catch (err) {
+    alert(err.message);
+  }
+  
+}
+
+onMounted(async () => {
+  await useStore.fetchTransaction();
 });
 </script>
 
