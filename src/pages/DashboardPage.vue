@@ -89,7 +89,7 @@
                   수정
                 </button>
                 <button
-                  @click="deleteTransaction(tx)"
+                  @click="deleteTransaction1(tx)"
                   title="삭제"
                   class="action-btn text-red"
                 >
@@ -156,15 +156,21 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch, reactive } from "vue";
-import { useDashBoardStore } from "@/stores/dashBoard";
-import { storeToRefs } from "pinia";
+import { ref, computed, onMounted, watch, reactive } from 'vue';
 
-const store = useDashBoardStore();
-const { transactions } = storeToRefs(store);
+// 🐷 원래 있던 피니아 가지고 와서 삭제 및 수정 기능 구현으로 바꾸기
+import { useCalendar } from '@/stores/calendar'
 
-const selectedType = ref(""); //'all', 'expense', 'income'
-const selectedCategory = ref(""); //배열로 다중 선택
+// 🐷 스토어 등록
+const useStore = useCalendar();
+
+// 🐷 이름 나중에 바꾸기
+// db.json 으로 부터 axios.get
+const { fetchTransaction, deleteTransaction } = useStore;
+
+const selectedType = ref(''); //'all', 'expense', 'income'
+const selectedCategory = ref(''); //배열로 다중 선택
+
 const categoryOptions = [
   "식비",
   "의료",
@@ -174,6 +180,7 @@ const categoryOptions = [
   "급여",
   "기타",
 ];
+
 const editForm = reactive({
   //수정 중인 데이터 임시 보관
   id: null,
@@ -227,8 +234,12 @@ const resetDateRange = () => {
 };
 
 // 거래 내역 필터링
+// filteredTransactions - 바로 template 쓰는지?
 const filteredTransactions = computed(() => {
-  return transactions.value
+  // 여기서 가지고 오기
+  const transactions = useStore.transaction;
+  
+  return transactions
     .filter((tx) => {
       const matchType = !selectedType.value || tx.type === selectedType.value;
 
@@ -258,33 +269,20 @@ const totalPages = computed(() =>
 );
 
 // 현재 페이지에 보여줄 데이터
+// 1페이지 / 2페이지... 1페이지에 보여줄 8개 데이터
 const pagedTransactions = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage;
   const end = start + itemsPerPage;
   return filteredTransactions.value.slice(start, end);
 });
 
-//데이터 삭제
-async function deleteTransaction(tx) {
+// 데이터 삭제
+async function deleteTransaction1(tx) {
   alert(tx.id);
   if (confirm(`id:"${tx.id}",memo:"${tx.memo}" 항목을 삭제할까요?`)) {
     try {
-      const response = await fetch(
-        `http://localhost:3000/transaction/${tx.id}`,
-        {
-          method: "DELETE",
-        }
-      );
-      console.log(response);
-      if (response.ok) {
-        alert("삭제 완료!");
-        const index = transactions.value.findIndex((t) => t.id === tx.id);
-        if (index !== -1) {
-          transactions.value.splice(index, 1); // 리스트에서 삭제
-        }
-      } else {
-        throw new Error("삭제 실패");
-      }
+      await useStore.deleteTransaction(tx.id);
+      await useStore.fetchTransaction();
     } catch (err) {
       alert(err.message);
     }
@@ -296,6 +294,8 @@ const currentGroup = computed(() =>
   Math.floor((currentPage.value - 1) / pageGroupSize)
 );
 
+// 페이지 1 2 3... 개수
+// 8개면 1개 14개면 2개 이런 로직?
 const pageNumbers = computed(() => {
   const start = currentGroup.value * pageGroupSize + 1;
   const end = Math.min(start + pageGroupSize - 1, totalPages.value);
@@ -303,7 +303,7 @@ const pageNumbers = computed(() => {
 });
 
 onMounted(() => {
-  store.fetchTransactions();
+  useStore.fetchTransaction();
 });
 </script>
 
