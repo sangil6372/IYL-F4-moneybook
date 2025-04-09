@@ -2,8 +2,9 @@
 import "./assets/main.css";
 // 부트스트랩
 import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min.js"; 
-import "@fortawesome/fontawesome-free/css/all.min.css"; 
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import "animate.css";
 
 import { createApp } from "vue";
 

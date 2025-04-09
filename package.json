@@ -14,9 +14,11 @@
     "@fullcalendar/daygrid": "^6.1.17",
     "@fullcalendar/interaction": "^6.1.17",
     "@fullcalendar/vue3": "^6.1.17",
+    "animate.css": "^4.1.1",
     "axios": "^1.8.4",
     "bootstrap": "^5.3.4",
     "chart.js": "^4.4.8",
+    "fullcalendar": "^6.1.17",
     "json-server": "^1.0.0-beta.3",
     "pinia": "^3.0.1",
     "vue": "^3.5.13",
@@ -25,7 +27,8 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.1",
-    "vite": "^6.2.5",
+    "sass-embedded": "^1.86.3",
+    "vite": "^6.2.1",
     "vite-plugin-vue-devtools": "^7.7.2"
   }
 }
