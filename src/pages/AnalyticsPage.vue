@@ -15,6 +15,11 @@
       </div>
     </div>
 
+    <div class="row bg-secondary">
+      <!-- 목표  -->
+       <p class="">목표입니다.</p>
+    </div>
+
     <div class="row">
       <!-- 라인 차트 -->
       <div class="col-md-8 mb-4">
