@@ -14,7 +14,7 @@
       <!-- 우측 결제일/입력폼 영역 -->
       <div class="col-12 col-lg-3">
         <!-- 초기 상태: 다가오는 결제일 -->
-        <div v-if="!selectedDate" class="card shadow-sm">
+        <div v-if="!selectedDate" class="card shadow-sm card w-100">
           <div class="card-header bg-white">
             <h5 class="mb-0">
               <i class="fa-solid fa-calendar-check me-2 text-primary"></i>
@@ -59,45 +59,11 @@
               style="top: 12px; right: 16px; cursor: pointer; font-size: 1.2rem"
               title="입력 닫기"
             ></i>
-            <ul class="list-group mb-3" v-if="selectedDateforEach.length">
-              <li
-                v-for="item in selectedDateforEach"
-                :key="item.id"
-                class="list-group-item d-flex justify-content-between align-items-center"
-              >
-                <div>
-                  <span
-                    :class="
-                      item.type === 'income' ? 'text-success' : 'text-danger'
-                    "
-                    class="fw-bold"
-                  >
-                    {{ item.type === "income" ? "+" : "-"
-                    }}{{ item.amount.toLocaleString() }}원
-                  </span>
-                  <span class="text-muted ms-2">{{ item.category }}</span>
-                  <span
-                    v-if="item.fixedCost === 'true'"
-                    class="badge bg-warning text-dark ms-2"
-                    >고정</span
-                  >
-                </div>
-                <div>
-                  <button
-                    class="btn btn-sm btn-outline-primary me-2"
-                    @click="editTransaction(item)"
-                  >
-                    수정
-                  </button>
-                  <button
-                    class="btn btn-sm btn-outline-danger"
-                    @click="storeCalendar.deleteTransaction(item.id)"
-                  >
-                    삭제
-                  </button>
-                </div>
-              </li>
-            </ul>
+            <TransactionList
+              :transactions="selectedDateforEach"
+              @edit="editTransaction"
+              @delete="storeCalendar.deleteTransaction"
+            />
             <button
               class="btn btn-outline-success w-100"
               @click="formView = true"
@@ -122,98 +88,7 @@
                 style="top: 12px; right: 16px; cursor: pointer"
               ></i>
             </h5>
-
-            <!-- 금액 입력 -->
-            <div class="mb-3">
-              <label for="amount" class="form-label">금액</label>
-              <div class="input-group">
-                <input
-                  id="amount"
-                  type="number"
-                  class="form-control"
-                  v-model="form.amount"
-                  placeholder="0"
-                />
-                <span class="input-group-text">원</span>
-              </div>
-            </div>
-
-            <!-- 수입/지출 선택 -->
-            <div class="mb-3">
-              <label class="form-label d-block">분류</label>
-              <div class="form-check form-check-inline">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  id="income"
-                  value="income"
-                  v-model="form.type"
-                />
-                <label class="form-check-label" for="income">수입</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  id="expense"
-                  value="expense"
-                  v-model="form.type"
-                />
-                <label class="form-check-label" for="expense">지출</label>
-              </div>
-            </div>
-
-            <!-- 고정 여부 -->
-            <div class="mb-3">
-              <label class="form-label d-block">고정 지출 여부</label>
-              <div class="form-check form-check-inline">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  id="true"
-                  value="true"
-                  v-model="form.fixedCost"
-                />
-                <label for="true"> 고정 지출 </label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  id="false"
-                  value="false"
-                  v-model="form.fixedCost"
-                />
-                <label for="false"> 비고정 지출 </label>
-              </div>
-            </div>
-
-            <!-- 카테고리 -->
-            <div class="mb-3">
-              <label for="category" class="form-label">카테고리</label>
-              <select id="category" class="form-select" v-model="form.category">
-                <option disabled value="">카테고리를 선택하세요</option>
-                <option>식비</option>
-                <option>의료</option>
-                <option>교통</option>
-                <option>여가</option>
-                <option>통신</option>
-                <option>급여</option>
-                <option>기타</option>
-              </select>
-            </div>
-
-            <!-- 메모 -->
-            <div class="mb-3">
-              <label for="memo" class="form-label">메모</label>
-              <textarea
-                id="memo"
-                class="form-control"
-                rows="2"
-                v-model="form.memo"
-                placeholder="자세한 내용을 입력해 주세요"
-              ></textarea>
-            </div>
+            <InputForm :form="form" @save="saveForm" />
 
             <button class="btn btn-success w-100" @click="saveForm">
               <i class="fa-solid fa-floppy-disk me-2"></i> 저장
@@ -223,6 +98,7 @@
       </div>
     </div>
   </div>
+  <div></div>
 </template>
 
 <script setup>
@@ -235,6 +111,8 @@ import koLocale from "@fullcalendar/core/locales/ko";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { useCalendar } from "@/stores/calendar";
+import InputForm from "@/components/InputForm.vue";
+import TransactionList from "@/components/TransactionList.vue";
 
 // pinia 연결
 const storeCalendar = useCalendar();
@@ -442,7 +320,6 @@ const calendarOptions = computed(() => ({
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   padding: 20px;
-  height: auto;
 }
 
 /* 헤더 (제목 및 네비게이션) */
@@ -494,11 +371,10 @@ const calendarOptions = computed(() => ({
 .fc .fc-daygrid-day-number {
   font-size: 13px;
   font-weight: 600;
-  margin: 4px;
+  margin: 2px 4px;
   color: #212529;
 }
-
-.fc-day-today {
+.fc-day-con .fc-day-today {
   background-color: transparent !important;
   border: none !important;
 }
@@ -562,6 +438,9 @@ const calendarOptions = computed(() => ({
   .fc-button {
     font-size: 12px;
     padding: 4px 10px;
+  }
+  .fc-event-main {
+    font-size: 0.7em;
   }
 }
 </style>
