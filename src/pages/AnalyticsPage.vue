@@ -150,20 +150,8 @@ const analyzeThisMonth = async () => {
     
     if (type === 'expense') exp += item.amount;
     else if (type === 'income') inc += item.amount;
-    
-    // // 수입이라면 총수입과 날짜에 따른 수입 기록
-    // // 지출이라면 카테고리별 지출도 추가
-    // if (item.type === 'expense') {
-    //   if (!categoryMap[item.category]) categoryMap[item.category] = 0
-    //   exp += item.amount
-    //   dailyMap[day].expense += item.amount
-    //   categoryMap[item.category] += item.amount
-    // }
-    // else if (item.type === 'income') {
-    //   inc += item.amount
-    //   dailyMap[day].income += item.amount
-    // }
   });
+  
   // 반응형에 대입
   income.value = inc;
   expense.value = exp;
