@@ -306,6 +306,7 @@ function goTransaction(date) {
   selectedDate.value = date;
   formView.value = false;
   editId.value = null;
+  highlight(date);
 }
 
 // 날짜 클릭시 얻어오는 것들
