@@ -5,10 +5,12 @@ export const useAuthStore = defineStore("auth", {
   state: () => ({
     user: null,
   }),
+
   getters: {
     isLoggedIn: (state) => !!state.user,
     userName: (state) => (state.user ? state.user.name : ""),
   },
+
   actions: {
     async register(name, email, password) {
       // 회원 가입 로직
@@ -62,6 +64,7 @@ export const useAuthStore = defineStore("auth", {
         throw error;
       }
     },
+
     async login(email, password) {
       if (!email || !password) {
         throw new Error("이메일과 비밀번호를 모두 입력해주세요.");
@@ -86,11 +89,13 @@ export const useAuthStore = defineStore("auth", {
         throw error;
       }
     },
+
     logout() {
       // 상태 초기화
       this.user = null;
       sessionStorage.removeItem("userId");
     },
+
     // Rotuer의 네비게이션 가드에서 체크함
     // 새로 고침 시 sessonID 로 재요청!
     async loadUserFromStorage() {
@@ -106,10 +111,12 @@ export const useAuthStore = defineStore("auth", {
         }
       }
     },
+    
     updateGoals(goals) {
       if (this.user) {
         this.user.goals = goals;
       }
     },
   },
+
 });

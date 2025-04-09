@@ -4,24 +4,45 @@ import { reactive, computed } from "vue";
 import { defineStore } from "pinia";
 import axios from "axios";
 
+// 🐷 userID 쓰기 위해 피니아 임포트
+import { useAuthStore } from '@/stores/auth';
+
 export const useCalendar = defineStore("transaction", () => {
   //state
   const BASEURI = "/api/transaction";
   const state = reactive({ transaction: [] });
+  const authStore = useAuthStore();
 
   //getter
   const transaction = computed(() => state.transaction);
 
   // actions
+  // 거래 목록 db.json에서 다시 받아오기
   const fetchTransaction = async () => {
     try {
-      const reponse = await axios.get(BASEURI);
-      state.transaction = reponse.data;
-      console.log("거래 목록 가져오기");
+      // 🐷 reponse -> response
+      const response = await axios.get(BASEURI);
+      
+      // 🐷 userId 가져오기
+      const userId = authStore.user.id;
+
+      // 🐷 성공적으로 가져오면 state 에 넣기
+      if (response.status === 200) {
+        // 🐷 userId 에 따라서 거래목록을 필터링
+        const userTransaction = response.data.filter(item => {
+          return item.userId === userId;
+        });
+        // 🐷 필터링된 거래 목록 state에 넣기
+        state.transaction = userTransaction;
+        console.log('거래 목록 가져오기');
+      } else {
+        alert('거래 목록 조회 실패');
+      }
     } catch (error) {
       alert("에러발생:" + error);
     }
   };
+
   // 캘린더 events 넣기
   const calendarEvents = computed(() => {
     const total = {};
@@ -73,8 +94,8 @@ export const useCalendar = defineStore("transaction", () => {
 
   return {
     transaction,
-    fetchTransaction,
     calendarEvents,
+    fetchTransaction,
     addTransaction,
     deleteTransaction,
     updateTransaction,

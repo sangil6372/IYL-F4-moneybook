@@ -2,16 +2,19 @@
   <div class="d-flex">
     <!-- 데스크탑일 때만 NavBar를 렌더링 -->
     <NavBar v-if="!isMobile && !isExcludedView" />
+
     <!-- 우측 콘텐츠 영역은 항상 flex-grow -->
     <div class="flex-grow-1 d-flex flex-column min-vh-100">
       <Header v-if="!isExcludedView" />
+      
       <main class="flex-grow-1 p-4 bg-light">
         <RouterView />
       </main>
-      <!-- <Footer />  필요 없을 것 같기도도-->
+      
+      <!-- <Footer />  필요 없을 것 같기도-->
     </div>
-  </div>
 
+  </div>
   <!-- 모바일 전용 햄버거 버튼은 NavBar 내부에서 offcanvas로 표시됨 -->
 </template>
 
@@ -30,13 +33,14 @@ const isExcludedView = computed(() => {
   return excludedPaths.includes(route.path);
 });
 
-//  임시로 모바일 사이즈 확인
+// 임시로 모바일 사이즈 확인
 const isMobile = ref(false);
 
 function checkWindowSize() {
   isMobile.value = window.innerWidth < 992;
 }
 
+// 윈도우 사이즈가 달라질때 isMobile 이 true <-> false 되도록 설정
 onMounted(() => {
   checkWindowSize();
   window.addEventListener("resize", checkWindowSize);
