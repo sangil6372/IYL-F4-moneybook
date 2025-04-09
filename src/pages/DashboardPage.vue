@@ -1,7 +1,6 @@
 <template>
   <div class="p-8 pb-28">
     <div class="container">
-      
       <!-- 필터 바 전체 -->
       <div class="filter-bar">
         <!-- 유형 토글 버튼 -->
@@ -21,7 +20,7 @@
             수입
           </button>
         </div>
-        
+
         <!-- 날짜 선택 -->
         <div class="filter-group date-group">
           <label>시작일</label>
@@ -159,19 +158,19 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch, reactive } from 'vue';
+import { ref, computed, onMounted, watch, reactive } from "vue";
 
 // 🐷 원래 있던 피니아 가지고 와서 삭제 및 수정 기능 구현으로 바꾸기
-import { useCalendar } from '@/stores/calendar'
+import { useCalendar } from "@/stores/calendar";
 
 // 🐷 스토어 등록
 const useStore = useCalendar();
 
 // 지출 수입은 이걸로 관리 'all', 'expense', 'income'
-const selectedType = ref('');
+const selectedType = ref("");
 
 // 카테고리는 배열로 다중 선택 가능하도록
-const selectedCategory = ref('');
+const selectedCategory = ref("");
 const categoryOptions = [
   "식비",
   "의료",
@@ -243,19 +242,21 @@ const resetDateRange = () => {
 const filteredTransaction = computed(() => {
   // !!! Store 파일에서 transaction 가져오기
   const transaction = useStore.transaction;
-  
-  return transaction.filter((tx) => {
-    const matchType = !selectedType.value || tx.type === selectedType.value;
-    // 카테고리 다중 선택 필터링
-    const matchCategory =
-      selectedCategory.value.length === 0 ||
-      selectedCategory.value.includes(tx.category);
-    const txDate = new Date(tx.date);
-    const start = startDate.value ? new Date(startDate.value) : null;
-    const end = endDate.value ? new Date(endDate.value) : null;
-    const matchDate = (!start || txDate >= start) && (!end || txDate <= end);
-    return matchType && matchCategory && matchDate;
-    }).sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  return transaction
+    .filter((tx) => {
+      const matchType = !selectedType.value || tx.type === selectedType.value;
+      // 카테고리 다중 선택 필터링
+      const matchCategory =
+        selectedCategory.value.length === 0 ||
+        selectedCategory.value.includes(tx.category);
+      const txDate = new Date(tx.date);
+      const start = startDate.value ? new Date(startDate.value) : null;
+      const end = endDate.value ? new Date(endDate.value) : null;
+      const matchDate = (!start || txDate >= start) && (!end || txDate <= end);
+      return matchType && matchCategory && matchDate;
+    })
+    .sort((a, b) => new Date(a.date) - new Date(b.date));
 });
 
 // template 에서 쓰는 날짜 출력용
@@ -279,7 +280,7 @@ const currentGroup = computed(() =>
 // 현재 페이지 그룹에 해당하는
 // !!! 실제로 사용하는 페이지 번호들을 계산하여 배열로 반환
 const pageNumbers = computed(() => {
-  const start = (currentGroup.value * pageGroupSize) + 1;
+  const start = currentGroup.value * pageGroupSize + 1;
   const end = Math.min(start + pageGroupSize - 1, totalPages.value);
   return Array.from({ length: end - start + 1 }, (_, i) => start + i);
 });
@@ -294,7 +295,7 @@ const pagedTransaction = computed(() => {
 
 // 데이터 삭제 할지 물어보기 호출
 async function deleteCheck(tx) {
-  if (confirm('항목을 삭제할까요?')) {
+  if (confirm("항목을 삭제할까요?")) {
     try {
       // Store의 함수 사용
       await useStore.deleteTransaction(tx.id);
@@ -310,12 +311,11 @@ async function updateCheck(tx) {
   try {
     // Store의 함수 사용
     // update 위한 정보 입력 받기!!
-    await useStore.updateTransaction(tx.id, );
+    await useStore.updateTransaction(tx.id);
     await useStore.fetchTransaction();
   } catch (err) {
     alert(err.message);
   }
-  
 }
 
 onMounted(async () => {
