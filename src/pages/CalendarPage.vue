@@ -36,7 +36,9 @@
                 {{ getDate(item.date) }}일
               </div>
               <div class="d-flex flex-column">
-                <div class="fw-bold">{{ item.category }}</div>
+                <div class="fw-bold">
+                  {{ `${categoryEmoji[item.category] || ""} ${item.category}` }}
+                </div>
                 <div class="text-muted">
                   {{ formatDate(item.date) }},
                   {{ item.amount.toLocaleString() }}원
@@ -171,6 +173,7 @@ import InputForm from "@/components/InputForm.vue";
 import TransactionList from "@/components/TransactionList.vue";
 import { Modal } from "bootstrap";
 import { useAuthStore } from "@/stores/auth";
+import { categoryEmoji } from "@/utils/categoryEmoji";
 
 // pinia 연결
 const storeCalendar = useCalendar();

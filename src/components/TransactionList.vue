@@ -14,7 +14,9 @@
           {{ item.type === "income" ? "+" : "-"
           }}{{ item.amount.toLocaleString() }}원
         </span>
-        <span class="text-muted ms-2">{{ item.category }}</span>
+        <span class="text-muted ms-2">
+          {{ `${categoryEmoji[item.category] || ""} ${item.category}` }}
+        </span>
       </div>
 
       <!-- 고정 + 버튼들 -->
@@ -43,12 +45,14 @@
 </template>
 
 <script setup>
+import { categoryEmoji } from "@/utils/categoryEmoji";
 const props = defineProps({
   transactions: {
     type: Array,
     required: true,
   },
 });
+
 const emit = defineEmits(["edit", "delete"]);
 function editTransaction(item) {
   emit("edit", item);
