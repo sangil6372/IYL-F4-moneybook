@@ -12,6 +12,12 @@ export const useCalendar = defineStore("transaction", () => {
   //getter
   const transaction = computed(() => state.transaction);
 
+  const fixedCostTransaction = computed(() =>
+    transaction.value.filter(
+      (item) => item.fixedCost === "true" && item.type === "expense"
+    )
+  );
+
   // actions
   const fetchTransaction = async () => {
     try {
@@ -78,5 +84,6 @@ export const useCalendar = defineStore("transaction", () => {
     addTransaction,
     deleteTransaction,
     updateTransaction,
+    fixedCostTransaction,
   };
 });

@@ -1,212 +1,224 @@
 <!-- CalendarTest.vue -->
 <template>
-  <div class="d-flex p-4 bg-light" style="min-height: 100vh">
-    <!-- 달력 부분 -->
-    <div class="flex-grow-1">
-      <FullCalendar :options="calendarOptions" />
-    </div>
-
-    <!-- 우측 영역 (결제일 or 입력 폼) -->
-    <div class="container w-25 ms-4">
-      <!-- 날짜 선택이 안될 경우 (초기상태) -->
-      <div v-if="!selectedDate" class="card shadow-sm">
-        <div class="card-header bg-white">
-          <h5 class="mb-0">
-            <i class="fa-solid fa-calendar-check me-2 text-primary"></i>
-            다가오는 결제일
-          </h5>
-        </div>
-        <div class="card-body">
-          <!-- 항목 1: 빨강 -->
-          <div
-            class="d-flex align-items-center mb-3 border-start border-danger border-4 ps-3"
-          >
-            <div class="flex-grow-1">
-              <div class="fw-bold">넷플릭스</div>
-              <small class="text-muted">10일, 13,900원</small>
-            </div>
-          </div>
-          <!-- 항목 2: 주황 -->
-          <div
-            class="d-flex align-items-center mb-3 border-start border-warning border-4 ps-3"
-          >
-            <div class="flex-grow-1">
-              <div class="fw-bold">유튜브 프리미엄</div>
-              <small class="text-muted">20일, 13,900원</small>
-            </div>
-          </div>
-          <!-- 항목 3: 초록 -->
-          <div
-            class="d-flex align-items-center mb-1 border-start border-success border-4 ps-3"
-          >
-            <div class="flex-grow-1">
-              <div class="fw-bold">월세</div>
-              <small class="text-muted">25일, 700,000원</small>
-            </div>
+  <div class="container-fluid py-4 bg-light" style="min-height: 100vh">
+    <div class="row">
+      <!-- 캘린더 영역 (넓은 비율) -->
+      <div class="col-12 col-lg-9 mb-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <FullCalendar :options="calendarOptions" />
           </div>
         </div>
       </div>
 
-      <!-- 날짜 선택이 됨 (목록 및 추가 기능 )  -->
-      <div v-else-if="selectedDate && !formView" class="card shadow-sm mt-3">
-        <div class="card-body">
-          <h5 class="card-title mb-4">
-            <i class="fa-solid fa-calendar-day me-2 text-primary"></i>
-            {{ selectedDate }} 거래 내역
-          </h5>
-          <!-- X 아이콘 -->
-          <i
-            class="fa-solid fa-xmark text-secondary"
-            @click="closeForm(true)"
-            style="
-              position: absolute;
-              top: 12px;
-              right: 16px;
-              cursor: pointer;
-              font-size: 1.2rem;
-            "
-            title="입력 닫기"
-          ></i>
-
-          <!-- 리스트 보여주기 -->
-          <ul class="list-group mb-3" v-if="selectedDateforEach.length">
-            <li
-              v-for="item in selectedDateforEach"
+      <!-- 우측 결제일/입력폼 영역 -->
+      <div class="col-12 col-lg-3">
+        <!-- 초기 상태: 다가오는 결제일 -->
+        <div v-if="!selectedDate" class="card shadow-sm">
+          <div class="card-header bg-white">
+            <h5 class="mb-0">
+              <i class="fa-solid fa-calendar-check me-2 text-primary"></i>
+              다가오는 결제일
+            </h5>
+          </div>
+          <div class="card-body">
+            <div
+              v-for="item in remindFixedCost"
               :key="item.id"
-              class="list-group-item d-flex justify-content-between align-items-center"
+              class="d-flex align-items-start mb-3 cursor-pointer"
+              @click="goTransaction(item.date)"
             >
-              <div>
-                <span
-                  :class="
-                    item.type === 'income' ? 'text-success' : 'text-danger'
-                  "
-                  class="fw-bold"
-                >
-                  {{ item.type === "income" ? "+" : "-"
-                  }}{{ item.amount.toLocaleString() }}원
-                </span>
-                <span class="text-muted ms-2">{{ item.category }}</span>
+              <div
+                class="d-flex align-items-center justify-content-center me-3 rounded-2"
+                :class="getClass(item.date)"
+                style="width: 50px; height: 50px; font-weight: bold"
+              >
+                {{ getDate(item.date) }}일
               </div>
-              <div>
-                <button
-                  class="btn btn-sm btn-outline-primary me-2"
-                  @click="editTransaction(item)"
-                >
-                  수정
-                </button>
-                <button
-                  class="btn btn-sm btn-outline-danger"
-                  @click="storeCalendar.deleteTransaction(item.id)"
-                >
-                  삭제
-                </button>
+              <div class="d-flex flex-column">
+                <div class="fw-bold">{{ item.category }}</div>
+                <div class="text-muted">
+                  {{ formatDate(item.date) }},
+                  {{ item.amount.toLocaleString() }}원
+                </div>
               </div>
-            </li>
-          </ul>
-
-          <!-- 추가 버튼 -->
-          <button
-            class="btn btn-outline-success w-100"
-            @click="formView = true"
-          >
-            거래 추가
-          </button>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div
-        v-else-if="selectedDate && formView"
-        class="card shadow-sm position-relative mt-3"
-      >
-        <div class="card-body">
-          <h5 class="card-title mb-4">
-            <i class="fa-solid fa-pen-to-square me-2 text-primary"></i>
-            {{ selectedDate }} 입력
+        <!-- 거래 내역 보기 -->
+        <div v-else-if="selectedDate && !formView" class="card shadow-sm mt-3">
+          <div class="card-body">
+            <h5 class="card-title mb-4">
+              <i class="fa-solid fa-calendar-day me-2 text-primary"></i>
+              {{ selectedDate }} 거래 내역
+            </h5>
             <i
-              class="fa-solid fa-xmark text-secondary"
-              @click="closeForm(false)"
-              style="
-                position: absolute;
-                top: 12px;
-                right: 16px;
-                cursor: pointer;
-              "
+              class="fa-solid fa-xmark text-secondary position-absolute"
+              @click="closeForm(true)"
+              style="top: 12px; right: 16px; cursor: pointer; font-size: 1.2rem"
               title="입력 닫기"
             ></i>
-          </h5>
-
-          <div class="mb-3">
-            <label for="amount" class="form-label">금액</label>
-            <div class="input-group">
-              <input
-                id="amount"
-                type="number"
-                class="form-control"
-                v-model="form.amount"
-                placeholder="0"
-              />
-              <span class="input-group-text">원</span>
-            </div>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label d-block">분류</label>
-            <div class="form-check form-check-inline">
-              <input
-                class="form-check-input"
-                type="radio"
-                id="income"
-                value="income"
-                v-model="form.type"
-              />
-              <label class="form-check-label" for="income">수입</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input
-                class="form-check-input"
-                type="radio"
-                id="expense"
-                value="expense"
-                v-model="form.type"
-              />
-              <label class="form-check-label" for="expense">지출</label>
-            </div>
-          </div>
-
-          <div class="mb-3">
-            <label for="category" class="form-label">카테고리</label>
-            <select
-              id="category"
-              class="form-select"
-              v-model="form.category"
-              placeholder="예: 식비, 교통비, 구독 등"
+            <ul class="list-group mb-3" v-if="selectedDateforEach.length">
+              <li
+                v-for="item in selectedDateforEach"
+                :key="item.id"
+                class="list-group-item d-flex justify-content-between align-items-center"
+              >
+                <div>
+                  <span
+                    :class="
+                      item.type === 'income' ? 'text-success' : 'text-danger'
+                    "
+                    class="fw-bold"
+                  >
+                    {{ item.type === "income" ? "+" : "-"
+                    }}{{ item.amount.toLocaleString() }}원
+                  </span>
+                  <span class="text-muted ms-2">{{ item.category }}</span>
+                  <span
+                    v-if="item.fixedCost === 'true'"
+                    class="badge bg-warning text-dark ms-2"
+                    >고정</span
+                  >
+                </div>
+                <div>
+                  <button
+                    class="btn btn-sm btn-outline-primary me-2"
+                    @click="editTransaction(item)"
+                  >
+                    수정
+                  </button>
+                  <button
+                    class="btn btn-sm btn-outline-danger"
+                    @click="storeCalendar.deleteTransaction(item.id)"
+                  >
+                    삭제
+                  </button>
+                </div>
+              </li>
+            </ul>
+            <button
+              class="btn btn-outline-success w-100"
+              @click="formView = true"
             >
-              <option disabled value="">카테고리를 선택하세요</option>
-              <option>식비</option>
-              <option>의료</option>
-              <option>교통</option>
-              <option>여가</option>
-              <option>통신</option>
-              <option>급여</option>
-              <option>기타</option>
-            </select>
+              거래 추가
+            </button>
           </div>
+        </div>
 
-          <div class="mb-3">
-            <label for="memo" class="form-label">메모</label>
-            <textarea
-              id="memo"
-              class="form-control"
-              rows="2"
-              v-model="form.memo"
-              placeholder="자세한 내용을 입력해 주세요"
-            ></textarea>
+        <!-- 거래 입력 폼 -->
+        <div
+          v-else-if="selectedDate && formView"
+          class="card shadow-sm position-relative mt-3"
+        >
+          <div class="card-body">
+            <h5 class="card-title mb-4">
+              <i class="fa-solid fa-pen-to-square me-2 text-primary"></i>
+              {{ selectedDate }} 입력
+              <i
+                class="fa-solid fa-xmark text-secondary position-absolute"
+                @click="closeForm(false)"
+                style="top: 12px; right: 16px; cursor: pointer"
+              ></i>
+            </h5>
+
+            <!-- 금액 입력 -->
+            <div class="mb-3">
+              <label for="amount" class="form-label">금액</label>
+              <div class="input-group">
+                <input
+                  id="amount"
+                  type="number"
+                  class="form-control"
+                  v-model="form.amount"
+                  placeholder="0"
+                />
+                <span class="input-group-text">원</span>
+              </div>
+            </div>
+
+            <!-- 수입/지출 선택 -->
+            <div class="mb-3">
+              <label class="form-label d-block">분류</label>
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  id="income"
+                  value="income"
+                  v-model="form.type"
+                />
+                <label class="form-check-label" for="income">수입</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  id="expense"
+                  value="expense"
+                  v-model="form.type"
+                />
+                <label class="form-check-label" for="expense">지출</label>
+              </div>
+            </div>
+
+            <!-- 고정 여부 -->
+            <div class="mb-3">
+              <label class="form-label d-block">고정 지출 여부</label>
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  id="true"
+                  value="true"
+                  v-model="form.fixedCost"
+                />
+                <label for="true"> 고정 지출 </label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  id="false"
+                  value="false"
+                  v-model="form.fixedCost"
+                />
+                <label for="false"> 비고정 지출 </label>
+              </div>
+            </div>
+
+            <!-- 카테고리 -->
+            <div class="mb-3">
+              <label for="category" class="form-label">카테고리</label>
+              <select id="category" class="form-select" v-model="form.category">
+                <option disabled value="">카테고리를 선택하세요</option>
+                <option>식비</option>
+                <option>의료</option>
+                <option>교통</option>
+                <option>여가</option>
+                <option>통신</option>
+                <option>급여</option>
+                <option>기타</option>
+              </select>
+            </div>
+
+            <!-- 메모 -->
+            <div class="mb-3">
+              <label for="memo" class="form-label">메모</label>
+              <textarea
+                id="memo"
+                class="form-control"
+                rows="2"
+                v-model="form.memo"
+                placeholder="자세한 내용을 입력해 주세요"
+              ></textarea>
+            </div>
+
+            <button class="btn btn-success w-100" @click="saveForm">
+              <i class="fa-solid fa-floppy-disk me-2"></i> 저장
+            </button>
           </div>
-
-          <button class="btn btn-success w-100" @click="saveForm">
-            <i class="fa-solid fa-floppy-disk me-2"></i>
-            저장
-          </button>
         </div>
       </div>
     </div>
@@ -218,7 +230,10 @@ import { ref, onMounted, computed } from "vue";
 import FullCalendar from "@fullcalendar/vue3";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-
+import koLocale from "@fullcalendar/core/locales/ko";
+// npm install date-fns 필요!
+import { format } from "date-fns";
+import { ko } from "date-fns/locale";
 import { useCalendar } from "@/stores/calendar";
 
 // pinia 연결
@@ -242,6 +257,7 @@ const form = ref({
   type: "expense",
   category: "",
   memo: "",
+  fixedCost: false,
 });
 
 // 거래 필터링
@@ -251,19 +267,74 @@ const selectedDateforEach = computed(() => {
   );
 });
 
+// 기한 지났는지 확인해서 목록 출력
+const remindFixedCost = computed(() => {
+  return storeCalendar.fixedCostTransaction
+    .filter((item) => getDate(item.date) >= 0)
+    .sort((a, b) => getDate(a.date) - getDate(b.date));
+});
+
 /* function 들 */
+
+// 고정 지출 날짜 계산 후 bootstrap 넣기
+function getClass(dateStr) {
+  const date = getDate(dateStr);
+  if (date <= 7) {
+    return "bg-danger text-white";
+  } else if (date <= 14) {
+    return "bg-warning text-dark";
+  } else {
+    return "bg-success text-white";
+  }
+}
+
+// 오늘이랑 고정 지출일 날짜 차이 계산
+function getDate(dateStr) {
+  const today = new Date();
+  const target = new Date(dateStr);
+  const diffTime = target - today;
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+}
+
+// 날짜 포맷
+function formatDate(dateStr) {
+  return format(new Date(dateStr), "dd일", { locale: ko });
+}
+
+// 다가오는 결제일에 있는 목록 클릭시 -> 해당하는 날짜의 목록으로 이동
+function goTransaction(date) {
+  selectedDate.value = date;
+  formView.value = false;
+  editId.value = null;
+}
 
 // 날짜 클릭시 얻어오는 것들
 function handleDateClick(info) {
   selectedDate.value = info.dateStr;
   formView.value = false;
   editId.value = null;
+  highlight(info.dateStr);
+}
+
+// 캘린더에서 클릭하면 해당 날짜 하이라이트
+function highlight(dateStr) {
+  removeHighlight();
+  document.querySelectorAll(".fc-daygrid-day").forEach((cell) => {
+    cell.classList.remove("fc-day-selected");
+  });
+  const target = document.querySelector(
+    `.fc-daygrid-day[data-date="${dateStr}"]`
+  );
+  if (target) {
+    target.classList.add("fc-day-selected");
+  }
 }
 
 // 입력 폼 닫기
 function closeForm(resetAll = false) {
   if (resetAll) {
-    selectedDate.value = null; // 다가오는 결제일로 돌아감
+    selectedDate.value = null;
+    removeHighlight();
   }
   formView.value = false;
   editId.value = null;
@@ -272,7 +343,15 @@ function closeForm(resetAll = false) {
     type: "expense",
     category: "",
     memo: "",
+    fixedCost: false,
   };
+}
+
+function removeHighlight() {
+  const prev = document.querySelector(".fc-day-selected");
+  if (prev) {
+    prev.classList.remove("fc-day-selected");
+  }
 }
 
 // 거래 내역 추가
@@ -313,13 +392,24 @@ const calendarOptions = computed(() => ({
   plugins: [dayGridPlugin, interactionPlugin],
   initialView: "dayGridMonth",
   eventColor: "transparent",
+  locale: koLocale,
+  contentHeight: "auto",
+
+  // 상단 헤더
+  headerToolbar: {
+    left: "prev",
+    center: "title",
+    right: "next",
+  },
+  titleFormat: { month: "long" },
+
+  dateClick: handleDateClick,
   // +/-를 눌러도 작동하게
   eventClick(info) {
     const clickedDate = info.event.startStr;
     handleDateClick({ dateStr: clickedDate });
   },
 
-  dateClick: handleDateClick,
   events: storeCalendar.calendarEvents,
   eventContent(info) {
     const { income, expense } = info.event.extendedProps;
@@ -333,5 +423,144 @@ const calendarOptions = computed(() => ({
 
     return { html: plus + minus };
   },
+  dayCellClassNames(arg) {
+    const day = arg.date.getDay(); // 0: 일, 6: 토
+    if (day === 0) return ["fc-day-sun"];
+    if (day === 6) return ["fc-day-sat"];
+    return ["fc-day-else"];
+  },
 }));
 </script>
+
+<style>
+/* 캘린더 전체 */
+.fc {
+  font-family: "Noto Sans KR", sans-serif;
+  font-size: 14px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  height: auto;
+}
+
+/* 헤더 (제목 및 네비게이션) */
+.fc-toolbar-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0d6efd;
+}
+
+.fc-button {
+  background-color: #0dcaf0;
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.fc-button:hover {
+  background-color: #31d2f2;
+}
+
+.fc-button:disabled {
+  background-color: #adb5bd;
+}
+.fc-daygrid-day-frame {
+  margin: 2px;
+  border-radius: 4px;
+}
+
+/* 헤더 버튼 간격 */
+.fc-header-toolbar {
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 요일 헤더 색상 */
+.fc-col-header-cell {
+  background-color: #e9f7fd;
+  padding: 10px 0;
+  font-weight: 600;
+  border-bottom: 1px solid #dee2e6;
+}
+
+/* 날짜 칸 (일자 영역) */
+.fc .fc-daygrid-day-number {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 4px;
+  color: #212529;
+}
+
+.fc-day-today {
+  background-color: transparent !important;
+  border: none !important;
+}
+
+/* 이벤트 카드 영역 */
+.fc-event {
+  font-size: 12px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  background-color: #d1ecf1;
+  color: #0c5460;
+  margin-top: 4px;
+  text-align: left;
+}
+
+/* 요일별 색상 */
+.fc-day-sun .fc-daygrid-day-number {
+  color: #dc3545 !important;
+}
+
+.fc-day-sat .fc-daygrid-day-number {
+  color: #0d6efd !important;
+}
+
+.fc-day-else .fc-daygrid-day-number {
+  color: #6c757d !important;
+}
+
+/* 요일 헤더 (한글 요일 텍스트) */
+.fc-col-header-cell.fc-day-sun .fc-col-header-cell-cushion {
+  color: #dc3545 !important;
+  font-weight: bold;
+}
+
+.fc-col-header-cell.fc-day-sat .fc-col-header-cell-cushion {
+  color: #0d6efd !important;
+  font-weight: bold;
+}
+
+.fc-col-header-cell:not(.fc-day-sat):not(.fc-day-sun)
+  .fc-col-header-cell-cushion {
+  color: #6c757d !important;
+  font-weight: bold;
+}
+.fc-day-selected {
+  background-color: #e0f7fa !important;
+  border: 2px solid #a0deeb !important;
+  border-radius: 8px;
+  transition: 0.3s ease-in-out;
+}
+.fc-daygrid-day {
+  border-bottom: 1px solid #dee2e6;
+}
+
+/* 반응형 대응 */
+@media (max-width: 768px) {
+  .fc-toolbar-title {
+    font-size: 1.2rem;
+  }
+
+  .fc-button {
+    font-size: 12px;
+    padding: 4px 10px;
+  }
+}
+</style>
