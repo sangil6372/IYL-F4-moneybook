@@ -59,7 +59,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="tx in pagedTransactions" :key="tx.id" class="table-row">
+            <tr v-for="tx in pagedTransaction" :key="tx.id" class="table-row">
               <td>
                 <span
                   :class="[
@@ -103,7 +103,7 @@
     </div>
 
     <div
-      v-if="filteredTransactions.length === 0"
+      v-if="filteredTransaction.length === 0"
       class="text-center text-muted mt-5"
     >
       거래 내역이 없습니다.
@@ -269,7 +269,7 @@ function formatDate(dateStr) {
 
 // 토탈 페이지 개수
 const totalPages = computed(() =>
-  Math.ceil(filteredTransactions.value.length / itemsPerPage)
+  Math.ceil(filteredTransaction.value.length / itemsPerPage)
 );
 
 // 페이지네이션 그룹 계산
@@ -289,10 +289,10 @@ const pageNumbers = computed(() => {
 
 // 현재 페이지에 보여줄 거래 목록
 // Example : 1페이지에 보여줄 8개 데이터
-const pagedTransactions = computed(() => {
+const pagedTransaction = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage;
   const end = start + itemsPerPage;
-  return filteredTransactions.value.slice(start, end);
+  return filteredTransaction.value.slice(start, end);
 });
 
 // 데이터 삭제 할지 물어보기 호출
