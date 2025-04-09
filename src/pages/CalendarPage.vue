@@ -98,7 +98,44 @@
       </div>
     </div>
   </div>
-  <div></div>
+
+  <div
+    class="modal fade"
+    id="transactionModal"
+    tabindex="-1"
+    aria-labelledby="transactionModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-scrollable modal-fullscreen-sm-down">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="transactionModalLabel">
+            {{ selectedDate }} 거래 내역
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+            @click="closeForm(true)"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <TransactionList
+            :transactions="selectedDateforEach"
+            @edit="editTransaction"
+            @delete="storeCalendar.deleteTransaction"
+          />
+          <button
+            class="btn btn-outline-success w-100 mt-3"
+            @click="showFormModal"
+          >
+            거래 추가
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -113,6 +150,8 @@ import { ko } from "date-fns/locale";
 import { useCalendar } from "@/stores/calendar";
 import InputForm from "@/components/InputForm.vue";
 import TransactionList from "@/components/TransactionList.vue";
+import { Modal } from "bootstrap";
+import { nextTick } from "vue";
 
 // pinia 연결
 const storeCalendar = useCalendar();
@@ -193,6 +232,16 @@ function handleDateClick(info) {
   formView.value = false;
   editId.value = null;
   highlight(info.dateStr);
+
+  if (window.innerWidth < 768) {
+    nextTick(() => {
+      const el = document.getElementById("transactionModal");
+      if (el) {
+        const modal = new Modal(el);
+        modal.show();
+      }
+    });
+  }
 }
 
 // 캘린더에서 클릭하면 해당 날짜 하이라이트
