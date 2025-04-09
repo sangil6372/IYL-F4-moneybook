@@ -70,7 +70,8 @@
 
 <script setup>
 import { ref, computed} from 'vue'
-import { useTransaction } from '@/stores/transaction'
+// 🐷 이름 나중에 바꾸기
+import { useCalendar } from '@/stores/calendar'
 import { Line, Doughnut } from 'vue-chartjs'
 import {
   Chart as ChartJS,
@@ -88,7 +89,8 @@ import {
 ChartJS.register(Title, Tooltip, Legend, ArcElement, LineElement, PointElement, CategoryScale, LinearScale);
 
 // pinia 등록
-const useStore = useTransaction();
+// 🐷 이름 나중에 바꾸기
+const useStore = useCalendar();
 // db.json 으로 부터 axios.get
 const { fetchTransaction } = useStore;
 
