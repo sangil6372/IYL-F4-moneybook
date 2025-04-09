@@ -79,7 +79,7 @@
                   >이메일 <span class="text-danger">(필수)</span></label
                 >
                 <div class="row g-2">
-                  <div class="col-8">
+                  <div class="col-9">
                     <input
                       type="email"
                       class="form-control"
@@ -111,28 +111,27 @@
                       사용 가능한 이메일입니다.
                     </div>
                   </div>
-                  <div class="col-4">
+                  <div class="col-3">
                     <button
                       type="button"
-                      class="btn btn-outline-secondary w-100"
+                      class="btn btn-outline-secondary w-100 check-btn"
                       @click="checkEmailExists"
                     >
                       중복 확인
                     </button>
                   </div>
                 </div>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label"
-                  >비밀번호 <span class="text-danger">(필수)</span></label
-                >
-                <input
-                  type="password"
-                  class="form-control"
-                  placeholder="비밀번호 입력"
-                  v-model="regPassword"
-                />
+                <div class="mb-3">
+                  <label class="form-label"
+                    >비밀번호 <span class="text-danger">(필수)</span></label
+                  >
+                  <input
+                    type="password"
+                    class="form-control"
+                    placeholder="비밀번호 입력"
+                    v-model="regPassword"
+                  />
+                </div>
               </div>
 
               <div class="mb-3">
@@ -154,13 +153,14 @@
                 </div>
               </div>
 
-              <div class="mb-3">
+              <div class="mb-3 d-grid justify-content-center">
                 <label class="form-label">이름 (선택)</label>
                 <input
                   type="text"
                   class="form-control"
                   placeholder="이름 입력"
                   v-model="regName"
+                  style="max-width: 200px"
                 />
               </div>
             </form>
@@ -310,8 +310,11 @@ async function checkEmailExists() {
 
 <style scoped>
 .logo {
-  width: 400px;
+  width: 100%;
+  max-width: 200px; /* 카드 안에서 너무 커지지 않도록 제한 */
   height: auto;
+  display: block;
+  margin: 0 auto;
 }
 .desc {
   font-size: 2rem;
@@ -321,19 +324,27 @@ async function checkEmailExists() {
 .card-body {
   padding: 2rem 2rem;
 }
-
 form label {
+  display: block; /* 세로로 정렬되도록 유지 */
+  text-align: left !important; /* 가운데 정렬을 확실히 덮어쓰기 */
+  margin-bottom: 0.4rem;
   font-size: 1rem;
-  margin-bottom: 0.3rem;
-  display: block;
+  font-weight: 500;
   color: #333;
 }
 
 .form-control {
-  padding: 0.9rem 1rem;
-  font-size: 1rem;
-  margin-bottom: 1.2rem;
-  border-radius: 12px;
+  height: 40px;
+  font-size: 0.95rem;
+  padding: 0.7rem 0.9rem;
+}
+.check-btn {
+  padding: 0.35rem !important;
+  font-size: 0.85rem !important;
+  font-weight: bold !important;
+  border-radius: 15px !important;
+  height: 40px !important;
+  white-space: nowrap;
 }
 
 .btn {
@@ -358,6 +369,9 @@ form label {
 .modal-body {
   padding: 2rem 2rem;
 }
+.modal-body form {
+  align-items: center;
+}
 
 .modal-body .form-label {
   font-size: 1rem;
@@ -371,10 +385,14 @@ form label {
 }
 
 .modal-footer {
-  padding: 1.5rem;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+  padding: 1rem 1.5rem;
+  gap: 1rem; /* 버튼 간격 */
 }
+
 .modal {
   z-index: 2000 !important;
 }
@@ -417,16 +435,18 @@ body {
 
 .main-card {
   background: rgba(255, 255, 255, 0.95);
-  border-radius: 24px;
-  padding: 3rem 6rem;
-  max-width: 800px;
+  border-radius: 16px;
+  padding: 2rem 2.5rem;
+  max-width: 400px;
+  min-width: 300px;
+  min-height: 400px;
   width: 100%;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
   z-index: 2;
 }
 
 .login-label {
-  font-size: 2rem;
+  font-size: 1rem;
   font-weight: 700;
   color: #fff;
   background-color: #129d72;
@@ -438,7 +458,7 @@ body {
 }
 
 label {
-  font-size: 2em !important;
+  font-size: 1em !important;
   font-weight: 600;
 }
 
@@ -495,5 +515,58 @@ label {
   color: rgba(103, 58, 183, 1);
   box-shadow: none;
   border: 2px solid rgba(103, 58, 183, 1);
+}
+/* 모달 크기 & 반응형 스타일 개선 */
+.modal-dialog {
+  max-width: 400px;
+  min-width: 360px;
+
+  width: 90%;
+  margin: 2rem auto;
+  transition: all 0.3s ease-in-out;
+}
+
+.modal-body {
+  padding-left: 2em;
+  padding-right: 2em;
+}
+
+.modal-body .form-label {
+  font-size: 0.95rem;
+  margin-bottom: 0.3rem;
+  color: #444;
+  font-weight: 500;
+}
+
+.modal-body input.form-control {
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+.modal-footer .btn {
+  width: 30%;
+  min-width: 100px;
+  border-radius: 20px;
+}
+
+.modal.fade .modal-dialog {
+  transform: translateY(-30px);
+  opacity: 0;
+  transition: all 0.3s ease-in-out;
+}
+
+.modal.fade.show .modal-dialog {
+  transform: translateY(0);
+  opacity: 1;
 }
 </style>
