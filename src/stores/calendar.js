@@ -16,6 +16,12 @@ export const useCalendar = defineStore("transaction", () => {
   //getter
   const transaction = computed(() => state.transaction);
 
+  const fixedCostTransaction = computed(() =>
+    transaction.value.filter(
+      (item) => item.fixedCost === "true" && item.type === "expense"
+    )
+  );
+
   // actions
   // 거래 목록 db.json에서 다시 받아오기
   const fetchTransaction = async () => {
@@ -99,5 +105,6 @@ export const useCalendar = defineStore("transaction", () => {
     addTransaction,
     deleteTransaction,
     updateTransaction,
+    fixedCostTransaction,
   };
 });

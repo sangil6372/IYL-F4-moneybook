@@ -51,7 +51,6 @@
       }
     }
   ],
-
   "transaction": [
     {
       "id": "1",
@@ -61,7 +60,7 @@
       "type": "expense",
       "memo": "",
       "userId": "d3e6",
-      "isIter": false
+      "fixedCost": "false"
     },
     {
       "id": "2",
@@ -70,7 +69,8 @@
       "amount": 5500,
       "type": "expense",
       "memo": "",
-      "userId": "d3e6"
+      "userId": "d3e6",
+      "fixedCost": "false"
     },
     {
       "id": "3",
@@ -79,7 +79,8 @@
       "amount": 4500,
       "type": "expense",
       "memo": "",
-      "userId": "d3e6"
+      "userId": "d3e6",
+      "fixedCost": "false"
     },
     {
       "id": "4",
@@ -88,7 +89,8 @@
       "amount": 4500,
       "type": "expense",
       "memo": "",
-      "userId": "d3e6"
+      "userId": "d3e6",
+      "fixedCost": "false"
     },
     {
       "id": "5",
@@ -97,7 +99,8 @@
       "amount": 4500,
       "type": "expense",
       "memo": "",
-      "userId": "d3e6"
+      "userId": "d3e6",
+      "fixedCost": "false"
     },
     {
       "id": "6",
@@ -106,7 +109,8 @@
       "amount": 4500,
       "type": "expense",
       "memo": "",
-      "userId": "d3e6"
+      "userId": "d3e6",
+      "fixedCost": "false"
     },
     {
       "id": "7",
@@ -115,7 +119,8 @@
       "amount": 4500,
       "type": "income",
       "memo": "",
-      "userId": "d3e6"
+      "userId": "d3e6",
+      "fixedCost": "false"
     },
     {
       "id": "8",
@@ -124,16 +129,18 @@
       "amount": 4500,
       "type": "income",
       "memo": "",
-      "userId": "6c9d"
+      "userId": "6c9d",
+      "fixedCost": "false"
     },
     {
       "id": "35df",
       "amount": 13030,
       "type": "expense",
-      "category": "",
+      "category": "교통",
       "memo": "",
       "date": "2025-04-05",
-      "userId": "6c9d"
+      "userId": "6c9d",
+      "fixedCost": "false"
     },
     {
       "id": "6df3",
@@ -142,7 +149,8 @@
       "category": "의료",
       "memo": "",
       "date": "2025-04-05",
-      "userId": "6c9d"
+      "userId": "6c9d",
+      "fixedCost": "false"
     },
     {
       "id": "100",
@@ -151,7 +159,8 @@
       "category": "의료",
       "memo": "",
       "date": "2025-04-12",
-      "userId": "6c9d"
+      "userId": "6c9d",
+      "fixedCost": "false"
     },
     {
       "id": "101",
@@ -160,7 +169,8 @@
       "category": "교통",
       "memo": "",
       "date": "2025-04-13",
-      "userId": "6c9d"
+      "userId": "6c9d",
+      "fixedCost": "false"
     },
     {
       "id": "102",
@@ -169,7 +179,8 @@
       "category": "식비",
       "memo": "",
       "date": "2025-04-16",
-      "userId": "6c9d"
+      "userId": "6c9d",
+      "fixedCost": "false"
     },
     {
       "id": "103",
@@ -178,7 +189,8 @@
       "category": "기타",
       "memo": "",
       "date": "2025-04-19",
-      "userId": "6c9d"
+      "userId": "6c9d",
+      "fixedCost": "false"
     },
     {
       "id": "104",
@@ -187,7 +199,48 @@
       "category": "여가",
       "memo": "",
       "date": "2025-04-25",
-      "userId": "6c9d"
+      "userId": "6c9d",
+      "fixedCost": "false"
+    },
+    {
+      "id": "2031",
+      "amount": 55000,
+      "type": "expense",
+      "category": "교통",
+      "memo": "",
+      "date": "2025-04-10",
+      "userId": "6c9d",
+      "fixedCost": "true"
+    },
+    {
+      "id": "1003",
+      "amount": 200000,
+      "type": "expense",
+      "category": "여가",
+      "memo": "",
+      "date": "2025-04-25",
+      "userId": "6c9d",
+      "fixedCost": "true"
+    },
+    {
+      "id": "2074",
+      "amount": 4900,
+      "type": "expense",
+      "category": "커피",
+      "memo": "",
+      "date": "2025-04-17",
+      "userId": "6c9d",
+      "fixedCost": "true"
+    },
+    {
+      "id": "2213",
+      "amount": 13900,
+      "type": "expense",
+      "category": "통신",
+      "memo": "",
+      "date": "2025-04-25",
+      "userId": "6c9d",
+      "fixedCost": "true"
     }
   ]
 }
