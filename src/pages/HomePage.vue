@@ -6,21 +6,25 @@
     <div class="main-card">
       <!-- 로고 + 타이틀 -->
       <div class="logo-box text-center mb-4">
-        <img src="@/assets/logo.png" alt="Logo" class="logo animate__animated animate__bounce" />
-        <div class="login-label mt-3">로그인</div>
+        <img
+          src="@/assets/logo.png"
+          alt="Logo"
+          class="logo animate__animated animate__bounce"
+        />
+        <div class="login-label mt-3">Login</div>
       </div>
 
       <!-- 로그인 입력 -->
       <div class="login-card card">
         <div class="card-body">
-          <h5 class="card-title mb-4">로그인</h5>
           <form @submit="handleLogin">
-
-            <label >이메일</label>
+            <label class="animate__animated animate__lightSpeedInLeft"
+              >Email</label
+            >
             <input
               type="email"
               class="form-control"
-              placeholder="이메일 입력"
+              placeholder="example@example.com"
               v-model="loginEmail"
               @blur="loginEmailTouched = true"
               :class="{ 'is-invalid': loginEmailTouched && !isLoginEmailValid }"
@@ -28,12 +32,14 @@
             <div class="invalid-feedback">
               올바른 이메일 형식을 입력해주세요.
             </div>
-
-            <label class="mt-3">비밀번호</label>
+            <br />
+            <label class="mt-3 animate__animated animate__lightSpeedInRight"
+              >Password</label
+            >
             <input
               type="password"
               class="form-control"
-              placeholder="비밀번호 입력"
+              placeholder="Enter your password"
               v-model="loginPassword"
             />
 
@@ -420,13 +426,74 @@ body {
 }
 
 .login-label {
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: 2rem;
+  font-weight: 700;
   color: #fff;
   background-color: #129d72;
   padding: 0.5rem 1.5rem;
-  border-radius: 50px;
+  border-radius: 10px;
   margin-top: 1rem;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  opacity: 0.8; /* 비활성화된 느낌 주기 (선택사항) */
+}
+
+label {
+  font-size: 2em !important;
+  font-weight: 600;
+}
+
+.btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 기존 스타일 유지 */
+  background: linear-gradient(
+    0deg,
+    rgba(0, 172, 238, 1) 0%,
+    rgba(2, 126, 251, 1) 100%
+  );
+  border: none;
+  color: white;
+  width: 80px;
+  height: 40px;
+  border-radius: 50px;
+  font-weight: 600;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+/* hover 스타일 */
+.btn-primary:hover {
+  background: transparent;
+  color: rgba(2, 126, 251, 1);
+  box-shadow: none;
+  border: 2px solid rgba(2, 126, 251, 1);
+}
+
+.btn-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    0deg,
+    rgb(135, 125, 216) 0%,
+    rgb(160, 148, 180) 100%
+  );
+  border: none;
+  color: white;
+  width: 80px;
+  height: 40px;
+  border-radius: 50px;
+  font-weight: 600;
+  padding: 0 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: transparent;
+  color: rgba(103, 58, 183, 1);
+  box-shadow: none;
+  border: 2px solid rgba(103, 58, 183, 1);
 }
 </style>
