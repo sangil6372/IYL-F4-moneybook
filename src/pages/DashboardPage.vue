@@ -67,7 +67,7 @@
                     tx.type === 'expense' ? 'expense' : 'income',
                   ]"
                 >
-                  {{ tx.type === 'expense' ? '지출' : '수입' }}
+                  {{ tx.type === "expense" ? "지출" : "수입" }}
                 </span>
               </td>
               <td>{{ formatDate(tx.date) }}</td>
@@ -76,8 +76,8 @@
               <td>
                 {{
                   tx.memo.length > 8
-                    ? tx.memo.slice(0, 8) + '...'
-                    : tx.memo || '-'
+                    ? tx.memo.slice(0, 8) + "..."
+                    : tx.memo || "-"
                 }}
               </td>
               <td>
@@ -156,36 +156,35 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch, reactive } from 'vue';
-import { useDashBoardStore } from '@/stores/dashBoard';
-import { storeToRefs } from 'pinia';
-import 'vue-multiselect/dist/vue-multiselect.min.css';
+import { ref, computed, onMounted, watch, reactive } from "vue";
+import { useDashBoardStore } from "@/stores/dashBoard";
+import { storeToRefs } from "pinia";
 
 const store = useDashBoardStore();
 const { transactions } = storeToRefs(store);
 
-const selectedType = ref(''); //'all', 'expense', 'income'
-const selectedCategory = ref(''); //배열로 다중 선택
+const selectedType = ref(""); //'all', 'expense', 'income'
+const selectedCategory = ref(""); //배열로 다중 선택
 const categoryOptions = [
-  '식비',
-  '의료',
-  '교통',
-  '여가',
-  '통신',
-  '급여',
-  '기타',
+  "식비",
+  "의료",
+  "교통",
+  "여가",
+  "통신",
+  "급여",
+  "기타",
 ];
 const editForm = reactive({
   //수정 중인 데이터 임시 보관
   id: null,
-  date: '',
+  date: "",
   amount: 0,
-  type: 'expense',
-  category: '',
-  memo: '',
+  type: "expense",
+  category: "",
+  memo: "",
 });
-const startDate = ref(''); //시작 날짜 필터
-const endDate = ref(''); // 마지막 날짜 필터
+const startDate = ref(""); //시작 날짜 필터
+const endDate = ref(""); // 마지막 날짜 필터
 const currentPage = ref(1); //현재 페이지 번호
 const itemsPerPage = 8; //한 페이지당 리스트 8개 표시
 const pageGroupSize = 5; //페이지네이션 5개 단위로 묶기 ex)1,2,3,4,5
@@ -193,7 +192,7 @@ const isEditModalVisible = ref(false); // 수정 팝업 상태
 
 function toggleType(type) {
   // 같은 버튼을 두 번 누르면 전체 보기로 전환
-  selectedType.value = selectedType.value === type ? '' : type;
+  selectedType.value = selectedType.value === type ? "" : type;
 }
 
 //  선택 값 변경 시 페이지 1로 초기화
@@ -206,13 +205,13 @@ const setDateRange = (range) => {
   const today = new Date();
   let start = new Date();
 
-  if (range === '7days') {
+  if (range === "7days") {
     // 최근 1주일: 오늘 포함 7일
     start.setDate(today.getDate() - 6);
-  } else if (range === '1month') {
+  } else if (range === "1month") {
     // 최근 1개월: 오늘 포함 30일
     start.setDate(today.getDate() - 29);
-  } else if (range === 'thisMonth') {
+  } else if (range === "thisMonth") {
     // 이번 달: 4월 1일 ~ 오늘
     start = new Date(today.getFullYear(), today.getMonth(), 1);
   }
@@ -223,8 +222,8 @@ const setDateRange = (range) => {
 
 // 전체 기간 초기화 함수
 const resetDateRange = () => {
-  startDate.value = '';
-  endDate.value = '';
+  startDate.value = "";
+  endDate.value = "";
 };
 
 // 거래 내역 필터링
@@ -273,18 +272,18 @@ async function deleteTransaction(tx) {
       const response = await fetch(
         `http://localhost:3000/transaction/${tx.id}`,
         {
-          method: 'DELETE',
+          method: "DELETE",
         }
       );
       console.log(response);
       if (response.ok) {
-        alert('삭제 완료!');
+        alert("삭제 완료!");
         const index = transactions.value.findIndex((t) => t.id === tx.id);
         if (index !== -1) {
           transactions.value.splice(index, 1); // 리스트에서 삭제
         }
       } else {
-        throw new Error('삭제 실패');
+        throw new Error("삭제 실패");
       }
     } catch (err) {
       alert(err.message);
@@ -491,7 +490,7 @@ onMounted(() => {
   flex-wrap: wrap;
 }
 
-.date-group input[type='date'] {
+.date-group input[type="date"] {
   padding: 6px 10px;
   border-radius: 6px;
   border: 1px solid #ccc;

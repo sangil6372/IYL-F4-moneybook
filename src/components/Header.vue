@@ -26,7 +26,7 @@
             </RouterLink>
           </li>
           <li class="nav-item">
-            <RouterLink to="/transaction" class="nav-link" active-class="active">
+            <RouterLink to="/calendar" class="nav-link" active-class="active">
               <i class="fa-solid fa-money-bill-transfer me-1"></i> Calendar
             </RouterLink>
           </li>
