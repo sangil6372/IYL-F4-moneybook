@@ -1,10 +1,13 @@
 ﻿# 🪜SADARI
 
 ## 팀프로젝트 틀 세팅 목록입니다.
-
+    npm install
 - pinia
 - axios
 - bootstrap@5
+- chart.js
+- fullcalendar
+- animate
 
 ## 개발 시작하면 이렇게 해주세요!
 
