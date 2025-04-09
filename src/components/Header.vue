@@ -21,6 +21,11 @@
           class="navbar-nav ms-auto gap-lg-4 gap-2 align-items-lg-center flex-column flex-lg-row mt-3 mt-lg-0"
         >
           <li class="nav-item">
+            <RouterLink to="/dashboard" class="nav-link" active-class="active">
+              <i class="fas fa-table me-1"></i> Dashboard
+            </RouterLink>
+          </li>
+          <li class="nav-item">
             <RouterLink to="/analytics" class="nav-link" active-class="active">
               <i class="fa-solid fa-chart-simple me-1"></i> Analytics
             </RouterLink>
@@ -28,11 +33,6 @@
           <li class="nav-item">
             <RouterLink to="/calendar" class="nav-link" active-class="active">
               <i class="fa-solid fa-money-bill-transfer me-1"></i> Calendar
-            </RouterLink>
-          </li>
-          <li class="nav-item">
-            <RouterLink to="/dashboard" class="nav-link" active-class="active">
-              <i class="fas fa-table me-1"></i> Dashboard
             </RouterLink>
           </li>
           <li class="nav-item">
