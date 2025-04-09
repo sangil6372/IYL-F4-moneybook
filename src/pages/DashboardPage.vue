@@ -1,154 +1,104 @@
 <template>
   <div class="p-8 pb-28">
-    <!-- bottom padding -->
-    <div class="flex justify-between items-center mb-6">
-      <div class="flex flex-wrap gap-4">
-        <!-- 거래유형 필터 -->
-        <select v-model="selectedType" class="border px-3 py-2 rounded text-sm">
-          <option value="all">내역 전체보기</option>
-          <option value="expense">지출</option>
-          <option value="income">수입</option>
-        </select>
-
-        <!-- 날짜 필터 버튼 -->
-        <div class="flex flex-wrap gap-2">
+    <div class="container">
+      <!-- 필터 바 전체 -->
+      <div class="filter-bar">
+        <!-- 유형 토글 버튼 -->
+        <div class="filter-group">
           <button
-            @click="setDateRange('7days')"
-            class="px-3 py-1 border rounded"
+            class="toggle-btn"
+            :class="{ active: selectedType === 'expense' }"
+            @click="toggleType('expense')"
           >
-            최근 1주일
+            지출
           </button>
           <button
-            @click="setDateRange('1month')"
-            class="px-3 py-1 border rounded"
+            class="toggle-btn"
+            :class="{ active: selectedType === 'income' }"
+            @click="toggleType('income')"
           >
-            최근 1개월
-          </button>
-          <button
-            @click="setDateRange('thisMonth')"
-            class="px-3 py-1 border rounded"
-          >
-            이번 달
-          </button>
-          <button @click="resetDateRange" class="px-3 py-1 border rounded">
-            전체 기간
+            수입
           </button>
         </div>
 
-        <!-- 사용자 직접 날짜 선택 -->
-        <div class="flex flex-wrap gap-2 items-center">
-          <label>
-            시작일:
-            <input
-              type="date"
-              v-model="startDate"
-              class="border px-2 py-1 rounded"
-            />
-          </label>
-          <label>
-            종료일:
-            <input
-              type="date"
-              v-model="endDate"
-              class="border px-2 py-1 rounded"
-            />
-          </label>
+        <!-- 날짜 선택 -->
+        <div class="filter-group date-group">
+          <label>시작일</label>
+          <input type="date" v-model="startDate" />
+          <span>~</span>
+          <label>종료일</label>
+          <input type="date" v-model="endDate" />
         </div>
 
-        <Multiselect
-          v-model="selectedCategory"
-          :options="categoryOptions"
-          :multiple="true"
-          :close-on-select="false"
-          :clear-on-select="false"
-          placeholder="카테고리 선택"
-          class="text-sm w-48"
-        />
+        <!-- 카테고리 필터 -->
+        <div class="filter-group">
+          <label>카테고리</label>
+          <select v-model="selectedCategory" class="category-select">
+            <option value="">카테고리 선택</option>
+            <option
+              v-for="option in categoryOptions"
+              :key="option"
+              :value="option"
+            >
+              {{ option }}
+            </option>
+          </select>
+        </div>
       </div>
-    </div>
 
-    <table class="w-full text-sm border-t">
-      <thead>
-        <tr class="text-left border-b bg-gray-50">
-          <th class="py-2 px-2">분류</th>
-          <th class="py-2 px-2">날짜</th>
-          <th class="py-2 px-2">카테고리</th>
-          <th class="py-2 px-2">금액</th>
-          <th class="py-2 px-2">메모</th>
-          <th class="py-2 px-2">관리</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="tx in pagedTransactions"
-          :key="tx.id"
-          class="border-b hover:bg-gray-50"
-        >
-          <td class="py-2 px-2">
-            <span
-              :class="[
-                'px-2 py-1 rounded-full text-xs font-bold',
-                tx.type === 'expense'
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-red-100 text-red-700',
-              ]"
-            >
-              {{ tx.type === 'expense' ? '지출' : '수입' }}
-            </span>
-          </td>
-          <td class="py-2 px-2">{{ formatDate(tx.date) }}</td>
-          <td class="py-2 px-2">{{ tx.category }}</td>
-          <td class="py-2 px-2 text-blue-600 font-bold">
-            {{ tx.amount.toLocaleString() }} 원
-          </td>
-          <td class="py-2 px-2">
-            {{
-              tx.memo.length > 8 ? tx.memo.slice(0, 8) + '...' : tx.memo || '-'
-            }}
-          </td>
-          <td class="py-2 px-2">
-            <button
-              @click="editTransaction(tx)"
-              title="수정"
-              class="text-blue-500 mr-2"
-            >
-              수정
-            </button>
-            <button
-              @click="deleteTransaction(tx)"
-              title="삭제"
-              class="text-red-500"
-            >
-              삭제
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div v-if="editModalVisible" class="modal-overlay">
-      <div class="modal">
-        <h2>거래 내역 수정</h2>
-        <form @submit.prevent="updateTransaction">
-          <label>날짜: <input type="date" v-model="editForm.date" /></label>
-          <label>금액: <input type="number" v-model="editForm.amount" /></label>
-          <label
-            >타입:
-            <select v-model="editForm.type">
-              <option value="income">수입</option>
-              <option value="expense">지출</option>
-            </select></label
-          >
-          <label
-            >카테고리: <input type="text" v-model="editForm.category"
-          /></label>
-          <label>메모: <input type="text" v-model="editForm.memo" /></label>
-
-          <div class="modal-buttons">
-            <button type="submit">저장</button>
-            <button type="button" @click="closeEditModal">취소</button>
-          </div>
-        </form>
+      <div class="table-wrapper">
+        <table class="custom-table">
+          <thead>
+            <tr class="table-head">
+              <th class="py-2 px-2">분류</th>
+              <th class="py-2 px-2">날짜</th>
+              <th class="py-2 px-2">카테고리</th>
+              <th class="py-2 px-2">금액</th>
+              <th class="py-2 px-2">메모</th>
+              <th class="py-2 px-2">관리</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="tx in pagedTransactions" :key="tx.id" class="table-row">
+              <td>
+                <span
+                  :class="[
+                    'type-label',
+                    tx.type === 'expense' ? 'expense' : 'income',
+                  ]"
+                >
+                  {{ tx.type === 'expense' ? '지출' : '수입' }}
+                </span>
+              </td>
+              <td>{{ formatDate(tx.date) }}</td>
+              <td>{{ tx.category }}</td>
+              <td class="amount">{{ tx.amount.toLocaleString() }} 원</td>
+              <td>
+                {{
+                  tx.memo.length > 8
+                    ? tx.memo.slice(0, 8) + '...'
+                    : tx.memo || '-'
+                }}
+              </td>
+              <td>
+                <button
+                  @click="openEditModal(tx)"
+                  title="수정"
+                  class="action-btn"
+                >
+                  수정
+                </button>
+                <button
+                  @click="deleteTransaction(tx)"
+                  title="삭제"
+                  class="action-btn text-red"
+                >
+                  삭제
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -161,21 +111,19 @@
   </div>
 
   <!-- 하단 고정된 페이지네이션 -->
-  <div
-    class="fixed bottom-0 left-0 w-full bg-white py-3 border-t text-center z-10"
-  >
+  <div class="pagination-container">
     <button
       @click="currentPage--"
       :disabled="currentPage === 1"
-      class="mx-1 px-2 py-1 border rounded"
+      class="pagination-button"
     >
-      이전
+      <i class="fa-solid fa-chevron-left"></i>
     </button>
 
     <button
       v-if="currentGroup > 0"
       @click="currentPage = (currentGroup - 1) * pageGroupSize + 1"
-      class="mx-1 px-2 py-1 border rounded"
+      class="pagination-button"
     >
       ←
     </button>
@@ -184,10 +132,7 @@
       v-for="page in pageNumbers"
       :key="page"
       @click="currentPage = page"
-      :class="[
-        'mx-1 px-3 py-1 border rounded',
-        currentPage === page ? 'bg-blue-500 text-white' : 'bg-white',
-      ]"
+      :class="['pagination-button', currentPage === page ? 'active' : '']"
     >
       {{ page }}
     </button>
@@ -195,7 +140,7 @@
     <button
       v-if="(currentGroup + 1) * pageGroupSize < totalPages"
       @click="currentPage = (currentGroup + 1) * pageGroupSize + 1"
-      class="mx-1 px-2 py-1 border rounded"
+      class="pagination-button"
     >
       →
     </button>
@@ -203,25 +148,24 @@
     <button
       @click="currentPage++"
       :disabled="currentPage === totalPages"
-      class="mx-1 px-2 py-1 border rounded"
+      class="pagination-button"
     >
-      다음
+      <i class="fa-solid fa-chevron-right"></i>
     </button>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watch, reactive } from 'vue';
 import { useDashBoardStore } from '@/stores/dashBoard';
 import { storeToRefs } from 'pinia';
-import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
 
 const store = useDashBoardStore();
 const { transactions } = storeToRefs(store);
 
-const selectedType = ref('all'); //'all', 'expense', 'income'
-const selectedCategory = ref([]); //배열로 다중 선택
+const selectedType = ref(''); //'all', 'expense', 'income'
+const selectedCategory = ref(''); //배열로 다중 선택
 const categoryOptions = [
   '식비',
   '의료',
@@ -231,21 +175,26 @@ const categoryOptions = [
   '급여',
   '기타',
 ];
+const editForm = reactive({
+  //수정 중인 데이터 임시 보관
+  id: null,
+  date: '',
+  amount: 0,
+  type: 'expense',
+  category: '',
+  memo: '',
+});
 const startDate = ref(''); //시작 날짜 필터
 const endDate = ref(''); // 마지막 날짜 필터
 const currentPage = ref(1); //현재 페이지 번호
 const itemsPerPage = 8; //한 페이지당 리스트 8개 표시
 const pageGroupSize = 5; //페이지네이션 5개 단위로 묶기 ex)1,2,3,4,5
-const editModalVisible = ref(false); // 수정 팝업 상태
-const editForm = ref({
-  //수정 중인 데이터 임시 보관
-  id: null,
-  date: '',
-  amount: 0,
-  type: '',
-  category: '',
-  memo: '',
-});
+const isEditModalVisible = ref(false); // 수정 팝업 상태
+
+function toggleType(type) {
+  // 같은 버튼을 두 번 누르면 전체 보기로 전환
+  selectedType.value = selectedType.value === type ? '' : type;
+}
 
 //  선택 값 변경 시 페이지 1로 초기화
 watch([selectedType, selectedCategory, startDate, endDate], () => {
@@ -280,23 +229,24 @@ const resetDateRange = () => {
 
 // 거래 내역 필터링
 const filteredTransactions = computed(() => {
-  return transactions.value.filter((tx) => {
-    const matchType =
-      selectedType.value === 'all' || tx.type === selectedType.value;
+  return transactions.value
+    .filter((tx) => {
+      const matchType = !selectedType.value || tx.type === selectedType.value;
 
-    // 카테고리 다중 선택 필터링
-    const matchCategory =
-      selectedCategory.value.length === 0 ||
-      selectedCategory.value.includes(tx.category);
+      // 카테고리 다중 선택 필터링
+      const matchCategory =
+        selectedCategory.value.length === 0 ||
+        selectedCategory.value.includes(tx.category);
 
-    const txDate = new Date(tx.date);
-    const start = startDate.value ? new Date(startDate.value) : null;
-    const end = endDate.value ? new Date(endDate.value) : null;
+      const txDate = new Date(tx.date);
+      const start = startDate.value ? new Date(startDate.value) : null;
+      const end = endDate.value ? new Date(endDate.value) : null;
 
-    const matchDate = (!start || txDate >= start) && (!end || txDate <= end);
+      const matchDate = (!start || txDate >= start) && (!end || txDate <= end);
 
-    return matchType && matchCategory && matchDate;
-  });
+      return matchType && matchCategory && matchDate;
+    })
+    .sort((a, b) => new Date(a.date) - new Date(b.date));
 });
 
 function formatDate(dateStr) {
@@ -318,7 +268,7 @@ const pagedTransactions = computed(() => {
 //데이터 삭제
 async function deleteTransaction(tx) {
   alert(tx.id);
-  if (confirm(`"${tx.memo}" 항목을 삭제할까요?`)) {
+  if (confirm(`id:"${tx.id}",memo:"${tx.memo}" 항목을 삭제할까요?`)) {
     try {
       const response = await fetch(
         `http://localhost:3000/transaction/${tx.id}`,
@@ -329,8 +279,6 @@ async function deleteTransaction(tx) {
       console.log(response);
       if (response.ok) {
         alert('삭제 완료!');
-        // 리스트 갱신이 필요함
-        // location.reload(); // 삭제 시 새로고침
         const index = transactions.value.findIndex((t) => t.id === tx.id);
         if (index !== -1) {
           transactions.value.splice(index, 1); // 리스트에서 삭제
@@ -341,43 +289,6 @@ async function deleteTransaction(tx) {
     } catch (err) {
       alert(err.message);
     }
-  }
-}
-
-//수정 버튼 눌렀을 때 호출되는 함수
-function editTransaction(tx) {
-  editForm.value = { ...tx }; // 기존 데이터 불러오기
-  editModalVisible.value = true;
-}
-//수정 팝업 모달 닫기
-function closeEditModal() {
-  editModalVisible.value = false;
-}
-
-//수정 요청 보내기
-async function updateTransaction() {
-  const tx = editForm.value;
-  try {
-    const response = await fetch(`http://localhost:3000/transaction/${tx.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(tx),
-    });
-
-    if (!response.ok) throw new Error('수정 실패');
-
-    // 리스트 갱신
-    const index = transactions.value.findIndex((t) => t.id === tx.id);
-    if (index !== -1) {
-      transactions.value[index] = { ...tx };
-    }
-
-    alert('수정 완료!');
-    closeEditModal();
-  } catch (err) {
-    alert(err.message);
   }
 }
 
@@ -398,45 +309,272 @@ onMounted(() => {
 </script>
 
 <style scoped>
-table td,
-table th {
-  padding-top: 12px;
-  padding-bottom: 12px;
-}
-.action-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
+.category-select {
+  appearance: none;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: white;
+  font-size: 14px;
+  color: #333;
+  min-width: 160px;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='gray' height='16' viewBox='0 0 24 24' width='16' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px 16px;
 }
 
-.action-buttons button {
+/* ✅ 테이블 감싸는 wrapper */
+.table-wrapper {
+  max-width: 1000px; /* 원하는 최대 너비 */
+  margin: 0 auto; /* 가운데 정렬 */
+  padding: 20px;
+}
+
+/* ✅ 테이블 기본 스타일 */
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  color: #333;
+  text-align: center;
+}
+
+/* ✅ 테이블 헤더 */
+.table-head th {
+  padding: 12px;
+  background-color: #f9fafb;
+  font-weight: 600;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* ✅ 테이블 내용 행 */
+.table-row td {
+  padding: 12px;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.2s;
+}
+
+.table-row:hover {
+  background-color: #f9f9f9;
+}
+
+/* ✅ 금액 컬럼 강조 */
+.amount {
+  font-weight: bold;
+  color: #2563eb;
+}
+
+/* ✅ 수입/지출 라벨 */
+.type-label {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 12px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.type-label.income {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.type-label.expense {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+/* ✅ 수정/삭제 버튼 */
+.action-btn {
   background: none;
   border: none;
+  color: #3b82f6;
   cursor: pointer;
-  font-size: 18px;
-  padding: 4px;
+  padding: 4px 8px;
+  font-size: 13px;
+  margin-right: 4px;
 }
 
-.action-buttons button:hover {
-  transform: scale(1.2);
-  transition: 0.2s ease;
+.action-btn:hover {
+  text-decoration: underline;
 }
 
-.modal {
+.action-btn.text-red {
+  color: #ef4444;
+}
+
+/* ✅ 페이지네이션 */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.page-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  border: none;
+  color: #374151;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.page-btn.active {
+  background: #2563eb;
+  color: white;
+}
+
+.page-btn:hover {
+  background: #e5e7eb;
+}
+
+.pagination-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 12px 0;
+  text-align: center;
+  z-index: 10;
+  background-color: transparent; /* 배경 투명 */
+  border-top: none; /* 선 제거 */
+}
+/* 현재 선택된 페이지 스타일 */
+.pagination-button.active {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+  font-weight: bold;
+}
+
+/* 비활성화된 버튼 */
+.pagination-button:disabled {
+  color: #aaa;
+  border-color: #ddd;
+  background-color: #f9f9f9;
+  cursor: not-allowed;
+}
+/* 버튼 기본 스타일 */
+.pagination-button {
+  display: inline-block;
+  margin: 0 4px;
+  padding: 6px 14px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  color: #333;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.filter-bar {
+  background-color: #e0f7f9;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.date-group input[type='date'] {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.toggle-btn {
+  padding: 8px 20px;
+  border-radius: 20px;
+  border: 1px solid #3cb2ac;
+  background-color: white;
+  color: #3cb2ac;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.toggle-btn.active {
+  background-color: #3cb2ac;
+  color: white;
+}
+
+.primary-btn {
+  background-color: #3cb2ac;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.primary-btn:hover {
+  background-color: #2ca59a;
+}
+
+.secondary-btn {
+  background-color: white;
+  color: #3cb2ac;
+  border: 1px solid #3cb2ac;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.secondary-btn:hover {
+  background-color: #ebfafa;
+}
+
+.container {
+  max-width: 900px; /* 또는 1000px 등 원하는 고정 너비 */
+  margin: 0 auto;
+}
+
+/* 모달창 css 시작 부분*/
+.edit-modal-box {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.4);
+  background-color: rgba(0, 0, 0, 0.4);
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 999;
 }
-.modal-content {
-  background: white;
-  padding: 1.5rem;
+
+.modal {
+  background-color: white;
+  padding: 24px;
   border-radius: 8px;
-  width: 300px;
+  width: 400px; /* 크기 조절 */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.edit-form input,
+.edit-form textarea {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 8px;
+  box-sizing: border-box;
 }
 </style>
