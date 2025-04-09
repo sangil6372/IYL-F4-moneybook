@@ -8,6 +8,7 @@
 - chart.js
 - fullcalendar
 - animate
+- date-fns
 
 ## 개발 시작하면 이렇게 해주세요!
 
