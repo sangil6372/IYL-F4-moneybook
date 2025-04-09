@@ -1,6 +1,6 @@
 /* 캘린더에서 사용할 pinia */
 
-import { reactive, computed } from "vue";
+import { ref, reactive, computed } from "vue";
 import { defineStore } from "pinia";
 import axios from "axios";
 
@@ -15,6 +15,7 @@ export const useCalendar = defineStore("transaction", () => {
 
   //getter
   const transaction = computed(() => state.transaction);
+  const totalTransaction = computed(() => state.transaction.length);
 
   const fixedCostTransaction = computed(() =>
     transaction.value.filter(
@@ -40,6 +41,7 @@ export const useCalendar = defineStore("transaction", () => {
         });
         // 🐷 필터링된 거래 목록 state에 넣기
         state.transaction = userTransaction;
+        totalTransaction.value = state.transaction.length;
         console.log('거래 목록 가져오기');
       } else {
         alert('거래 목록 조회 실패');
@@ -99,6 +101,7 @@ export const useCalendar = defineStore("transaction", () => {
   };
 
   return {
+    totalTransaction,
     transaction,
     calendarEvents,
     fetchTransaction,
