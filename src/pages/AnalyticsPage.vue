@@ -4,13 +4,13 @@
 
     <!-- 상단 지표 카드 3개 -->
     <div class="d-flex justify-content-between mb-4">
-      <div class="flex-fill text-center bg-light mx-2 py-3 rounded shadow-sm">
+      <div class="flex-fill text-center bg-light mx-2 py-3 rounded shadow-sm card-hover">
         <h5>💸 지출 <strong>{{ expense.toLocaleString() }}원</strong></h5>
       </div>
-      <div class="flex-fill text-center bg-light mx-2 py-3 rounded shadow-sm">
+      <div class="flex-fill text-center bg-light mx-2 py-3 rounded shadow-sm card-hover">
         <h5>💵 수입 <strong>{{ income.toLocaleString() }}원</strong></h5>
       </div>
-      <div class="flex-fill text-center bg-light mx-2 py-3 rounded shadow-sm">
+      <div class="flex-fill text-center bg-light mx-2 py-3 rounded shadow-sm card-hover">
         <h5>🏦 이익 <strong>{{ net.toLocaleString() }}원</strong></h5>
       </div>
     </div>
@@ -70,7 +70,8 @@
 
 <script setup>
 import { ref, computed} from 'vue'
-import { useTransaction } from '@/stores/transaction'
+// 🐷 이름 나중에 바꾸기
+import { useCalendar } from '@/stores/calendar'
 import { Line, Doughnut } from 'vue-chartjs'
 import {
   Chart as ChartJS,
@@ -88,7 +89,8 @@ import {
 ChartJS.register(Title, Tooltip, Legend, ArcElement, LineElement, PointElement, CategoryScale, LinearScale);
 
 // pinia 등록
-const useStore = useTransaction();
+// 🐷 이름 나중에 바꾸기
+const useStore = useCalendar();
 // db.json 으로 부터 axios.get
 const { fetchTransaction } = useStore;
 
@@ -148,20 +150,8 @@ const analyzeThisMonth = async () => {
     
     if (type === 'expense') exp += item.amount;
     else if (type === 'income') inc += item.amount;
-    
-    // // 수입이라면 총수입과 날짜에 따른 수입 기록
-    // // 지출이라면 카테고리별 지출도 추가
-    // if (item.type === 'expense') {
-    //   if (!categoryMap[item.category]) categoryMap[item.category] = 0
-    //   exp += item.amount
-    //   dailyMap[day].expense += item.amount
-    //   categoryMap[item.category] += item.amount
-    // }
-    // else if (item.type === 'income') {
-    //   inc += item.amount
-    //   dailyMap[day].income += item.amount
-    // }
   });
+  
   // 반응형에 대입
   income.value = inc;
   expense.value = exp;
@@ -269,4 +259,12 @@ const lineChartOptions = {
 
 
 <style scoped>
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
 </style>
