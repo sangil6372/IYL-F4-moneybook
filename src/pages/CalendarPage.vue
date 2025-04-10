@@ -6,7 +6,7 @@
       <div class="col-12 col-lg-9 mb-4">
         <div class="card shadow-sm">
           <div class="card-body">
-            <FullCalendar :options="calendarOptions" />
+            <FullCalendar :options="calendarOptions" :key="calendarKey" />
           </div>
         </div>
       </div>
@@ -14,7 +14,7 @@
       <!-- 우측 결제일/입력폼 영역 -->
       <div class="col-12 col-lg-3">
         <!-- 초기 상태: 다가오는 결제일 -->
-        <div v-if="!selectedDate" class="card shadow-sm">
+        <div v-if="!selectedDate || cardStacked" class="card shadow-sm w-100">
           <div class="card-header bg-white">
             <h5 class="mb-0">
               <i class="fa-solid fa-calendar-check me-2 text-primary"></i>
@@ -59,47 +59,13 @@
               style="top: 12px; right: 16px; cursor: pointer; font-size: 1.2rem"
               title="입력 닫기"
             ></i>
-            <ul class="list-group mb-3" v-if="selectedDateforEach.length">
-              <li
-                v-for="item in selectedDateforEach"
-                :key="item.id"
-                class="list-group-item d-flex justify-content-between align-items-center"
-              >
-                <div>
-                  <span
-                    :class="
-                      item.type === 'income' ? 'text-success' : 'text-danger'
-                    "
-                    class="fw-bold"
-                  >
-                    {{ item.type === "income" ? "+" : "-"
-                    }}{{ item.amount.toLocaleString() }}원
-                  </span>
-                  <span class="text-muted ms-2">{{ item.category }}</span>
-                  <span
-                    v-if="item.fixedCost === 'true'"
-                    class="badge bg-warning text-dark ms-2"
-                    >고정</span
-                  >
-                </div>
-                <div>
-                  <button
-                    class="btn btn-sm btn-outline-primary me-2"
-                    @click="editTransaction(item)"
-                  >
-                    수정
-                  </button>
-                  <button
-                    class="btn btn-sm btn-outline-danger"
-                    @click="storeCalendar.deleteTransaction(item.id)"
-                  >
-                    삭제
-                  </button>
-                </div>
-              </li>
-            </ul>
+            <TransactionList
+              :transactions="selectedDateforEach"
+              @edit="editTransaction"
+              @delete="storeCalendar.deleteTransaction"
+            />
             <button
-              class="btn btn-outline-success w-100"
+              class="btn btn-outline-success w-100 text-nowrap"
               @click="formView = true"
             >
               거래 추가
@@ -122,103 +88,60 @@
                 style="top: 12px; right: 16px; cursor: pointer"
               ></i>
             </h5>
-
-            <!-- 금액 입력 -->
-            <div class="mb-3">
-              <label for="amount" class="form-label">금액</label>
-              <div class="input-group">
-                <input
-                  id="amount"
-                  type="number"
-                  class="form-control"
-                  v-model="form.amount"
-                  placeholder="0"
-                />
-                <span class="input-group-text">원</span>
-              </div>
-            </div>
-
-            <!-- 수입/지출 선택 -->
-            <div class="mb-3">
-              <label class="form-label d-block">분류</label>
-              <div class="form-check form-check-inline">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  id="income"
-                  value="income"
-                  v-model="form.type"
-                />
-                <label class="form-check-label" for="income">수입</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  id="expense"
-                  value="expense"
-                  v-model="form.type"
-                />
-                <label class="form-check-label" for="expense">지출</label>
-              </div>
-            </div>
-
-            <!-- 고정 여부 -->
-            <div class="mb-3">
-              <label class="form-label d-block">고정 지출 여부</label>
-              <div class="form-check form-check-inline">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  id="true"
-                  value="true"
-                  v-model="form.fixedCost"
-                />
-                <label for="true"> 고정 지출 </label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  id="false"
-                  value="false"
-                  v-model="form.fixedCost"
-                />
-                <label for="false"> 비고정 지출 </label>
-              </div>
-            </div>
-
-            <!-- 카테고리 -->
-            <div class="mb-3">
-              <label for="category" class="form-label">카테고리</label>
-              <select id="category" class="form-select" v-model="form.category">
-                <option disabled value="">카테고리를 선택하세요</option>
-                <option>식비</option>
-                <option>의료</option>
-                <option>교통</option>
-                <option>여가</option>
-                <option>통신</option>
-                <option>급여</option>
-                <option>기타</option>
-              </select>
-            </div>
-
-            <!-- 메모 -->
-            <div class="mb-3">
-              <label for="memo" class="form-label">메모</label>
-              <textarea
-                id="memo"
-                class="form-control"
-                rows="2"
-                v-model="form.memo"
-                placeholder="자세한 내용을 입력해 주세요"
-              ></textarea>
-            </div>
-
-            <button class="btn btn-success w-100" @click="saveForm">
-              <i class="fa-solid fa-floppy-disk me-2"></i> 저장
-            </button>
+            <InputForm :form="form" @save="saveForm" />
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="modal fade"
+    id="transactionModal"
+    tabindex="-1"
+    aria-labelledby="transactionModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="transactionModalLabel">
+            <template v-if="formView">
+              <i class="fa-solid fa-calendar-day me-2 text-primary"></i>
+              {{ selectedDate }} 입력
+            </template>
+            <template v-else>
+              <i class="fa-solid fa-pen-to-square me-2 text-primary"></i>
+              {{ selectedDate }} 거래 내역
+            </template>
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            aria-label="Close"
+            @click.stop="handleModalClose"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <template v-if="formView">
+            <InputForm :form="form" @save="saveForm" />
+          </template>
+          <template v-else>
+            <TransactionList
+              :transactions="selectedDateforEach"
+              @edit="editTransaction"
+              @delete="storeCalendar.deleteTransaction"
+            />
+            <button
+              class="btn btn-outline-success w-100 mt-3"
+              @click="
+                closeForm(false);
+                formView = true;
+              "
+            >
+              거래 추가
+            </button>
+          </template>
         </div>
       </div>
     </div>
@@ -226,7 +149,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, nextTick, onUnmounted, watch } from "vue";
 import FullCalendar from "@fullcalendar/vue3";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -235,6 +158,9 @@ import koLocale from "@fullcalendar/core/locales/ko";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { useCalendar } from "@/stores/calendar";
+import InputForm from "@/components/InputForm.vue";
+import TransactionList from "@/components/TransactionList.vue";
+import { Modal } from "bootstrap";
 
 // pinia 연결
 const storeCalendar = useCalendar();
@@ -250,6 +176,52 @@ const formView = ref(false);
 
 // 수정하기위한 id
 const editId = ref(null);
+
+// 사이드카드가 아래로 내려갔는지 확인
+const cardStacked = ref(false);
+
+onMounted(() => {
+  window.addEventListener("resize", detectCardStack);
+  nextTick(detectCardStack); // 초기 체크
+});
+onUnmounted(() => {
+  window.removeEventListener("resize", detectCardStack);
+});
+
+function detectCardStack() {
+  const calendarEl = document.querySelector(".col-lg-9");
+  const cardEl = document.querySelector(".col-lg-3");
+
+  if (calendarEl && cardEl) {
+    const calendarTop = calendarEl.getBoundingClientRect().top;
+    const cardTop = cardEl.getBoundingClientRect().top;
+    cardStacked.value = cardTop > calendarTop + 20; // 20px은 여유값
+  }
+}
+
+watch(cardStacked, (newVal) => {
+  const el = document.getElementById("transactionModal");
+
+  if (newVal && selectedDate.value) {
+    nextTick(() => {
+      if (el) {
+        const modal = Modal.getInstance(el) || new Modal(el);
+        modal.show();
+      }
+    });
+  }
+
+  if (!newVal) {
+    nextTick(() => {
+      if (el) {
+        const modal = Modal.getInstance(el);
+        modal?.hide();
+      }
+    });
+  }
+
+  calendarKey.value++;
+});
 
 // 입력 폼 상태
 const form = ref({
@@ -276,17 +248,35 @@ const remindFixedCost = computed(() => {
     .sort((a, b) => getDate(a.date) - getDate(b.date));
 });
 
+// 모바일일때 '원' 빼기 위한 변수 선언
+const calendarKey = ref(0);
+
 /* function 들 */
+
+// 모달 닫기 함수
+function handleModalClose() {
+  const el = document.getElementById("transactionModal");
+  const modal = Modal.getOrCreateInstance(el);
+  if (formView.value) {
+    formView.value = false;
+    editId.value = null;
+  } else {
+    modal.hide(); // 모달 닫기
+
+    // 선택 날짜 및 상태 초기화
+    closeForm(true);
+  }
+}
 
 // 고정 지출 날짜 계산 후 bootstrap 넣기
 function getClass(dateStr) {
   const date = getDate(dateStr);
   if (date <= 7) {
-    return "bg-danger text-white";
+    return "bg-danger-soft fw-bold text-white";
   } else if (date <= 14) {
-    return "bg-warning text-dark";
+    return "bg-warning-soft fw-bold text-white";
   } else {
-    return "bg-success text-white";
+    return "bg-success-soft fw-bold text-white";
   }
 }
 
@@ -300,7 +290,7 @@ function getDate(dateStr) {
 
 // 날짜 포맷
 function formatDate(dateStr) {
-  return format(new Date(dateStr), "dd일", { locale: ko });
+  return format(new Date(dateStr), "d일", { locale: ko });
 }
 
 // 다가오는 결제일에 있는 목록 클릭시 -> 해당하는 날짜의 목록으로 이동
@@ -308,14 +298,36 @@ function goTransaction(date) {
   selectedDate.value = date;
   formView.value = false;
   editId.value = null;
+
+  highlight(date);
+  if (cardStacked.value) {
+    nextTick(() => {
+      const el = document.getElementById("transactionModal");
+      if (el) {
+        const modal = new Modal(el);
+        modal.show();
+      }
+    });
+  }
 }
 
 // 날짜 클릭시 얻어오는 것들
 function handleDateClick(info) {
+  closeForm(false);
   selectedDate.value = info.dateStr;
   formView.value = false;
   editId.value = null;
   highlight(info.dateStr);
+
+  if (cardStacked.value) {
+    nextTick(() => {
+      const el = document.getElementById("transactionModal");
+      if (el) {
+        const modal = new Modal(el);
+        modal.show();
+      }
+    });
+  }
 }
 
 // 캘린더에서 클릭하면 해당 날짜 하이라이트
@@ -338,6 +350,7 @@ function closeForm(resetAll = false) {
     selectedDate.value = null;
     removeHighlight();
   }
+  document.activeElement?.blur?.();
   formView.value = false;
   editId.value = null;
   form.value = {
@@ -346,6 +359,7 @@ function closeForm(resetAll = false) {
     category: "",
     memo: "",
     fixedCost: false,
+    userId: "6c9d",
   };
 }
 
@@ -358,7 +372,7 @@ function removeHighlight() {
 
 // 거래 내역 추가
 const saveForm = async () => {
-  if (!form.value.amount || !form.value.type) {
+  if (!form.value.amount || !form.value.category) {
     alert("금액과 분류는 반드시 작성해주세요.");
     return;
   }
@@ -414,13 +428,18 @@ const calendarOptions = computed(() => ({
 
   events: storeCalendar.calendarEvents,
   eventContent(info) {
+    const width = cardStacked.value;
     const { income, expense } = info.event.extendedProps;
 
     const plus = income
-      ? `<div class="text-success fw-bold">+${income.toLocaleString()}원</div>`
+      ? `<div class="text-success fw-bold">+${income.toLocaleString()}${
+          width ? "" : "원"
+        }</div>`
       : "";
     const minus = expense
-      ? `<div class="text-danger fw-bold">-${expense.toLocaleString()}원</div>`
+      ? `<div class="text-danger fw-bold">-${expense.toLocaleString()}${
+          width ? "" : "원"
+        }</div>`
       : "";
 
     return { html: plus + minus };
@@ -435,6 +454,19 @@ const calendarOptions = computed(() => ({
 </script>
 
 <style>
+/* 다가오는 결제일 색상 변경 */
+.bg-danger-soft {
+  background-color: #f76871; /* 연한 붉은색 */
+}
+
+.bg-warning-soft {
+  background-color: #f8d15a; /* 연한 노랑 */
+}
+
+.bg-success-soft {
+  background-color: #61f061; /* 연한 초록 */
+}
+
 /* 캘린더 전체 */
 .fc {
   font-family: "Noto Sans KR", sans-serif;
@@ -443,14 +475,12 @@ const calendarOptions = computed(() => ({
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   padding: 20px;
-  height: auto;
 }
 
 /* 헤더 (제목 및 네비게이션) */
 .fc-toolbar-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #0d6efd;
 }
 
 .fc-button {
@@ -495,11 +525,10 @@ const calendarOptions = computed(() => ({
 .fc .fc-daygrid-day-number {
   font-size: 13px;
   font-weight: 600;
-  margin: 4px;
+  margin: 2px 4px;
   color: #212529;
 }
-
-.fc-day-today {
+.fc-day-con .fc-day-today {
   background-color: transparent !important;
   border: none !important;
 }
@@ -552,17 +581,5 @@ const calendarOptions = computed(() => ({
 }
 .fc-daygrid-day {
   border-bottom: 1px solid #dee2e6;
-}
-
-/* 반응형 대응 */
-@media (max-width: 768px) {
-  .fc-toolbar-title {
-    font-size: 1.2rem;
-  }
-
-  .fc-button {
-    font-size: 12px;
-    padding: 4px 10px;
-  }
 }
 </style>

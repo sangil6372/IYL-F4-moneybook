@@ -159,10 +159,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch, reactive } from 'vue';
+import { ref, computed, onMounted, watch, reactive } from "vue";
 
 // 🐷 원래 있던 피니아 가지고 와서 삭제 및 수정 기능 구현으로 바꾸기
-import { useCalendar } from '@/stores/calendar'
+import { useCalendar } from "@/stores/calendar";
 
 // 🐷 스토어 등록
 const useStore = useCalendar();
@@ -243,7 +243,6 @@ const resetDateRange = () => {
 const filteredTransaction = computed(() => {
   // !!! Store 파일에서 transaction 가져오기
   const transaction = useStore.transaction;
-  
   return transaction.filter((tx) => {
     const matchType = !selectedType.value || tx.type === selectedType.value;
     // 카테고리 다중 선택 필터링
@@ -294,7 +293,8 @@ const pagedTransaction = computed(() => {
 
 // 데이터 삭제 할지 물어보기 호출
 async function deleteCheck(tx) {
-  if (confirm('항목을 삭제할까요?')) {
+
+  if (confirm("항목을 삭제할까요?")) {
     try {
       // Store의 함수 사용
       await useStore.deleteTransaction(tx.id);
@@ -310,12 +310,11 @@ async function updateCheck(tx) {
   try {
     // Store의 함수 사용
     // update 위한 정보 입력 받기!!
-    await useStore.updateTransaction(tx.id, );
+    await useStore.updateTransaction(tx.id);
     await useStore.fetchTransaction();
   } catch (err) {
     alert(err.message);
   }
-  
 }
 
 onMounted(async () => {
