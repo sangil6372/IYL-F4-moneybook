@@ -1,217 +1,255 @@
 <template>
-    <div class="container-fluid">
-  <div class="card p-4 m-3 my-5 border-0 shadow-sm rounded-4 bg-custom">
-
-  <div class="row g-4 align-items-end">
-    <!-- 수입/지출 선택 -->
-    <div class="col-auto">
-      <label class="form-label text-muted small fw-semibold text-center d-block">분류</label>
-            <select class="form-select text-center" v-model="editForm.type">
-              <option value="income">수입</option>
-              <option value="expense">지출</option>
-            </select>
-          </div>
-
-    <!-- 날짜 -->
-    <div class="col-auto">
-      <label class="form-label text-muted small fw-semibold text-center d-block">날짜</label>
-      <input type="date" class="form-control text-center" v-model="editForm.date" />
-    </div>
-
-    <!-- 카테고리 선택 -->
-    <div class="col-auto">
-      <label class="form-label text-muted small fw-semibold text-center d-block">카테고리</label>
-      <select class="form-select text-center" v-model="editForm.category">
-        <option value="">선택</option>
-        <option value="식비">식비</option>
-        <option value="교통">교통</option>
-        <option value="주거">주거</option>
-        <option value="기타">기타</option>
-      </select>
-    </div>
-
-    <!-- 금액 -->
-    <div class="col">
-      <label class="form-label text-muted small fw-semibold text-center d-block">금액</label>
-      <div class="d-flex align-items-center">
-        <input type="number" class="form-control" v-model="editForm.amount" placeholder="Price..."/>
-      </div>
-    </div>
-
-    <!-- 메모 -->
-    <div class="col flex-grow-1">
-      <label class="form-label text-muted small fw-semibold text-center d-block">메모</label>
-      <input type="text" class="form-control" v-model="editForm.memo" placeholder="Enter..." />
-    </div>
-
-   
-
-    <!-- 추가 버튼 -->
-    <div class="col-auto text-center">
-      <label class="form-label text-muted small fw-semibold text-center d-block">추가</label>
-      <button class="btn btn-outline-secondary px-3 py-2" @click="addCheck">
-        <i class="fa-solid fa-plus"></i>
-      </button>
-    </div>
-
-  </div>
-</div>
-
-      <div class="top-filter-bar d-flex justify-content-between">
-        <div>
-          <div class="category-filter">
-            <select v-model="selectedType" class="simple-select">
-              <option value="">내역 전체보기</option>
-              <option value="expense">지출</option>
-              <option value="income">수입</option>
-            </select>
-          </div>
-          <div class="category-filter">
-            <select v-model="selectedCategory" class="simple-select">
-              <option value="">카테고리 전체보기</option>
-              <option
-                v-for="option in categoryOptions"
-                :key="option"
-                :value="option"
-              >
-                {{ option }}
-              </option>
-            </select>
-          </div>
-
-          <!-- 날짜별 전체보기 -->
-          <div class="category-filter">
-            <select
-              v-model="selectedDateRange"
-              class="simple-select"
-              @change="onDateRangeChange"
-            >
-              <option value="">요일 전체보기</option>
-              <option value="7days">최근 1주일</option>
-              <option value="1month">최근 1개월</option>
-              <option value="thisMonth">이번 달</option>
-              <option value="custom">기간 설정</option>
-            </select>
-          </div>
-
-          <!-- 날짜 팝업 -->
-          <div v-if="showCustomPopup" class="custom-popup" :style="popupStyle">
-            <label>
-              시작일:
-              <input type="date" v-model="startDate" />
-            </label>
-            <label>
-              종료일:
-              <input type="date" v-model="endDate" />
-            </label>
-            <div class="popup-buttons">
-              <button @click="applyCustomDate">적용</button>
-              <button @click="closeCustomPopup">취소</button>
-            </div>
-          </div>
-
-        </div>
-          <!-- !!! 여기에 total 개수 추가 -->
-        <div class="total-number ml-auto">
-          전체 거래 : {{ useStore.totalTransaction }}건
+  <div class="container-fluid">
+    <div class="card p-4 m-3 my-5 border-0 shadow-sm rounded-4 bg-custom">
+      <div class="row g-4 align-items-end">
+        <!-- 수입/지출 선택 -->
+        <div class="col-auto">
+          <label
+            class="form-label text-muted small fw-semibold text-center d-block"
+            >분류</label
+          >
+          <select class="form-select text-center" v-model="editForm.type">
+            <option value="income">수입</option>
+            <option value="expense">지출</option>
+          </select>
         </div>
 
-      </div>
+        <!-- 날짜 -->
+        <div class="col-auto">
+          <label
+            class="form-label text-muted small fw-semibold text-center d-block"
+            >날짜</label
+          >
+          <input
+            type="date"
+            class="form-control text-center"
+            v-model="editForm.date"
+          />
+        </div>
 
+        <!-- 카테고리 선택 -->
+        <div class="col-auto">
+          <label
+            class="form-label text-muted small fw-semibold text-center d-block"
+            >카테고리</label
+          >
+          <select class="form-select text-center" v-model="editForm.category">
+            <option value="">선택</option>
+            <option value="식비">식비</option>
+            <option value="교통">교통</option>
+            <option value="주거">주거</option>
+            <option value="기타">기타</option>
+          </select>
+        </div>
 
-      <div class="table-wrapper">
-        <table class="custom-table">
-          <thead>
-            <tr class="table-head">
-              <th class="py-2 px-2">분류</th>
-              <th class="py-2 px-2">날짜</th>
-              <th class="py-2 px-2">카테고리</th>
-              <th class="py-2 px-2">금액</th>
-              <th class="py-2 px-2">메모</th>
-              <th class="py-2 px-2">관리</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="tx in pagedTransaction" :key="tx.id" class="table-row">
-              <td>
-                <span
-                  :class="[
-                    'type-label',
-                    tx.type === 'expense' ? 'expense' : 'income',
-                  ]"
-                >
-                  {{ tx.type === "expense" ? "지출" : "수입" }}
-                </span>
-              </td>
-              <td>{{ formatDate(tx.date) }}</td>
-              <td>{{ tx.category }}</td>
-              <td :class="tx.type === 'income' ? 'income':'expense'">{{ tx.amount.toLocaleString() }} 원</td>
-              <td>
-                {{
-                  tx.memo.length > 8
-                    ? tx.memo.slice(0, 8) + "..."
-                    : tx.memo || "-"
-                }}
-              </td>
-              <td>
-                <button
-                  @click="updateCheck(tx)"
-                  title="수정"
-                  class="action-btn"
-                >
-                  수정
-                </button>
-                <!-- 위의 수정을 누르면 updateCheck 호출 후 해당 거래를 모달로 수정! -->
-                <button
-                  @click="deleteCheck(tx)"
-                  title="삭제"
-                  class="action-btn text-red"
-                >
-                  삭제
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        
-      </div>
-    </div>
-
-    <div
-      v-if="filteredTransaction.length === 0"
-      class="text-center text-muted mt-5"
-    >
-      거래 내역이 없습니다.
-    </div>
-
-    <!-- 거래 수정 모달 -->
-    <!-- 🟡 Bootstrap 모달 컴포넌트 추가 -->
-    <div
-      class="modal fade"
-      id="editModal"
-      tabindex="-1"
-      aria-labelledby="editModalLabel"
-      aria-hidden="true"
-      ref="editModalRef"
-    >
-      <div class="modal-dialog">
-        <div class="modal-content p-3">
-          <div class="modal-header">
-            <h5 class="modal-title" id="editModalLabel">거래 수정</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          
-          <div class="modal-body">
-            <!-- 여기에 InputForm 컴포넌트 삽입 -->
-            <InputForm
-              :form="editForm"
-              @save="handleUpdate"
+        <!-- 금액 -->
+        <div class="col">
+          <label
+            class="form-label text-muted small fw-semibold text-center d-block"
+            >금액</label
+          >
+          <div class="d-flex align-items-center">
+            <input
+              type="number"
+              class="form-control"
+              v-model="editForm.amount"
+              placeholder="Price..."
             />
           </div>
         </div>
+
+        <!-- 메모 -->
+        <div class="col flex-grow-1">
+          <label
+            class="form-label text-muted small fw-semibold text-center d-block"
+            >메모</label
+          >
+          <input
+            type="text"
+            class="form-control"
+            v-model="editForm.memo"
+            placeholder="Enter..."
+          />
+        </div>
+
+        <!-- 추가 버튼 -->
+        <div class="col-auto text-center">
+          <label
+            class="form-label text-muted small fw-semibold text-center d-block"
+            >추가</label
+          >
+          <button class="btn btn-outline-secondary px-3 py-2" @click="addCheck">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        </div>
       </div>
     </div>
 
+    <div class="top-filter-bar d-flex justify-content-between">
+      <div>
+        <div class="category-filter">
+          <select v-model="selectedType" class="simple-select">
+            <option value="">내역 전체보기</option>
+            <option value="expense">지출</option>
+            <option value="income">수입</option>
+          </select>
+        </div>
+        <div class="category-filter">
+          <select v-model="selectedCategory" class="simple-select">
+            <option value="">카테고리 전체보기</option>
+            <option
+              v-for="option in categoryOptions"
+              :key="option"
+              :value="option"
+            >
+              {{ option }}
+            </option>
+          </select>
+        </div>
+
+        <!-- 날짜별 전체보기 -->
+        <div class="category-filter">
+          <select
+            v-model="selectedDateRange"
+            class="simple-select"
+            @change="onDateRangeChange"
+          >
+            <option value="">요일 전체보기</option>
+            <option value="7days">최근 1주일</option>
+            <option value="1month">최근 1개월</option>
+            <option value="thisMonth">이번 달</option>
+            <option value="custom">기간 설정</option>
+          </select>
+        </div>
+
+        <!-- 날짜 팝업 -->
+        <div
+          v-if="showCustomPopup"
+          class="dropdown-menu show p-3 shadow border rounded"
+          style="
+            position: absolute;
+            top: 100%;
+            left: 0;
+            z-index: 1050;
+            min-width: 250px;
+          "
+        >
+          <label class="form-label">
+            시작일:
+            <input type="date" v-model="startDate" class="form-control" />
+          </label>
+          <label class="form-label mt-2">
+            종료일:
+            <input type="date" v-model="endDate" class="form-control" />
+          </label>
+          <div class="d-flex justify-content-end gap-2 mt-3">
+            <button class="btn btn-primary btn-sm" @click="applyCustomDate">
+              적용
+            </button>
+            <button class="btn btn-secondary btn-sm" @click="closeCustomPopup">
+              취소
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- !!! 여기에 total 개수 추가 -->
+      <div class="total-number ml-auto">
+        전체 거래 : {{ useStore.totalTransaction }}건
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="custom-table">
+        <thead>
+          <tr class="table-head">
+            <th class="py-2 px-2">분류</th>
+            <th class="py-2 px-2">날짜</th>
+            <th class="py-2 px-2">카테고리</th>
+            <th class="py-2 px-2">금액</th>
+            <th class="py-2 px-2">메모</th>
+            <th class="py-2 px-2">관리</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="tx in pagedTransaction" :key="tx.id" class="table-row">
+            <td>
+              <span
+                :class="[
+                  'type-label',
+                  tx.type === 'expense' ? 'expense' : 'income',
+                ]"
+              >
+                {{ tx.type === "expense" ? "지출" : "수입" }}
+              </span>
+            </td>
+            <td>{{ formatDate(tx.date) }}</td>
+            <td>{{ tx.category }}</td>
+            <td :class="tx.type === 'income' ? 'income' : 'expense'">
+              {{ tx.amount.toLocaleString() }} 원
+            </td>
+            <td>
+              {{
+                tx.memo.length > 8
+                  ? tx.memo.slice(0, 8) + "..."
+                  : tx.memo || "-"
+              }}
+            </td>
+            <td>
+              <button @click="updateCheck(tx)" title="수정" class="action-btn">
+                수정
+              </button>
+              <!-- 위의 수정을 누르면 updateCheck 호출 후 해당 거래를 모달로 수정! -->
+              <button
+                @click="deleteCheck(tx)"
+                title="삭제"
+                class="action-btn text-red"
+              >
+                삭제
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div
+    v-if="filteredTransaction.length === 0"
+    class="text-center text-muted mt-5"
+  >
+    거래 내역이 없습니다.
+  </div>
+
+  <!-- 거래 수정 모달 -->
+  <!-- 🟡 Bootstrap 모달 컴포넌트 추가 -->
+  <div
+    class="modal fade"
+    id="editModal"
+    tabindex="-1"
+    aria-labelledby="editModalLabel"
+    aria-hidden="true"
+    ref="editModalRef"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content p-3">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editModalLabel">거래 수정</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+
+        <div class="modal-body">
+          <!-- 여기에 InputForm 컴포넌트 삽입 -->
+          <InputForm :form="editForm" @save="handleUpdate" />
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- 하단 고정된 페이지네이션 -->
   <div class="pagination-container">
@@ -260,15 +298,14 @@
   </div>
 </template>
 
-
 <script setup>
 import { ref, computed, onMounted, watch, reactive } from "vue";
 
 // 🐷 부트스트랩 모달 가져오기
-import { Modal } from 'bootstrap';
+import { Modal } from "bootstrap";
 
 // 🐷 수정 모달 불러오기
-import InputForm from '@/components/InputForm.vue';
+import InputForm from "@/components/InputForm.vue";
 
 // 🐷 원래 있던 피니아 가지고 와서 삭제 및 수정 기능 구현으로 바꾸기
 import { useCalendar } from "@/stores/calendar";
@@ -277,17 +314,17 @@ import { useCalendar } from "@/stores/calendar";
 const useStore = useCalendar();
 
 // 🐷 userID 쓰기 위해 피니아 임포트
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from "@/stores/auth";
 const authStore = useAuthStore();
 
 // 🐷 userId 가져오기
 const userId = authStore.user.id;
 
 // 지출 수입은 이걸로 관리 'all', 'expense', 'income'
-const selectedType = ref('');
+const selectedType = ref("");
 
 // 카테고리는 배열로 다중 선택 가능하도록
-const selectedCategory = ref('');
+const selectedCategory = ref("");
 const categoryOptions = [
   "식비",
   "의료",
@@ -307,7 +344,6 @@ const editForm = reactive({
   category: "",
   memo: "",
   fixedCost: "false",
-  // 임시 하드코딩
   userId: userId,
 });
 
@@ -359,23 +395,55 @@ const resetDateRange = () => {
   endDate.value = "";
 };
 
+const selectedDateRange = ref(""); // 드롭다운에서 선택한 날짜 범위
+const showCustomPopup = ref(false); // 사용자 설정 팝업 표시 여부
+const popupStyle = ref({}); // 팝업 위치 스타일
+
+// 날짜 범위 선택 시 처리
+function onDateRangeChange() {
+  if (selectedDateRange.value === "custom") {
+    showCustomPopup.value = true;
+  } else {
+    showCustomPopup.value = false;
+    if (selectedDateRange.value === "") {
+      resetDateRange();
+    } else {
+      setDateRange(selectedDateRange.value);
+    }
+  }
+}
+
+// 사용자 지정 날짜 적용
+function applyCustomDate() {
+  showCustomPopup.value = false;
+}
+
+// 사용자 지정 날짜 팝업 닫기 (취소)
+function closeCustomPopup() {
+  showCustomPopup.value = false;
+  selectedDateRange.value = ""; // 선택 취소
+  resetDateRange();
+}
+
 // 거래 내역 필터링 + 기간에 따른 정렬!
 // filteredTransaction 은 필터 조건에 맞는 transaction 목록
 const filteredTransaction = computed(() => {
   // !!! Store 파일에서 transaction 가져오기
   const transaction = useStore.transaction;
-  return transaction.filter((tx) => {
-    const matchType = !selectedType.value || tx.type === selectedType.value;
-    // 카테고리 다중 선택 필터링
-    const matchCategory =
-      selectedCategory.value.length === 0 ||
-      selectedCategory.value.includes(tx.category);
-    const txDate = new Date(tx.date);
-    const start = startDate.value ? new Date(startDate.value) : null;
-    const end = endDate.value ? new Date(endDate.value) : null;
-    const matchDate = (!start || txDate >= start) && (!end || txDate <= end);
-    return matchType && matchCategory && matchDate;
-    }).sort((a, b) => new Date(a.date) - new Date(b.date));
+  return transaction
+    .filter((tx) => {
+      const matchType = !selectedType.value || tx.type === selectedType.value;
+      // 카테고리 다중 선택 필터링
+      const matchCategory =
+        selectedCategory.value.length === 0 ||
+        selectedCategory.value.includes(tx.category);
+      const txDate = new Date(tx.date);
+      const start = startDate.value ? new Date(startDate.value) : null;
+      const end = endDate.value ? new Date(endDate.value) : null;
+      const matchDate = (!start || txDate >= start) && (!end || txDate <= end);
+      return matchType && matchCategory && matchDate;
+    })
+    .sort((a, b) => new Date(a.date) - new Date(b.date));
 });
 
 // template 에서 쓰는 날짜 출력용
@@ -399,7 +467,7 @@ const currentGroup = computed(() =>
 // 현재 페이지 그룹에 해당하는
 // !!! 실제로 사용하는 페이지 번호들을 계산하여 배열로 반환
 const pageNumbers = computed(() => {
-  const start = (currentGroup.value * pageGroupSize) + 1;
+  const start = currentGroup.value * pageGroupSize + 1;
   const end = Math.min(start + pageGroupSize - 1, totalPages.value);
   return Array.from({ length: end - start + 1 }, (_, i) => start + i);
 });
@@ -414,7 +482,6 @@ const pagedTransaction = computed(() => {
 
 // 데이터 삭제 할지 물어보기 호출
 async function deleteCheck(tx) {
-
   if (confirm("항목을 삭제할까요?")) {
     try {
       // Store의 함수 사용
@@ -447,41 +514,38 @@ async function updateCheck(tx) {
 
 async function addCheck() {
   const newTransaction = {
-    ...editForm
+    ...editForm,
   };
   delete newTransaction.id;
 
   // 예: Pinia 스토어에 추가
   await useStore.addTransaction(newTransaction);
   // 입력값 초기화
-  resetForm();
+  await resetForm();
 }
 
 function resetForm() {
-  editForm.value = {
-    type: "expense",
-    date: new Date().toISOString().slice(0, 10),
-    amount: 0,
-    category: "",
-    memo: "",
-    fixedCost: "false",
-  };
+  editForm.type = "expense";
+  editForm.date = new Date().toISOString().slice(0, 10);
+  editForm.amount = 0;
+  editForm.category = "";
+  editForm.memo = "";
+  editForm.fixedCost = "false";
 }
 
 // 모달이 저장 클릭하면 핸들러 작동
-function handleUpdate(formFromChild) {
-  useStore.updateTransaction(formFromChild.id, formFromChild);
-  resetForm();
+async function handleUpdate(formFromChild) {
+  await useStore.updateTransaction(formFromChild.id, formFromChild);
+  await resetForm();
 
   if (editModalInstance) {
     editModalInstance.hide(); // 모달 닫기
   }
 }
 
-
 onMounted(async () => {
   await useStore.fetchTransaction();
-  
+
   // 🐷 모달 인스턴스 초기화
   if (editModalRef.value) {
     editModalInstance = new Modal(editModalRef.value);
@@ -531,7 +595,7 @@ onMounted(async () => {
 }
 .expense {
   font-weight: bold;
-  color: #FF6384;
+  color: #ff6384;
 }
 
 /* ✅ 수입/지출 라벨 */
@@ -550,14 +614,14 @@ onMounted(async () => {
 
 .type-label.expense {
   background-color: #ffeaea;
-  color: #FF6384;
+  color: #ff6384;
 }
 
 /* ✅ 수정/삭제 버튼 */
 .action-btn {
   background: none;
   border: none;
-  color: #36A2EB;
+  color: #36a2eb;
   cursor: pointer;
   padding: 4px 8px;
   margin-right: 4px;
@@ -570,7 +634,7 @@ onMounted(async () => {
 }
 
 .action-btn.text-red {
-  color: #FF6384;
+  color: #ff6384;
 }
 
 /* ✅ 페이지네이션 */
@@ -593,7 +657,7 @@ onMounted(async () => {
 }
 
 .page-btn.active {
-  background: #36A2EB;
+  background: #36a2eb;
   color: white;
 }
 
@@ -614,9 +678,9 @@ onMounted(async () => {
 }
 /* 현재 선택된 페이지 스타일 */
 .pagination-button.active {
-  background-color: #36A2EB;
+  background-color: #36a2eb;
   color: #fff;
-  border-color: #36A2EB;
+  border-color: #36a2eb;
   font-weight: bold;
 }
 
@@ -775,7 +839,7 @@ onMounted(async () => {
   min-width: 220px;
 }
 
-.custom-popup input[type='date'] {
+.custom-popup input[type="date"] {
   width: 100%;
   padding: 4px;
   border: 1px solid #ddd;
@@ -813,15 +877,14 @@ onMounted(async () => {
   text-align: center;
 }
 
-
 /* 스핀 버튼 제거 */
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button {
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
 .bg-custom {
-  background: linear-gradient(135deg, #CFEFDC, #D1F1F5);
+  background: linear-gradient(135deg, #cfefdc, #d1f1f5);
 }
 </style>

@@ -5,15 +5,18 @@
     <div class="d-flex justify-content-between">
       <!-- 목표 기간 버튼 -->
       <button
-        class="btn btn-sm rounded-1 card-hover me-1"
-        :class="goalTab === 'month' ? 'btn-primary' : 'btn-outline-primary'"
+        class="btn btn-sm rounded-1 card-hover me-1 fw-bold me-2"
+        :class="
+          goalTab === 'month' ? 'custom-btn-active' : 'custom-btn-outline'
+        "
         @click="goalTab = 'month'"
       >
         이번 달
       </button>
+
       <button
-        class="btn btn-sm rounded-1 card-hover"
-        :class="goalTab === 'year' ? 'btn-primary' : 'btn-outline-primary'"
+        class="btn btn-sm rounded-1 card-hover fw-bold me-3"
+        :class="goalTab === 'year' ? 'custom-btn-active' : 'custom-btn-outline'"
         @click="goalTab = 'year'"
       >
         올해
@@ -56,14 +59,15 @@
             <!-- 차트 종류 버튼 -->
             <div class="mb-3">
               <button
-                class="btn btn-outline-primary btn-sm rounded-0 card-hover"
+                class="btn btn-outline-secondary btn-sm rounded-0 card-hover"
                 :class="{ active: chartTab === 'total' }"
                 @click="chartTab = 'total'"
               >
                 총 지출
               </button>
+              <span>{{ " " }}</span>
               <button
-                class="btn btn-outline-primary btn-sm me-3 rounded-0 card-hover"
+                class="btn btn-outline-secondary btn-sm me-3 rounded-0 card-hover"
                 :class="{ active: chartTab === 'category' }"
                 @click="chartTab = 'category'"
               >
@@ -121,7 +125,7 @@
     <h5
       class="mb-3 px-3 py-2 bg-primary bg-opacity-10 text-primary rounded d-inline-block card-hover"
     >
-      📆 최근 일주일 소비 성향
+      📆 이번 달 소비 성향
     </h5>
     <div
       class="row bg-white rounded shadow-sm p-3 h-100 d-flex flex-row justify-content-center align-items-center card-hover"
@@ -699,7 +703,7 @@ const displayNet = computed(() => displayIncome.value - displayExpense.value);
 const yearlyIncome = ref(0);
 
 // 차트 전환용 토글
-const chartTab = ref("total"); // 'total' or 'category'
+const chartTab = ref("category"); // 'total' or 'category'
 
 // 라인 차트만을 위한 반응형
 const lineChartWrapper = ref(null);
@@ -721,5 +725,22 @@ onBeforeUnmount(() => {
 .card-hover:hover {
   transform: translateY(-6px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.custom-btn-active {
+  background-color: #36a2eb;
+  color: white;
+  border: 1px solid #36a2eb;
+}
+
+.custom-btn-outline {
+  background-color: transparent;
+  color: #36a2eb;
+  border: 1px solid #36a2eb;
+}
+
+.custom-btn-active:hover,
+.custom-btn-outline:hover {
+  opacity: 0.9;
 }
 </style>
