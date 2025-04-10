@@ -5,7 +5,7 @@ import { defineStore } from "pinia";
 import axios from "axios";
 
 // 🐷 userID 쓰기 위해 피니아 임포트
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from "@/stores/auth";
 
 export const useCalendar = defineStore("transaction", () => {
   //state
@@ -29,22 +29,21 @@ export const useCalendar = defineStore("transaction", () => {
     try {
       // 🐷 reponse -> response
       const response = await axios.get(BASEURI);
-      
+
       // 🐷 userId 가져오기
       const userId = authStore.user.id;
 
       // 🐷 성공적으로 가져오면 state 에 넣기
       if (response.status === 200) {
         // 🐷 userId 에 따라서 거래목록을 필터링
-        const userTransaction = response.data.filter(item => {
+        const userTransaction = response.data.filter((item) => {
           return item.userId === userId;
         });
         // 🐷 필터링된 거래 목록 state에 넣기
         state.transaction = userTransaction;
-        totalTransaction.value = state.transaction.length;
         console.log('거래 목록 가져오기');
       } else {
-        alert('거래 목록 조회 실패');
+        alert("거래 목록 조회 실패");
       }
     } catch (error) {
       alert("에러발생:" + error);

@@ -1,9 +1,9 @@
 <template>
-  <header class="navbar navbar-expand-lg bg-white shadow-sm px-4 py-2">
-    <div class="container-fluid">
+  <div class="container-fluid">
+    <header class="navbar navbar-expand-lg px-5 py-3">
       <!-- 로고 -->
       <RouterLink to="/">
-        <img src="@/assets/logo.png" alt="Logo" class="logo-img" />
+        <img src="@/assets/logo2.png" alt="Logo" class="logo-img" />
       </RouterLink>
 
       <!-- 햄버거 버튼 -->
@@ -21,38 +21,42 @@
           class="navbar-nav ms-auto gap-lg-4 gap-2 align-items-lg-center flex-column flex-lg-row mt-3 mt-lg-0"
         >
           <li class="nav-item">
+            <RouterLink to="/dashboard" class="nav-link" active-class="active">
+              <i class="fas fa-table me-1"></i>
+            </RouterLink>
+          </li>
+          <li class="nav-item">
             <RouterLink to="/analytics" class="nav-link" active-class="active">
-              <i class="fa-solid fa-chart-simple me-1"></i> Analytics
+              <i class="fa-solid fa-chart-simple me-1"></i>
             </RouterLink>
           </li>
           <li class="nav-item">
             <RouterLink to="/calendar" class="nav-link" active-class="active">
-              <i class="fa-solid fa-money-bill-transfer me-1"></i> Calendar
-            </RouterLink>
-          </li>
-          <li class="nav-item">
-            <RouterLink to="/dashboard" class="nav-link" active-class="active">
-              <i class="fas fa-table me-1"></i> Dashboard
+              <i class="fa-solid fa-money-bill-transfer me-1"></i>
             </RouterLink>
           </li>
           <li class="nav-item">
             <RouterLink to="/profile" class="nav-link" active-class="active">
-              <i class="fas fa-user me-1"></i> Profile
+              <i class="fas fa-user me-1"></i>
             </RouterLink>
           </li>
           <li class="nav-item">
             <a
               href="#"
-              class="nav-link text-danger fw-bold"
+              class="nav-link fw-bold"
               @click.prevent="handleLogout"
+              style="color: #FF6384;"
             >
-              <i class="fas fa-sign-out-alt me-1"></i> 로그아웃
+              <i class="fas fa-sign-out-alt me-1"></i>
             </a>
           </li>
         </ul>
       </div>
-    </div>
+    
   </header>
+
+  </div>
+  
 </template>
 
 <script setup>
@@ -83,7 +87,7 @@ const handleLogout = () => {
 
 .nav-link.active,
 .nav-link:hover {
-  color: #0d6efd;
+  color: #1790a0;
 }
 
 .navbar-toggler {

@@ -305,6 +305,36 @@
       "memo": "약국 지출",
       "userId": "d3e6",
       "fixedCost": "false"
+    },
+    {
+      "id": "078e",
+      "amount": 55000,
+      "type": "expense",
+      "category": "교통",
+      "memo": "",
+      "fixedCost": "true",
+      "userId": "d3e6",
+      "date": "2025-04-12"
+    },
+    {
+      "id": "11ed",
+      "amount": 300000,
+      "type": "expense",
+      "category": "식비",
+      "memo": "",
+      "fixedCost": "true",
+      "userId": "d3e6",
+      "date": "2025-04-21"
+    },
+    {
+      "id": "d15d",
+      "amount": 500000,
+      "type": "expense",
+      "category": "통신",
+      "memo": "",
+      "fixedCost": "true",
+      "userId": "d3e6",
+      "date": "2025-04-28"
     }
   ]
 }
