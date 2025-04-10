@@ -38,6 +38,8 @@
 | **차트 시각화** | Chart.js |
 | **Mock Backend** | JSON Server |
 
+![{05B4F0DE-2528-4763-8674-1DE9E80274FD}](https://github.com/user-attachments/assets/af69c21b-9e6b-40bf-9cac-8f9019b624d4)
+
 ---
 
 ## 📌 주요 기능
