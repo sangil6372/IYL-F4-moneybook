@@ -2,7 +2,22 @@
   <!-- 컨테이너 -->
   <div class="container mt-4">
     <!-- 상단 지표 카드 3개 -->
-    <div class="d-flex justify-content-between mb-4">
+    <div class="d-flex justify-content-between">
+      <!-- 목표 기간 버튼 -->
+      <button
+        class="btn btn-sm rounded-1 card-hover me-1"
+        :class="goalTab === 'month' ? 'btn-primary' : 'btn-outline-primary'"
+        @click="goalTab = 'month'"
+      >
+        이번 달
+      </button>
+      <button
+        class="btn btn-sm rounded-1 card-hover"
+        :class="goalTab === 'year' ? 'btn-primary' : 'btn-outline-primary'"
+        @click="goalTab = 'year'"
+      >
+        올해
+      </button>
       <div
         class="flex-fill text-center bg-light mx-2 py-3 rounded shadow-sm card-hover"
       >
@@ -25,152 +40,165 @@
         </h5>
       </div>
     </div>
-    <div>
-      <button
-        class="btn me-2 fs-5 border-2 shadow-sm"
-        :class="{
-          'btn-primary': goalTab === 'month',
-          'btn-outline-primary': goalTab !== 'month',
-        }"
-        @click="goalTab = 'month'"
-      >
-        이번 달
-      </button>
-      <button
-        class="btn fs-5 border-2 shadow-sm"
-        :class="{
-          'btn-primary': goalTab === 'year',
-          'btn-outline-primary': goalTab !== 'year',
-        }"
-        @click="goalTab = 'year'"
-      >
-        올해
-      </button>
-    </div>
+
     <div class="row">
-      <div class="col-md-8">
-        <div
-          class="bg-ㅈ rounded shadow-sm p-4 h-100 d-flex flex-column justify-content-center align-items-center text-center"
-        >
-          <h4 class="mb-3">{{ spendingHeadline }}</h4>
-          <p class="fs-5 fw-bold">{{ spendingPersonality }}</p>
-        </div>
+      <!-- 탭 버튼 영역 -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div></div>
       </div>
-
-      <div class="col-md-4">
-        <div class="bg-white rounded shadow-sm p-4 h-100">
-          <h6>📢 지출 분석 요약</h6>
-          <p>{{ summaryTotalText }}</p>
-          <h6 class="mt-3">📂 카테고리별 요약</h6>
-          <pre style="white-space: pre-wrap">{{ summaryCategoryText }}</pre>
+      <div class="row align-items-stretch">
+        <!-- 좌측: 차트 -->
+        <div class="col-lg-8 mb-4">
+          <div
+            class="bg-white rounded shadow-sm p-3 h-100 card-hover"
+            style="height: 360px"
+          >
+            <!-- 차트 종류 버튼 -->
+            <div class="mb-3">
+              <button
+                class="btn btn-outline-primary btn-sm rounded-0 card-hover"
+                :class="{ active: chartTab === 'total' }"
+                @click="chartTab = 'total'"
+              >
+                총 지출
+              </button>
+              <button
+                class="btn btn-outline-primary btn-sm me-3 rounded-0 card-hover"
+                :class="{ active: chartTab === 'category' }"
+                @click="chartTab = 'category'"
+              >
+                카테고리별
+              </button>
+            </div>
+            <h6 class="mb-3">
+              {{
+                chartTab === "total"
+                  ? "📊 총 지출 vs 목표"
+                  : "📊 카테고리별 지출 vs 목표"
+              }}
+            </h6>
+            <Bar
+              v-if="chartTab === 'total' && goalTab === 'month'"
+              :data="horizontalBarDataMonth"
+              :options="horizontalBarOptions"
+            />
+            <Bar
+              v-if="chartTab === 'total' && goalTab === 'year'"
+              :data="horizontalBarDataYear"
+              :options="horizontalBarOptions"
+            />
+            <Bar
+              v-if="chartTab === 'category' && goalTab === 'month'"
+              :data="categoryBarDataMonth"
+              :options="horizontalBarOptions"
+              style="height: 300px"
+            />
+            <Bar
+              v-if="chartTab === 'category' && goalTab === 'year'"
+              :data="categoryBarDataYear"
+              :options="horizontalBarOptions"
+              style="height: 300px"
+            />
+          </div>
         </div>
-      </div>
-    </div>
 
-    <div class="row mt-4">
-      <!-- 목표 (상일) -->
-      <!-- 총 지출 vs 목표 -->
-      <div class="col-md-6 mb-4">
-        <div class="bg-white rounded shadow-sm p-3 h-100">
-          <h6 class="mb-3">📊 총 지출 vs 목표</h6>
-          <Bar
-            v-if="goalTab === 'month'"
-            :data="horizontalBarDataMonth"
-            :options="horizontalBarOptions"
-          />
-          <Bar
-            v-else
-            :data="horizontalBarDataYear"
-            :options="horizontalBarOptions"
-          />
-        </div>
-      </div>
-
-      <!-- 카테고리별 -->
-      <div class="col-md-6 mb-4">
-        <div class="bg-white rounded shadow-sm p-3 h-100">
-          <h6 class="mb-3">📊 카테고리별 지출 vs 목표</h6>
-          <Bar
-            v-if="goalTab === 'month'"
-            :data="categoryBarDataMonth"
-            :options="horizontalBarOptions"
-            style="height: 300px"
-          />
-          <Bar
-            v-else
-            :data="categoryBarDataYear"
-            :options="horizontalBarOptions"
-            style="height: 300px"
-          />
+        <!-- 우측: 요약 -->
+        <div class="col-lg-4 mb-4">
+          <div
+            class="bg-white rounded shadow-sm p-4 h-100 d-flex flex-column justify-content-center card-hover"
+          >
+            <div>
+              <h6 class="mb-3">📢 지출 분석 요약</h6>
+              <p>{{ summaryTotalText }}</p>
+              <h6 class="mt-3">📂 카테고리별 요약</h6>
+              <pre style="white-space: pre-wrap">{{ summaryCategoryText }}</pre>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
     <h5
-      class="mb-3 px-3 py-2 bg-primary bg-opacity-10 text-primary rounded d-inline-block"
+      class="mb-3 px-3 py-2 bg-primary bg-opacity-10 text-primary rounded d-inline-block card-hover"
     >
       📆 최근 일주일 소비 성향
     </h5>
-    <div class="row">
-      <!-- 라인 차트 -->
-      <div class="col-md-8 mb-4">
-        <div class="bg-white rounded shadow-sm p-3">
-          <Line :data="lineChartData" :options="lineChartOptions" />
+    <div
+      class="row bg-white rounded shadow-sm p-3 h-100 d-flex flex-row justify-content-center align-items-center card-hover"
+    >
+      <!-- 좌측: 도넛 차트 -->
+      <div class="col-lg-6 d-flex justify-content-center align-items-center">
+        <div class="position-relative" style="width: 240px; height: 240px">
+          <Doughnut :data="donutData" :options="donutOptions" />
+          <span
+            class="position-absolute text-center fw-bold"
+            style="
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -25px);
+              font-size: 0.8rem;
+            "
+          >
+            {{ donutTotal }}
+          </span>
         </div>
       </div>
 
-      <!-- 도넛 차트 -->
-      <div class="col-md-4">
-        <div
-          class="bg-white rounded shadow-sm p-3 h-100 d-flex flex-column justify-content-center align-items-center"
-        >
-          <!-- 클릭 가능한 지출과 수입 -->
-          <h6 class="mb-3">
-            <span
-              @click="selectedTab = 'expense'"
-              :class="{ 'fw-bold': selectedTab === 'expense' }"
-              style="cursor: pointer"
-              >지출</span
-            >
-            <span> | </span>
-            <span
-              @click="selectedTab = 'income'"
-              :class="{ 'fw-bold': selectedTab === 'income' }"
-              style="cursor: pointer"
-              >수입</span
-            >
-          </h6>
+      <!-- 우측: 카테고리별 리스트 -->
+      <div class="col-lg-6">
+        <!-- 지출/수입 탭 -->
+        <h6 class="mb-2 text-center">
+          <span
+            @click="selectedTab = 'expense'"
+            :class="{ 'fw-bold': selectedTab === 'expense' }"
+            style="cursor: pointer"
+            >지출</span
+          >
+          <span> | </span>
+          <span
+            @click="selectedTab = 'income'"
+            :class="{ 'fw-bold': selectedTab === 'income' }"
+            style="cursor: pointer"
+            >수입</span
+          >
+        </h6>
 
-          <!-- 차트 -->
-          <div class="position-relative" style="width: 150px; height: 150px">
-            <Doughnut :data="donutData" :options="donutOptions" />
-            <span
-              class="position-absolute text-center fw-bold"
-              style="
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -25px);
-                font-size: 0.8rem;
-              "
-            >
-              {{ donutTotal }}
-            </span>
-          </div>
-
-          <!-- 카테고리 -->
-          <div class="d-flex flex-wrap justify-content-around w-100 mt-3">
-            <div
-              class="text-center px-2 py-1"
-              v-for="(item, i) in donutLegend"
-              :key="i"
-              style="min-width: 80px"
-            >
-              <div :style="{ color: donutColors[i] }">
-                ●
-                <small>{{ item.label }}</small>
-              </div>
-              <small class="fw-bold">{{ item.value }}</small>
+        <!-- 카테고리 항목 리스트 -->
+        <div class="d-flex flex-column align-items-start px-3">
+          <div
+            class="d-flex justify-content-between w-100 mb-2"
+            v-for="(item, i) in donutLegend"
+            :key="i"
+          >
+            <div class="d-flex align-items-center">
+              <span :style="{ color: donutColors[i] }" class="me-2">●</span>
+              <small>{{ item.label }}</small>
             </div>
+            <small class="fw-bold">{{ item.value }}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-3">
+      <!-- 라인 차트 -->
+      <div class="col-lg-12 mb-4">
+        <div class="bg-white rounded shadow-sm p-3 card-hover">
+          <div
+            style="
+              position: relative;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              width: 100%;
+              height: 400px;
+            "
+          >
+            <Line
+              :data="lineChartData"
+              :options="lineChartOptions"
+              style="width: 100%; height: 100%"
+            />
           </div>
         </div>
       </div>
@@ -179,7 +207,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onBeforeUnmount } from "vue";
 // 🐷 이름 나중에 바꾸기
 import { useCalendar } from "@/stores/calendar";
 import { Line, Doughnut } from "vue-chartjs";
@@ -371,6 +399,7 @@ const lineChartData = computed(() => {
 // 그래프 옵션 세팅
 const lineChartOptions = {
   responsive: true,
+  maintainAspectRatio: true,
   plugins: {
     legend: {
       position: "top",
@@ -441,6 +470,15 @@ onMounted(async () => {
   analyzeThisMonth(transaction);
   analyzeThisYear(transaction);
   analyzeCategoryThisYear(transaction);
+
+  // 차트 부모 요소에 resize 감지
+  if (lineChartWrapper.value) {
+    resizeObserver.value = new ResizeObserver(() => {
+      // 강제로 resize 이벤트 트리거
+      window.dispatchEvent(new Event("resize"));
+    });
+    resizeObserver.value.observe(lineChartWrapper.value);
+  }
 });
 
 // 막대 차트 옵션 (공통 사용)
@@ -493,10 +531,10 @@ const horizontalBarDataYear = computed(() =>
 
 // 디버깅용
 watchEffect(() => {
-  console.log("✅ 이번 달 지출:", actualThisMonth.value);
-  console.log("🎯 이번 달 목표:", goalThisMonth.value);
-  console.log("✅ 올해 지출:", actualThisYear.value);
-  console.log("🎯 올해 목표:", goalThisYear.value);
+  console.log("이번 달 지출:", actualThisMonth.value);
+  console.log("이번 달 목표:", goalThisMonth.value);
+  console.log("올해 지출:", actualThisYear.value);
+  console.log("올해 목표:", goalThisYear.value);
 });
 
 //  카테 고리별 시각화
@@ -599,6 +637,16 @@ const summaryCategoryText = computed(() => {
 
   const results = [];
 
+  // 각 카테고리 이모지로 매핑
+  const categoryEmoji = {
+    식비: "🍱",
+    의료: "💊",
+    교통: "🚌",
+    여가: "🎮",
+    통신: "📱",
+    기타: "📦", // 기타는 필요하면 제외 가능
+  };
+
   Object.keys(goalMap).forEach((cat) => {
     const goal = goalMap[cat];
     const actual = actualMap[cat] || 0;
@@ -607,62 +655,26 @@ const summaryCategoryText = computed(() => {
 
     const diff = actual - goal;
     const rate = Math.round((actual / goal) * 100);
+    const emoji = categoryEmoji[cat] || "📁"; // fallback 이모지
 
     if (diff > 0) {
       results.push(
-        `📈 [${cat}] 목표보다 ${diff.toLocaleString()}원 초과 (${rate}%)`
+        `${emoji} ${cat} - 목표보다 ${diff.toLocaleString()}원 초과 (${rate}%)`
       );
     } else if (diff < 0) {
       results.push(
-        `📉 [${cat}] 목표보다 ${Math.abs(
+        `${emoji} ${cat} - 목표보다 ${Math.abs(
           diff
         ).toLocaleString()}원 절약 (${rate}%)`
       );
     } else {
-      results.push(`🎯 [${cat}] 목표와 동일`);
+      results.push(`${emoji} ${cat} - 목표와 동일`);
     }
   });
 
   return results.length
     ? results.join("\n")
     : "📊 설정된 카테고리 목표가 없습니다.";
-});
-
-// 소비 성향 분석 텍스트
-const categoryMessages = {
-  식비: "🍱 배는 부르셨나요? 맛있게 드셨다면 됐죠!",
-  의료: "💊 병원비가 많았네요. 쾌차하시길 바랍니다 🙏",
-  교통: "🚌 오늘도 출퇴근길에 모험을 하셨군요!",
-  여가: "🎮 놀 때는 제대로! 인생은 즐기는 거니까요 😎",
-  통신: "📱 데이터 폭탄 맞으셨나요? 요금제 점검도 한 번!",
-  기타: "📦 예측불허의 소비! 다음 달엔 정체를 밝혀보아요~",
-};
-
-const spendingPersonality = computed(() => {
-  const actualMap =
-    goalTab.value === "month"
-      ? pieDataMap.value.expense || {}
-      : yearlyCategoryExpenseMap.value || {};
-
-  const goalMap =
-    goalTab.value === "month"
-      ? user.value?.goals?.month?.categories || {}
-      : user.value?.goals?.year?.categories || {};
-
-  // 기타 제외
-  const filtered = Object.entries(actualMap).filter(([cat]) => cat !== "기타");
-
-  if (filtered.length === 0) return "📭 이번 기간엔 소비 기록이 없어요.";
-
-  // 가장 지출 많은 항목
-  const [topCategory, topAmount] = filtered.reduce((max, curr) =>
-    curr[1] > max[1] ? curr : max
-  );
-
-  const customMsg =
-    categoryMessages[topCategory] || `🧐 [${topCategory}]에 소비가 집중됐어요!`;
-
-  return `${customMsg}`;
 });
 
 // 멘트 체인지
@@ -685,6 +697,20 @@ const displayNet = computed(() => displayIncome.value - displayExpense.value);
 
 // 연간 수입도 필요해서 추가
 const yearlyIncome = ref(0);
+
+// 차트 전환용 토글
+const chartTab = ref("total"); // 'total' or 'category'
+
+// 라인 차트만을 위한 반응형
+const lineChartWrapper = ref(null);
+const resizeObserver = ref(null);
+
+onBeforeUnmount(() => {
+  // 감지 중단
+  if (resizeObserver.value && lineChartWrapper.value) {
+    resizeObserver.value.unobserve(lineChartWrapper.value);
+  }
+});
 </script>
 
 <style scoped>
