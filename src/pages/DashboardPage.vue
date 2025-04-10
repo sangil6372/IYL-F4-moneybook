@@ -89,6 +89,7 @@
                 >
                   수정
                 </button>
+                <!-- 위의 수정을 누르면 updateCheck 호출 후 해당 거래를 모달로 수정! -->
                 <button
                   @click="deleteCheck(tx)"
                   title="삭제"
@@ -100,9 +101,16 @@
             </tr>
           </tbody>
         </table>
+        
       </div>
     </div>
 
+    <EditModal
+          v-if="isEditModalVisible"
+          :editForm="editForm"
+          @close="isEditModalVisible = false"
+          @updated="useStore.fetchTransaction"
+        />
     <div
       v-if="filteredTransaction.length === 0"
       class="text-center text-muted mt-5"
@@ -158,8 +166,12 @@
   </div>
 </template>
 
+
 <script setup>
 import { ref, computed, onMounted, watch, reactive } from "vue";
+
+// 🐷 수정 모달 불러오기
+import EditModal from '@/components/EditModal.vue';
 
 // 🐷 원래 있던 피니아 가지고 와서 삭제 및 수정 기능 구현으로 바꾸기
 import { useCalendar } from "@/stores/calendar";
@@ -305,16 +317,21 @@ async function deleteCheck(tx) {
   }
 }
 
-// 데이터 업데이트 할지 물어보기 호출
+// 데이터 업데이트 호출
 async function updateCheck(tx) {
-  try {
-    // Store의 함수 사용
-    // update 위한 정보 입력 받기!!
-    await useStore.updateTransaction(tx.id);
-    await useStore.fetchTransaction();
-  } catch (err) {
-    alert(err.message);
-  }
+  // 여기서 거래를 수정!!
+
+  // 선택한 거래 정보를 editForm에 복사
+  editForm.id = tx.id;
+  editForm.date = tx.date;
+  editForm.amount = tx.amount;
+  editForm.type = tx.type;
+  editForm.category = tx.category;
+  editForm.memo = tx.memo;
+
+  // 모달 띄우기
+  isEditModalVisible.value = true;
+  console.log(isEditModalVisible.value);
 }
 
 onMounted(async () => {
