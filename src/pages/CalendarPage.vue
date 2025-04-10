@@ -503,13 +503,14 @@ const calendarOptions = computed(() => ({
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   padding: 20px;
+  border: 1px solid #a7d0e4;
 }
 .fc .fc-daygrid-day-frame {
-  min-height: 95px;
+  height: 95px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  padding-top: 0.5rem;
+  padding-top: 0.25rem;
 }
 
 /* 헤더 (제목 및 네비게이션) */
@@ -519,8 +520,8 @@ const calendarOptions = computed(() => ({
 }
 
 .fc-button {
-  background-color: #96dbe2 !important;
-  border: none !important;
+  background-color: #a7d0e4 !important;
+  border: 1px solid #e9f7fd !important;
   color: white;
   padding: 6px 12px;
   font-size: 14px;
@@ -529,7 +530,7 @@ const calendarOptions = computed(() => ({
 }
 
 .fc-button:hover {
-  background-color: #4db3c6 !important; /* 미디엄 블루 */
+  background-color: #88bdd3 !important; /* 미디엄 블루 */
   transform: translateY(-1px);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   transition: 0.2s ease;
@@ -574,13 +575,19 @@ const calendarOptions = computed(() => ({
   border-left: 1px solid #a7d0e4 !important;
   border-right: 1px solid #a7d0e4 !important;
 }
+.fc .fc-scrollgrid-section-header > th {
+  padding-bottom: 12px !important;
+}
+.fc .fc-scrollgrid-sync-table tbody tr:first-child .fc-daygrid-day-frame {
+  border-top: 1px solid #a7d0e4;
+}
 
 /* 날짜 칸 (일자 영역) */
 .fc .fc-daygrid-day-number {
   font-size: 13px;
   display: inline-block;
   font-weight: 600;
-  margin: 6px 4px;
+  margin-right: 6px;
   color: #212529;
   text-decoration: none !important;
 }
@@ -604,7 +611,7 @@ const calendarOptions = computed(() => ({
   border-radius: 10px;
   background-color: #d1ecf1;
   color: #0c5460;
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
 /* 요일별 색상 */
