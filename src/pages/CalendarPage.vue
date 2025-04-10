@@ -49,16 +49,25 @@
         <!-- 거래 내역 보기 -->
         <div v-else-if="selectedDate && !formView" class="card shadow-sm mt-3">
           <div class="card-body">
-            <h5 class="card-title mb-4">
-              <i class="fa-solid fa-calendar-day me-2 text-primary"></i>
-              {{ selectedDate }} 거래 내역
-            </h5>
-            <i
-              class="fa-solid fa-xmark text-secondary position-absolute"
-              @click="closeForm(true)"
-              style="top: 12px; right: 16px; cursor: pointer; font-size: 1.2rem"
-              title="입력 닫기"
-            ></i>
+            <div class="position-relative mb-3">
+              <!-- 아이콘 + 날짜 + 거래내역 -->
+              <div class="d-flex flex-wrap align-items-center gap-2 pe-4">
+                <i class="fa-solid fa-calendar-day text-primary"></i>
+                <span class="fw-bold">{{ selectedDate }}</span>
+                <span
+                  class="text-muted flex-shrink-0 flex-grow-1 transaction-label"
+                  >거래 내역</span
+                >
+              </div>
+
+              <!-- X 버튼은 오른쪽 위 고정 -->
+              <i
+                class="fa-solid fa-xmark position-absolute top-0 end-0 text-secondary"
+                style="cursor: pointer; font-size: 1.2rem"
+                @click="closeForm(true)"
+                title="입력 닫기"
+              ></i>
+            </div>
             <TransactionList
               :transactions="selectedDateforEach"
               @edit="editTransaction"
@@ -161,9 +170,11 @@ import { useCalendar } from "@/stores/calendar";
 import InputForm from "@/components/InputForm.vue";
 import TransactionList from "@/components/TransactionList.vue";
 import { Modal } from "bootstrap";
+import { useAuthStore } from "@/stores/auth";
 
 // pinia 연결
 const storeCalendar = useCalendar();
+const authStore = useAuthStore();
 onMounted(() => {
   storeCalendar.fetchTransaction();
 });
@@ -231,7 +242,7 @@ const form = ref({
   memo: "",
   fixedCost: false,
   // 🐷 여기서 userId 받아와서 추가해줘야돼!!
-  userId: "6c9d",
+  userId: authStore.user.id,
 });
 
 // 거래 필터링
@@ -359,7 +370,7 @@ function closeForm(resetAll = false) {
     category: "",
     memo: "",
     fixedCost: false,
-    userId: "d3e6",
+    userId: authStore.user.id,
   };
 }
 
@@ -434,14 +445,19 @@ const calendarOptions = computed(() => ({
     const { income, expense } = info.event.extendedProps;
 
     const plus = income
-      ? `<div class="text-success fw-bold">+${income.toLocaleString()}${
-          width ? "" : "원"
-        }</div>`
+      ? `<div class="text-success fw-bold" style="font-size:${
+          width ? "10px" : "13px"
+        }">
+        +${income.toLocaleString()}${width ? "" : "원"}
+      </div>`
       : "";
+
     const minus = expense
-      ? `<div class="text-danger fw-bold">-${expense.toLocaleString()}${
-          width ? "" : "원"
-        }</div>`
+      ? `<div class="text-danger fw-bold" style="font-size:${
+          width ? "10px" : "13px"
+        }">
+        -${expense.toLocaleString()}${width ? "" : "원"}
+      </div>`
       : "";
 
     return { html: plus + minus };
@@ -480,6 +496,8 @@ const calendarOptions = computed(() => ({
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   padding: 20px;
+  /* max-height: 700px; */
+  /* overflow-y: auto; */
 }
 
 /* 헤더 (제목 및 네비게이션) */
@@ -550,6 +568,11 @@ const calendarOptions = computed(() => ({
   border: none !important;
   box-shadow: none !important;
 }
+.fc .fc-day-today:hover {
+  background-color: #f1f9fb !important;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1) !important;
+  cursor: pointer;
+}
 .fc .fc-daygrid-day {
   cursor: default !important;
 }
@@ -599,5 +622,15 @@ const calendarOptions = computed(() => ({
   background-color: #e0f7fa !important;
   border-radius: 12px;
   border: 2px solid #96dbe2;
+}
+.transaction-label {
+  white-space: nowrap;
+}
+
+@media (max-width: 400px) {
+  .transaction-label {
+    width: 100%;
+    margin-top: 0.25rem;
+  }
 }
 </style>
