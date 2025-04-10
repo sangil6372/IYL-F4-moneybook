@@ -6,7 +6,6 @@ export const categories = [
   { label: "통신", emoji: "📱" },
   { label: "급여", emoji: "💵" },
   { label: "기타", emoji: "📦" },
-  { label: "주거", emoji: "🏠" },
 ];
 
 export const categoryEmoji = Object.fromEntries(
