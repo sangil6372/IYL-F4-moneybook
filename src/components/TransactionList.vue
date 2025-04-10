@@ -49,7 +49,7 @@ const emit = defineEmits(["edit", "delete"]);
 function editTransaction(item) {
   emit("edit", item);
 }
-function deleteTransaction(item) {
-  emit("delete", item.id);
+function deleteTransaction(id) {
+  emit("delete", id);
 }
 </script>

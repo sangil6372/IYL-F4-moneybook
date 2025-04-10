@@ -14,7 +14,7 @@
       <!-- 우측 결제일/입력폼 영역 -->
       <div class="col-12 col-lg-3">
         <!-- 초기 상태: 다가오는 결제일 -->
-        <div v-if="!selectedDate || resizeWidth" class="card shadow-sm w-100">
+        <div v-if="!selectedDate || cardStacked" class="card shadow-sm w-100">
           <div class="card-header bg-white">
             <h5 class="mb-0">
               <i class="fa-solid fa-calendar-check me-2 text-primary"></i>
@@ -177,6 +177,52 @@ const formView = ref(false);
 // 수정하기위한 id
 const editId = ref(null);
 
+// 사이드카드가 아래로 내려갔는지 확인
+const cardStacked = ref(false);
+
+onMounted(() => {
+  window.addEventListener("resize", detectCardStack);
+  nextTick(detectCardStack); // 초기 체크
+});
+onUnmounted(() => {
+  window.removeEventListener("resize", detectCardStack);
+});
+
+function detectCardStack() {
+  const calendarEl = document.querySelector(".col-lg-9");
+  const cardEl = document.querySelector(".col-lg-3");
+
+  if (calendarEl && cardEl) {
+    const calendarTop = calendarEl.getBoundingClientRect().top;
+    const cardTop = cardEl.getBoundingClientRect().top;
+    cardStacked.value = cardTop > calendarTop + 20; // 20px은 여유값
+  }
+}
+
+watch(cardStacked, (newVal) => {
+  const el = document.getElementById("transactionModal");
+
+  if (newVal && selectedDate.value) {
+    nextTick(() => {
+      if (el) {
+        const modal = Modal.getInstance(el) || new Modal(el);
+        modal.show();
+      }
+    });
+  }
+
+  if (!newVal) {
+    nextTick(() => {
+      if (el) {
+        const modal = Modal.getInstance(el);
+        modal?.hide();
+      }
+    });
+  }
+
+  calendarKey.value++;
+});
+
 // 입력 폼 상태
 const form = ref({
   amount: "",
@@ -202,51 +248,9 @@ const remindFixedCost = computed(() => {
     .sort((a, b) => getDate(a.date) - getDate(b.date));
 });
 
-// 화면 크기 조절을 위한 변수 설정
-const width = ref(window.innerWidth);
-
-// 브라우저 크기가 달라질때 마다 resize 값 변경 및 삭제
-onMounted(() => {
-  window.addEventListener("resize", updateWidth);
-});
-onUnmounted(() => {
-  window.removeEventListener("resize", updateWidth);
-});
-
-// 버튼 깨짐 방지 함수 설정
-const resizeWidth = computed(() => width.value < 1200);
-
 // 모바일일때 '원' 빼기 위한 변수 선언
 const calendarKey = ref(0);
 
-watch(resizeWidth, (newVal, oldVal) => {
-  // PC → 모바일 모달 열리기
-  if (oldVal === false && newVal === true) {
-    if (selectedDate.value) {
-      nextTick(() => {
-        const el = document.getElementById("transactionModal");
-        if (el) {
-          const modal = Modal.getInstance(el) || new Modal(el);
-          modal.show();
-        }
-      });
-    }
-    calendarKey.value++;
-  }
-
-  // 모바일 → PC 변경시 모달 닫기
-  if (oldVal === true && newVal === false) {
-    nextTick(() => {
-      const el = document.getElementById("transactionModal");
-      if (el) {
-        const modal = Modal.getInstance(el);
-        modal?.hide(); // 모달도 닫음
-      }
-    });
-    calendarKey.value++;
-  }
-  // 원 표시 제거 및 생성
-});
 /* function 들 */
 
 // 모달 닫기 함수
@@ -262,11 +266,6 @@ function handleModalClose() {
     // 선택 날짜 및 상태 초기화
     closeForm(true);
   }
-}
-
-// 화면 변경시 작동
-function updateWidth() {
-  width.value = window.innerWidth;
 }
 
 // 고정 지출 날짜 계산 후 bootstrap 넣기
@@ -301,7 +300,7 @@ function goTransaction(date) {
   editId.value = null;
 
   highlight(date);
-  if (resizeWidth.value) {
+  if (cardStacked.value) {
     nextTick(() => {
       const el = document.getElementById("transactionModal");
       if (el) {
@@ -314,12 +313,13 @@ function goTransaction(date) {
 
 // 날짜 클릭시 얻어오는 것들
 function handleDateClick(info) {
+  closeForm(false);
   selectedDate.value = info.dateStr;
   formView.value = false;
   editId.value = null;
   highlight(info.dateStr);
 
-  if (resizeWidth.value) {
+  if (cardStacked.value) {
     nextTick(() => {
       const el = document.getElementById("transactionModal");
       if (el) {
@@ -372,7 +372,7 @@ function removeHighlight() {
 
 // 거래 내역 추가
 const saveForm = async () => {
-  if (!form.value.amount || !form.value.type) {
+  if (!form.value.amount || !form.value.category) {
     alert("금액과 분류는 반드시 작성해주세요.");
     return;
   }
@@ -428,7 +428,7 @@ const calendarOptions = computed(() => ({
 
   events: storeCalendar.calendarEvents,
   eventContent(info) {
-    const width = resizeWidth.value;
+    const width = cardStacked.value;
     const { income, expense } = info.event.extendedProps;
 
     const plus = income
@@ -460,11 +460,11 @@ const calendarOptions = computed(() => ({
 }
 
 .bg-warning-soft {
-  background-color: #fcdc7b; /* 연한 노랑 */
+  background-color: #f8d15a; /* 연한 노랑 */
 }
 
 .bg-success-soft {
-  background-color: #85f185; /* 연한 초록 */
+  background-color: #61f061; /* 연한 초록 */
 }
 
 /* 캘린더 전체 */
@@ -481,7 +481,6 @@ const calendarOptions = computed(() => ({
 .fc-toolbar-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #0d6efd;
 }
 
 .fc-button {
