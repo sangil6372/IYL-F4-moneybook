@@ -1,7 +1,5 @@
 <template>
     <div class="container-fluid">
-
-      
   <div class="card p-4 m-3 my-5 border-0 shadow-sm rounded-4 bg-custom">
 
   <div class="row g-4 align-items-end">
@@ -821,10 +819,6 @@ input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
-}
-
-input[type=number] {
-  -moz-appearance: textfield;
 }
 
 .bg-custom {
