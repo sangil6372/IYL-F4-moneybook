@@ -1,11 +1,11 @@
 ﻿# 🪜SADARI
 
 ## 팀프로젝트 틀 세팅 목록입니다.
-```npm install vue vue-router pinia```
-```npm install axios```
-```npm install bootstrap @fortawesome/fontawesome-free```
-```npm install @fullcalendar/core @fullcalendar/daygrid @fullcalendar/interaction @fullcalendar/vue3```
-```npm install chart.js vue-chartjs```
+```npm install vue vue-router pinia```  
+```npm install axios```  
+```npm install bootstrap @fortawesome/fontawesome-free```  
+```npm install @fullcalendar/core @fullcalendar/daygrid   @fullcalendar/interaction @fullcalendar/vue3```  
+```npm install chart.js vue-chartjs```  
 
 # 설치 후 실행
 ```npm run dev```
