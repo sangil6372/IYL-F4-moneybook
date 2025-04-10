@@ -231,7 +231,7 @@ const form = ref({
   memo: "",
   fixedCost: false,
   // 🐷 여기서 userId 받아와서 추가해줘야돼!!
-  userId: "6c9d",
+  userId: "6c9d"
 });
 
 // 거래 필터링
