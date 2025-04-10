@@ -1,58 +1,63 @@
 <template>
     <div class="container-fluid">
 
-      <div class="card p-3 m-3">
+      
+  <div class="card p-4 m-3 my-5 border-0 shadow-sm rounded-4 bg-custom">
 
-        <div class="row g-3 align-items-center">
-          <!-- 수입/지출 선택 -->
-          <div class="col-auto">
-            <select class="form-select" v-model="editForm.type" style="width: 80px;">
+  <div class="row g-4 align-items-end">
+    <!-- 수입/지출 선택 -->
+    <div class="col-auto">
+      <label class="form-label text-muted small fw-semibold text-center d-block">분류</label>
+            <select class="form-select text-center" v-model="editForm.type">
               <option value="income">수입</option>
               <option value="expense">지출</option>
             </select>
           </div>
-        
-          <!-- 날짜 -->
-          <div class="col-auto">
-            <input type="date" class="form-control" v-model="editForm.date" />
-          </div>
-        
-          <!-- 금액 -->
-          <div class="col-auto">
-            <input type="number" class="form-control" v-model="editForm.amount" placeholder="금액" style="width: 120px;" />
-          </div>
-        
-          <!-- 카테고리 -->
-          <div class="col-auto">
-            <select class="form-select" v-model="editForm.category" style="width: 120px;">
-              <option value="">카테고리</option>
-              <option value="식비">식비</option>
-              <option value="교통">교통</option>
-              <option value="주거">주거</option>
-              <option value="기타">기타</option>
-            </select>
-          </div>
-        
-          <!-- 메모 -->
-          <div class="col-auto flex-grow-1">
-            <input type="text" class="form-control" v-model="editForm.memo" placeholder="메모" />
-          </div>
-        
-          <!-- 고정비 체크 -->
-          <div class="col-auto form-check">
-            <input type="checkbox" class="form-check-input" id="fixedCheck" v-model="editForm.fixedCost" true-value="true" false-value="false" />
-            <label class="form-check-label" for="fixedCheck">고정</label>
-          </div>
-        
-          <!-- 저장 버튼 -->
-          <div class="col-auto">
-            <button class="btn btn-success px-4" @click="addCheck">
-              <i class="fa-solid fa-floppy-disk me-2"></i>저장
-            </button>
-          </div>
-        </div>
+
+    <!-- 날짜 -->
+    <div class="col-auto">
+      <label class="form-label text-muted small fw-semibold text-center d-block">날짜</label>
+      <input type="date" class="form-control text-center" v-model="editForm.date" />
+    </div>
+
+    <!-- 카테고리 선택 -->
+    <div class="col-auto">
+      <label class="form-label text-muted small fw-semibold text-center d-block">카테고리</label>
+      <select class="form-select text-center" v-model="editForm.category">
+        <option value="">선택</option>
+        <option value="식비">식비</option>
+        <option value="교통">교통</option>
+        <option value="주거">주거</option>
+        <option value="기타">기타</option>
+      </select>
+    </div>
+    <!-- 금액 -->
+    <div class="col">
+      <label class="form-label text-muted small fw-semibold text-center d-block">금액</label>
+      <div class="d-flex align-items-center">
+        <input type="number" class="form-control" v-model="editForm.amount" placeholder="Price..."/>
       </div>
-      
+    </div>
+
+    <!-- 메모 -->
+    <div class="col flex-grow-1">
+      <label class="form-label text-muted small fw-semibold text-center d-block">메모</label>
+      <input type="text" class="form-control" v-model="editForm.memo" placeholder="Enter..." />
+    </div>
+
+   
+
+    <!-- 추가 버튼 -->
+    <div class="col-auto text-center">
+      <label class="form-label text-muted small fw-semibold text-center d-block">추가</label>
+      <button class="btn btn-outline-secondary px-3 py-2" @click="addCheck">
+        <i class="fa-solid fa-plus"></i>
+      </button>
+    </div>
+
+  </div>
+</div>
+
       <div class="top-filter-bar d-flex justify-content-between">
         <div>
           <div class="category-filter">
@@ -497,7 +502,6 @@ onMounted(async () => {
 /* 테이블 헤더 */
 .table-head th {
   padding: 12px;
-  background-color: #f9fafb;
   font-weight: 600;
   border-bottom: 1px solid #e5e7eb;
 }
@@ -838,5 +842,21 @@ onMounted(async () => {
   border-radius: 5px;
   width: 130px;
   text-align: center;
+}
+
+
+/* 스핀 버튼 제거 */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.bg-custom {
+  background: linear-gradient(135deg, #CFEFDC, #D1F1F5);
 }
 </style>

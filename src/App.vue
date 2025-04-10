@@ -4,7 +4,7 @@
     <div class="flex-grow-1 d-flex flex-column">
       <Header v-if="!isExcludedView" />
 
-      <main class="flex-grow-1 bg-light">
+      <main class="flex-grow-1">
         <RouterView />
       </main>
     </div>
