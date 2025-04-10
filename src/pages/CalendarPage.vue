@@ -423,7 +423,8 @@ const calendarOptions = computed(() => ({
   initialView: "dayGridMonth",
   eventColor: "transparent",
   locale: koLocale,
-  contentHeight: 650,
+  contentHeight: "auto",
+  aspectRatio: 1.6,
 
   fixedWeekCount: false,
 
@@ -478,6 +479,9 @@ const calendarOptions = computed(() => ({
 .fc-day-other .fc-daygrid-day-number {
   visibility: hidden;
 }
+.fc-day-other .fc-event {
+  display: none !important;
+}
 /* 다가오는 결제일 색상 변경 */
 .bg-danger-soft {
   background-color: #ff6384;
@@ -499,8 +503,13 @@ const calendarOptions = computed(() => ({
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   padding: 20px;
-  /* max-height: 700px; */
-  /* overflow-y: auto; */
+}
+.fc .fc-daygrid-day-frame {
+  min-height: 95px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-top: 0.5rem;
 }
 
 /* 헤더 (제목 및 네비게이션) */
@@ -510,8 +519,8 @@ const calendarOptions = computed(() => ({
 }
 
 .fc-button {
-  background-color: #96dbe2;
-  border: none;
+  background-color: #96dbe2 !important;
+  border: none !important;
   color: white;
   padding: 6px 12px;
   font-size: 14px;
@@ -520,11 +529,18 @@ const calendarOptions = computed(() => ({
 }
 
 .fc-button:hover {
-  background-color: #96dbe2;
+  background-color: #4db3c6 !important; /* 미디엄 블루 */
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: 0.2s ease;
 }
 
 .fc-button:disabled {
   background-color: #adb5bd;
+}
+.fc-button:focus {
+  outline: none !important;
+  box-shadow: none !important;
 }
 .fc-daygrid-day {
   padding: 4px;
@@ -550,8 +566,9 @@ const calendarOptions = computed(() => ({
 /* 요일 헤더 색상 */
 .fc-col-header-cell {
   background-color: #e9f7fd;
-  padding: 10px 0;
+  padding: 12px 0;
   font-weight: 600;
+  font-size: 1.1rem;
   border-bottom: 1px solid #a7d0e4 !important; /* 💙 파란색 테두리 */
   border-top: 1px solid #a7d0e4 !important;
   border-left: 1px solid #a7d0e4 !important;
@@ -561,8 +578,9 @@ const calendarOptions = computed(() => ({
 /* 날짜 칸 (일자 영역) */
 .fc .fc-daygrid-day-number {
   font-size: 13px;
+  display: inline-block;
   font-weight: 600;
-  margin: 2px 4px;
+  margin: 6px 4px;
   color: #212529;
   text-decoration: none !important;
 }
