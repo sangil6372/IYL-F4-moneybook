@@ -1,6 +1,7 @@
 <template>
-  <header class="navbar navbar-expand-lg bg-white shadow-sm px-4 py-2">
-    <div class="container-fluid">
+  <div class="container">
+    <header class="navbar navbar-expand-lg px-5 py-3">
+    
       <!-- 로고 -->
       <RouterLink to="/">
         <img src="@/assets/logo.png" alt="Logo" class="logo-img" />
@@ -22,22 +23,22 @@
         >
           <li class="nav-item">
             <RouterLink to="/dashboard" class="nav-link" active-class="active">
-              <i class="fas fa-table me-1"></i> Dashboard
+              <i class="fas fa-table me-1"></i>
             </RouterLink>
           </li>
           <li class="nav-item">
             <RouterLink to="/analytics" class="nav-link" active-class="active">
-              <i class="fa-solid fa-chart-simple me-1"></i> Analytics
+              <i class="fa-solid fa-chart-simple me-1"></i>
             </RouterLink>
           </li>
           <li class="nav-item">
             <RouterLink to="/calendar" class="nav-link" active-class="active">
-              <i class="fa-solid fa-money-bill-transfer me-1"></i> Calendar
+              <i class="fa-solid fa-money-bill-transfer me-1"></i>
             </RouterLink>
           </li>
           <li class="nav-item">
             <RouterLink to="/profile" class="nav-link" active-class="active">
-              <i class="fas fa-user me-1"></i> Profile
+              <i class="fas fa-user me-1"></i>
             </RouterLink>
           </li>
           <li class="nav-item">
@@ -46,13 +47,16 @@
               class="nav-link text-danger fw-bold"
               @click.prevent="handleLogout"
             >
-              <i class="fas fa-sign-out-alt me-1"></i> 로그아웃
+              <i class="fas fa-sign-out-alt me-1"></i>
             </a>
           </li>
         </ul>
       </div>
-    </div>
+    
   </header>
+
+  </div>
+  
 </template>
 
 <script setup>
