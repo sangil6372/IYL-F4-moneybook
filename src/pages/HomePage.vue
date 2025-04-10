@@ -2,7 +2,7 @@
   <div class="container">
     <div class="overlay" id="overlay" ref="overlay">
       <div class="sign-in" id="sign-in" ref="leftText">
-        <h1>Welcome Sadari🪜</h1>
+        <h1>Welcome SADARI</h1>
         <p>To keep connected with us please login with your personal info</p>
         <button
           class="switch-button"
@@ -71,6 +71,7 @@
             placeholder="rePassword"
             v-model="regConfirm"
             @blur="regConfirmTouched = true"
+            input="isDuplicateEmail = false"
             :class="{ 'is-invalid': regConfirmTouched && !isPasswordMatch }"
           />
           <div
@@ -79,38 +80,32 @@
           >
             비밀번호가 일치하지 않습니다.
           </div>
-          <button
-            class="control-button up"
-            type="submit"
-            :disabled="!isEmailValid || isDuplicateEmail || !isPasswordMatch"
-          >
-            Sign Up
-          </button>
+          <button class="control-button up" type="submit">Sign Up</button>
         </form>
       </div>
     </div>
   </div>
-
   <!-- 여기 위에서부터 내가 커스텀 -->
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { Modal } from 'bootstrap';
-import { useAuthStore } from '@/stores/auth';
-import { useRouter } from 'vue-router';
-import { computed } from 'vue';
-import axios from 'axios';
+import { ref, onMounted } from "vue";
+import { Modal } from "bootstrap";
+import { useAuthStore } from "@/stores/auth";
+import { useRouter } from "vue-router";
+import { computed } from "vue";
+import axios from "axios";
+import { watch } from "vue";
 
 const modalRef = ref(null);
 let modalInstance = null;
 
-const regEmail = ref('');
-const regPassword = ref('');
-const regConfirm = ref('');
-const loginEmail = ref('');
-const loginPassword = ref('');
-const regName = ref('');
+const regEmail = ref("");
+const regPassword = ref("");
+const regConfirm = ref("");
+const loginEmail = ref("");
+const loginPassword = ref("");
+const regName = ref("");
 // 여기서부터
 const overlay = ref(null);
 const leftText = ref(null);
@@ -122,6 +117,10 @@ const slideLeftButton = ref(null);
 // 여기까지 asd1.html script
 const router = useRouter();
 const authStore = useAuthStore();
+
+watch(regEmail, () => {
+  isDuplicateEmail.value = false;
+});
 
 // onMounted(() => {
 //   // modalInstance = new Modal(modalRef.value); 아마도 기존의 modal 창
@@ -135,50 +134,50 @@ onMounted(() => {
   const signinFormEl = signinForm.value;
 
   const openSignUp = () => {
-    leftTextEl.classList.remove('overlay-text-left-animation-out');
-    overlayEl.classList.remove('open-sign-in');
-    rightTextEl.classList.remove('overlay-text-right-animation');
+    leftTextEl.classList.remove("overlay-text-left-animation-out");
+    overlayEl.classList.remove("open-sign-in");
+    rightTextEl.classList.remove("overlay-text-right-animation");
 
-    accountFormEl.classList.add('form-left-slide-out');
-    rightTextEl.classList.add('overlay-text-right-animation-out');
-    overlayEl.classList.add('open-sign-up');
-    leftTextEl.classList.add('overlay-text-left-animation');
+    accountFormEl.classList.add("form-left-slide-out");
+    rightTextEl.classList.add("overlay-text-right-animation-out");
+    overlayEl.classList.add("open-sign-up");
+    leftTextEl.classList.add("overlay-text-left-animation");
 
     setTimeout(() => {
-      accountFormEl.classList.remove('form-left-slide-in');
-      accountFormEl.style.display = 'none';
-      accountFormEl.classList.remove('form-left-slide-out');
+      accountFormEl.classList.remove("form-left-slide-in");
+      accountFormEl.style.display = "none";
+      accountFormEl.classList.remove("form-left-slide-out");
     }, 700);
 
     setTimeout(() => {
-      signinFormEl.style.display = 'flex';
-      signinFormEl.classList.add('form-right-slide-in');
+      signinFormEl.style.display = "flex";
+      signinFormEl.classList.add("form-right-slide-in");
     }, 200);
   };
 
   const openSignIn = () => {
-    leftTextEl.classList.remove('overlay-text-left-animation');
-    overlayEl.classList.remove('open-sign-up');
-    rightTextEl.classList.remove('overlay-text-right-animation-out');
+    leftTextEl.classList.remove("overlay-text-left-animation");
+    overlayEl.classList.remove("open-sign-up");
+    rightTextEl.classList.remove("overlay-text-right-animation-out");
 
-    signinFormEl.classList.add('form-right-slide-out');
-    leftTextEl.classList.add('overlay-text-left-animation-out');
-    overlayEl.classList.add('open-sign-in');
-    rightTextEl.classList.add('overlay-text-right-animation');
+    signinFormEl.classList.add("form-right-slide-out");
+    leftTextEl.classList.add("overlay-text-left-animation-out");
+    overlayEl.classList.add("open-sign-in");
+    rightTextEl.classList.add("overlay-text-right-animation");
 
     setTimeout(() => {
-      signinFormEl.classList.remove('form-right-slide-in');
-      signinFormEl.style.display = 'none';
-      signinFormEl.classList.remove('form-right-slide-out');
+      signinFormEl.classList.remove("form-right-slide-in");
+      signinFormEl.style.display = "none";
+      signinFormEl.classList.remove("form-right-slide-out");
     }, 700);
 
     setTimeout(() => {
-      accountFormEl.style.display = 'flex';
-      accountFormEl.classList.add('form-left-slide-in');
+      accountFormEl.style.display = "flex";
+      accountFormEl.classList.add("form-left-slide-in");
     }, 200);
   };
-  slideRightButton.value?.addEventListener('click', openSignIn);
-  slideLeftButton.value?.addEventListener('click', openSignUp);
+  slideRightButton.value?.addEventListener("click", openSignIn);
+  slideLeftButton.value?.addEventListener("click", openSignUp);
 });
 //여기까지가 asd1.html script
 
@@ -206,47 +205,47 @@ async function handleLogin(e) {
 
   try {
     await authStore.login(loginEmail.value, loginPassword.value);
-    alert('로그인 성공!');
-    router.push('/dashboard');
+    alert("로그인 성공!");
+    router.push("/dashboard");
   } catch (err) {
-    alert('이메일 또는 비밀번호가 올바르지 않습니다.');
+    alert("이메일 또는 비밀번호가 올바르지 않습니다.");
   }
 }
-
-// 로그인 즉각 유효성 검사
-const loginEmailTouched = ref(false);
-
-const isLoginEmailValid = computed(() => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(loginEmail.value);
-});
 
 //  회원가입 버튼 핸들러
 async function handleRegister() {
   regEmailTouched.value = true;
   regConfirmTouched.value = true;
 
-  if (!isEmailValid.value || isDuplicateEmail.value) {
-    alert('이메일 형식이 잘못됐거나 이미 등록된 이메일입니다.');
+  if (!isEmailValid.value) {
+    alert("이메일 형식이 잘못됐거나 이미 등록된 이메일입니다.");
+    return;
+  }
+  // 중복 확인 먼저 실행
+  await checkEmailExists();
+
+  if (isDuplicateEmail.value) {
+    alert("이미 등록된 이메일입니다.");
     return;
   }
 
   if (!isPasswordMatch.value) {
-    alert('비밀번호가 일치하지 않습니다.');
+    alert("비밀번호가 일치하지 않습니다.");
     return;
   }
-  console.log('try 들어오기 전');
+  console.log("try 들어오기 전");
   try {
     await authStore.register(
       regName.value.trim(),
       regEmail.value.trim(),
       regPassword.value.trim()
     );
-    console.log('try 들어오기 후');
+    console.log("try 들어오기 후");
     loginEmail.value = regEmail.value;
     // closeModal(); 이거를 모달로 나왔을 때는 사용하지만 지금은 사용하지 않으니까 주석처리함. 안하면 회원가입 안됨.
+    slideRightButton.value?.click();
   } catch (e) {
-    alert('회원가입 중 오류가 발생했습니다.');
+    alert("회원가입 중 오류가 발생했습니다.");
     console.error(e);
   }
 }
@@ -268,11 +267,9 @@ const isPasswordMatch = computed(() => {
 // 중복 이메일인지 체크
 const isDuplicateEmail = ref(false);
 const checkingEmail = ref(false);
-const emailChecked = ref(false); // 중복 확인 버튼 눌렀는지 여부
 
 async function checkEmailExists() {
   checkingEmail.value = true;
-  emailChecked.value = true;
 
   try {
     const res = await axios.get(
@@ -280,23 +277,12 @@ async function checkEmailExists() {
     );
     isDuplicateEmail.value = res.data.length > 0;
   } catch (err) {
-    console.error('이메일 확인 오류:', err);
+    console.error("이메일 확인 오류:", err);
   } finally {
     checkingEmail.value = false;
   }
 }
 </script>
-
-<style>
-:root {
-  --form-height: 550px;
-  --form-width: 900px;
-  /*  Sea Green */
-  --left-color: #9fdeaf;
-  /*  Light Blue  */
-  --right-color: #96dbe2;
-}
-</style>
 
 <style scoped>
 /* 여기 body,html이렇게 되어있었음, 근데 내가 * 로 해볼라고 */
@@ -308,6 +294,7 @@ html {
   font-family: 'Helvetica Neue', sans-serif;
   letter-spacing: 0.5px;
 } */
+
 .container {
   width: var(--form-width);
   height: var(--form-height);
@@ -316,7 +303,14 @@ html {
   box-shadow: 2px 10px 40px rgba(22, 20, 19, 0.4);
   border-radius: 10px;
   margin-top: 50px;
+  padding: 0;
 }
+
+.container,
+.container * {
+  box-sizing: content-box;
+}
+
 /* Overlay*/
 .overlay {
   width: 100%;
@@ -526,7 +520,7 @@ html {
   font-weight: 300;
   border: none;
   background-color: #e4e4e494;
-  font-family: 'Helvetica Neue', sans-serif;
+  font-family: "Helvetica Neue", sans-serif;
   letter-spacing: 1.5px;
   padding-left: 20px;
 }
