@@ -41,7 +41,6 @@ export const useCalendar = defineStore("transaction", () => {
         });
         // 🐷 필터링된 거래 목록 state에 넣기
         state.transaction = userTransaction;
-        totalTransaction.value = state.transaction.length;
         console.log('거래 목록 가져오기');
       } else {
         alert('거래 목록 조회 실패');
