@@ -1,38 +1,63 @@
 <template>
-  <div class="notfound-wrapper">
-    <div class="content">
-      <h1 class="error-code">404</h1>
-      <p class="message">페이지를 찾을 수 없습니다.</p>
-      <router-link to="/" class="btn btn-primary mt-3">
-        로그인 화면으로 이동
-      </router-link>
-    </div>
+  <div class="section">
+    <h1 class="error">404</h1>
+    <div class="page">Ooops!!! The page you are looking for is not found</div>
+    <a class="back-home" href="/">Back to home</a>
   </div>
 </template>
 
-<style scoped>
-.notfound-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+<style>
+html,
+body {
+  margin: 0;
+  padding: 0;
   text-align: center;
-  background-color: #f8f9fa;
+  font-family: sans-serif;
+  background-color: #e7ffff;
 }
 
-.error-code {
-  font-size: 10rem;
-  font-weight: bold;
-  color: #343a40;
-  margin-bottom: 1rem;
+h1,
+a {
+  margin: 0;
+  padding: 0;
+  text-decoration: none;
 }
 
-.message {
-  font-size: 3rem;
-  color: #6c757d;
+.section {
+  padding: 4rem 2rem;
 }
 
-.btn-primary {
-  font-size: 3rem;
+.section .error {
+  font-size: 150px;
+  color: #008b62;
+  text-shadow: 1px 1px 1px #00593e, 2px 2px 1px #00593e, 3px 3px 1px #00593e,
+    4px 4px 1px #00593e, 5px 5px 1px #00593e, 6px 6px 1px #00593e,
+    7px 7px 1px #00593e, 8px 8px 1px #00593e, 25px 25px 8px rgba(0, 0, 0, 0.2);
+}
+
+.page {
+  margin: 2rem 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #444;
+}
+
+.back-home {
+  display: inline-block;
+  border: 2px solid #222;
+  color: #fff;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 0.75rem 1rem 0.6rem;
+  transition: all 0.2s linear;
+  box-shadow: 0 15px 15px -11px rgba(0, 0, 0, 0.4);
+  background: #222;
+  border-radius: 6px;
+}
+.back-home:hover {
+  background: #222;
+  color: #ddd;
 }
 </style>
+
+
