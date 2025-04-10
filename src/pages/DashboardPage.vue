@@ -1,6 +1,7 @@
 <template>
   <div class="p-8 pb-28">
     <div class="container">
+      
       <!-- 필터 바 전체 -->
       <div class="filter-bar">
         <!-- 유형 토글 버튼 -->
@@ -20,7 +21,7 @@
             수입
           </button>
         </div>
-
+        
         <!-- 날짜 선택 -->
         <div class="filter-group date-group">
           <label>시작일</label>
@@ -59,7 +60,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="tx in pagedTransactions" :key="tx.id" class="table-row">
+            <tr v-for="tx in pagedTransaction" :key="tx.id" class="table-row">
               <td>
                 <span
                   :class="[
@@ -82,14 +83,14 @@
               </td>
               <td>
                 <button
-                  @click="openEditModal(tx)"
+                  @click="updateCheck(tx)"
                   title="수정"
                   class="action-btn"
                 >
                   수정
                 </button>
                 <button
-                  @click="deleteTransaction1(tx)"
+                  @click="deleteCheck(tx)"
                   title="삭제"
                   class="action-btn text-red"
                 >
@@ -103,7 +104,7 @@
     </div>
 
     <div
-      v-if="filteredTransactions.length === 0"
+      v-if="filteredTransaction.length === 0"
       class="text-center text-muted mt-5"
     >
       거래 내역이 없습니다.
@@ -112,6 +113,7 @@
 
   <!-- 하단 고정된 페이지네이션 -->
   <div class="pagination-container">
+    <!-- << -->
     <button
       @click="currentPage--"
       :disabled="currentPage === 1"
@@ -119,7 +121,7 @@
     >
       <i class="fa-solid fa-chevron-left"></i>
     </button>
-
+    <!-- < -->
     <button
       v-if="currentGroup > 0"
       @click="currentPage = (currentGroup - 1) * pageGroupSize + 1"
@@ -128,6 +130,7 @@
       ←
     </button>
 
+    <!-- 페이지 목록 -->
     <button
       v-for="page in pageNumbers"
       :key="page"
@@ -164,13 +167,11 @@ import { useCalendar } from '@/stores/calendar'
 // 🐷 스토어 등록
 const useStore = useCalendar();
 
-// 🐷 이름 나중에 바꾸기
-// db.json 으로 부터 axios.get
-const { fetchTransaction, deleteTransaction } = useStore;
+// 지출 수입은 이걸로 관리 'all', 'expense', 'income'
+const selectedType = ref('');
 
-const selectedType = ref(''); //'all', 'expense', 'income'
-const selectedCategory = ref(''); //배열로 다중 선택
-
+// 카테고리는 배열로 다중 선택 가능하도록
+const selectedCategory = ref('');
 const categoryOptions = [
   "식비",
   "의료",
@@ -181,8 +182,8 @@ const categoryOptions = [
   "기타",
 ];
 
+//수정 중인 데이터 임시 보관
 const editForm = reactive({
-  //수정 중인 데이터 임시 보관
   id: null,
   date: "",
   amount: 0,
@@ -190,24 +191,28 @@ const editForm = reactive({
   category: "",
   memo: "",
 });
+
 const startDate = ref(""); //시작 날짜 필터
 const endDate = ref(""); // 마지막 날짜 필터
-const currentPage = ref(1); //현재 페이지 번호
-const itemsPerPage = 8; //한 페이지당 리스트 8개 표시
-const pageGroupSize = 5; //페이지네이션 5개 단위로 묶기 ex)1,2,3,4,5
-const isEditModalVisible = ref(false); // 수정 팝업 상태
 
+const currentPage = ref(1); // 현재 페이지 번호
+const itemsPerPage = 8; // 한 페이지당 리스트 8개 표시
+const pageGroupSize = 5; // 페이지네이션 5개 단위로 묶기 ex)1,2,3,4,5
+
+const isEditModalVisible = ref(false); // 수정 팝업 상태 관리
+
+// 같은 버튼을 두 번 누르면 전체 보기로 전환
 function toggleType(type) {
-  // 같은 버튼을 두 번 누르면 전체 보기로 전환
   selectedType.value = selectedType.value === type ? "" : type;
 }
 
-//  선택 값 변경 시 페이지 1로 초기화
+// 선택 값 변경 시 페이지 1로 초기화
 watch([selectedType, selectedCategory, startDate, endDate], () => {
   currentPage.value = 1;
 });
 
-//빠른 날짜 설정 함수
+// 빠른 날짜 설정 (Ex: 최근 7일 최근 30일)
+// startDate 와 endDate를 조작함
 const setDateRange = (range) => {
   const today = new Date();
   let start = new Date();
@@ -233,54 +238,65 @@ const resetDateRange = () => {
   endDate.value = "";
 };
 
-// 거래 내역 필터링
-// filteredTransactions - 바로 template 쓰는지?
-const filteredTransactions = computed(() => {
-  // 여기서 가지고 오기
-  const transactions = useStore.transaction;
+// 거래 내역 필터링 + 기간에 따른 정렬!
+// filteredTransaction 은 필터 조건에 맞는 transaction 목록
+const filteredTransaction = computed(() => {
+  // !!! Store 파일에서 transaction 가져오기
+  const transaction = useStore.transaction;
   
-  return transactions
-    .filter((tx) => {
-      const matchType = !selectedType.value || tx.type === selectedType.value;
-
-      // 카테고리 다중 선택 필터링
-      const matchCategory =
-        selectedCategory.value.length === 0 ||
-        selectedCategory.value.includes(tx.category);
-
-      const txDate = new Date(tx.date);
-      const start = startDate.value ? new Date(startDate.value) : null;
-      const end = endDate.value ? new Date(endDate.value) : null;
-
-      const matchDate = (!start || txDate >= start) && (!end || txDate <= end);
-
-      return matchType && matchCategory && matchDate;
-    })
-    .sort((a, b) => new Date(a.date) - new Date(b.date));
+  return transaction.filter((tx) => {
+    const matchType = !selectedType.value || tx.type === selectedType.value;
+    // 카테고리 다중 선택 필터링
+    const matchCategory =
+      selectedCategory.value.length === 0 ||
+      selectedCategory.value.includes(tx.category);
+    const txDate = new Date(tx.date);
+    const start = startDate.value ? new Date(startDate.value) : null;
+    const end = endDate.value ? new Date(endDate.value) : null;
+    const matchDate = (!start || txDate >= start) && (!end || txDate <= end);
+    return matchType && matchCategory && matchDate;
+    }).sort((a, b) => new Date(a.date) - new Date(b.date));
 });
 
+// template 에서 쓰는 날짜 출력용
 function formatDate(dateStr) {
   const date = new Date(dateStr);
   return `${date.getFullYear()}. ${date.getMonth() + 1}.${date.getDate()}`;
 }
 
+// 토탈 페이지 개수
 const totalPages = computed(() =>
-  Math.ceil(filteredTransactions.value.length / itemsPerPage)
+  Math.ceil(filteredTransaction.value.length / itemsPerPage)
 );
 
-// 현재 페이지에 보여줄 데이터
-// 1페이지 / 2페이지... 1페이지에 보여줄 8개 데이터
-const pagedTransactions = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  return filteredTransactions.value.slice(start, end);
+// 페이지네이션 그룹 계산
+// 4 -> 0 / 6 -> 1
+const currentGroup = computed(() =>
+  Math.floor((currentPage.value - 1) / pageGroupSize)
+);
+
+// 한번에 보여줄 페이지 개수만큼
+// 현재 페이지 그룹에 해당하는
+// !!! 실제로 사용하는 페이지 번호들을 계산하여 배열로 반환
+const pageNumbers = computed(() => {
+  const start = (currentGroup.value * pageGroupSize) + 1;
+  const end = Math.min(start + pageGroupSize - 1, totalPages.value);
+  return Array.from({ length: end - start + 1 }, (_, i) => start + i);
 });
 
-// 데이터 삭제
-async function deleteTransaction1(tx) {
-  alert(tx.id);
-  if (confirm(`id:"${tx.id}",memo:"${tx.memo}" 항목을 삭제할까요?`)) {
+// 현재 페이지에 보여줄 거래 목록
+// Example : 1페이지에 보여줄 8개 데이터
+const pagedTransaction = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  return filteredTransaction.value.slice(start, end);
+});
+
+// 데이터 삭제 할지 물어보기 호출
+async function deleteCheck(tx) {
+  if (confirm('항목을 삭제할까요?')) {
     try {
+      // Store의 함수 사용
       await useStore.deleteTransaction(tx.id);
       await useStore.fetchTransaction();
     } catch (err) {
@@ -289,21 +305,21 @@ async function deleteTransaction1(tx) {
   }
 }
 
-// 페이지네이션 그룹 계산
-const currentGroup = computed(() =>
-  Math.floor((currentPage.value - 1) / pageGroupSize)
-);
+// 데이터 업데이트 할지 물어보기 호출
+async function updateCheck(tx) {
+  try {
+    // Store의 함수 사용
+    // update 위한 정보 입력 받기!!
+    await useStore.updateTransaction(tx.id, );
+    await useStore.fetchTransaction();
+  } catch (err) {
+    alert(err.message);
+  }
+  
+}
 
-// 페이지 1 2 3... 개수
-// 8개면 1개 14개면 2개 이런 로직?
-const pageNumbers = computed(() => {
-  const start = currentGroup.value * pageGroupSize + 1;
-  const end = Math.min(start + pageGroupSize - 1, totalPages.value);
-  return Array.from({ length: end - start + 1 }, (_, i) => start + i);
-});
-
-onMounted(() => {
-  useStore.fetchTransaction();
+onMounted(async () => {
+  await useStore.fetchTransaction();
 });
 </script>
 

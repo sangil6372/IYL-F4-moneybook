@@ -1,227 +1,204 @@
 <template>
-  <div class="bg-img"></div>
-  <div
-    class="container content d-flex justify-content-center align-items-center min-vh-100"
-  >
-    <div class="main-card">
-      <!-- 로고 + 타이틀 -->
-      <div class="logo-box text-center mb-4">
-        <img
-          src="@/assets/logo.png"
-          alt="Logo"
-          class="logo animate__animated animate__bounce"
-        />
-        <div class="login-label mt-3">Login</div>
+  <div class="container">
+    <div class="overlay" id="overlay" ref="overlay">
+      <div class="sign-in" id="sign-in" ref="leftText">
+        <h1>Welcome Sadari🪜</h1>
+        <p>To keep connected with us please login with your personal info</p>
+        <button
+          class="switch-button"
+          id="slide-right-button"
+          ref="slideRightButton"
+        >
+          Sign In
+        </button>
       </div>
-
-      <!-- 로그인 입력 -->
-      <div class="login-card card">
-        <div class="card-body">
-          <form @submit="handleLogin">
-            <label class="animate__animated animate__lightSpeedInLeft"
-              >Email</label
-            >
-            <input
-              type="email"
-              class="form-control"
-              placeholder="example@example.com"
-              v-model="loginEmail"
-              @blur="loginEmailTouched = true"
-              :class="{ 'is-invalid': loginEmailTouched && !isLoginEmailValid }"
-            />
-            <div class="invalid-feedback">
-              올바른 이메일 형식을 입력해주세요.
-            </div>
-            <br />
-            <label class="mt-3 animate__animated animate__lightSpeedInRight"
-              >Password</label
-            >
-            <input
-              type="password"
-              class="form-control"
-              placeholder="Enter your password"
-              v-model="loginPassword"
-            />
-
-            <div class="d-flex gap-2 mt-4">
-              <button type="submit" class="btn btn-primary w-100">
-                로그인
-              </button>
-              <button
-                type="button"
-                class="btn btn-secondary w-100"
-                @click="openModal"
-              >
-                회원가입
-              </button>
-            </div>
-          </form>
-        </div>
+      <div class="sign-up" id="sign-up" ref="rightText">
+        <h1>Hello, Friend!</h1>
+        <p>Enter your personal details and start a journey with us</p>
+        <button
+          class="switch-button"
+          id="slide-left-button"
+          ref="slideLeftButton"
+        >
+          Sign Up
+        </button>
       </div>
     </div>
-
-    <!-- 회원가입 모달 -->
-    <div class="modal fade" tabindex="-1" ref="modalRef">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">회원가입</h5>
-            <button
-              type="button"
-              class="btn-close"
-              @click="closeModal"
-            ></button>
+    <div class="form">
+      <div class="sign-in" id="sign-in-info" ref="accountForm">
+        <h1>Sign In</h1>
+        <p class="small">or use your email account:</p>
+        <form id="sign-in-form" @submit.prevent="handleLogin">
+          <input type="email" placeholder="Email" v-model="loginEmail" />
+          <input
+            type="password"
+            placeholder="Password"
+            v-model="loginPassword"
+          />
+          <button class="control-button in">Sign In</button>
+        </form>
+      </div>
+      <div class="sign-up" id="sign-up-info" ref="signinForm">
+        <h1>Create Account</h1>
+        <p class="small">or use your email for registration:</p>
+        <form id="sign-up-form" @submit.prevent="handleRegister">
+          <input type="text" placeholder="Name" v-model="regName" />
+          <input
+            type="email"
+            placeholder="Email"
+            v-model="regEmail"
+            @blur="regEmailTouched = true"
+            :class="{
+              'is-invalid':
+                regEmailTouched && (!isEmailValid || isDuplicateEmail),
+            }"
+          />
+          <div v-if="regEmailTouched && !isEmailValid" class="invalid-feedback">
+            올바른 이메일 형식을 입력해주세요.
           </div>
-          <div class="modal-body">
-            <form>
-              <div class="mb-3">
-                <label class="form-label"
-                  >이메일 <span class="text-danger">(필수)</span></label
-                >
-                <div class="row g-2">
-                  <div class="col-9">
-                    <input
-                      type="email"
-                      class="form-control"
-                      :class="{
-                        'is-invalid':
-                          regEmailTouched &&
-                          (!isEmailValid || isDuplicateEmail),
-                      }"
-                      v-model="regEmail"
-                      placeholder="이메일 입력"
-                      @blur="regEmailTouched = true"
-                    />
-                    <div
-                      class="invalid-feedback"
-                      v-if="regEmailTouched && !isEmailValid"
-                    >
-                      올바른 이메일 형식을 입력해주세요.
-                    </div>
-                    <div
-                      class="invalid-feedback"
-                      v-else-if="regEmailTouched && isDuplicateEmail"
-                    >
-                      이미 등록된 이메일입니다.
-                    </div>
-                    <div
-                      class="valid-feedback"
-                      v-if="isEmailValid && !isDuplicateEmail"
-                    >
-                      사용 가능한 이메일입니다.
-                    </div>
-                  </div>
-                  <div class="col-3">
-                    <button
-                      type="button"
-                      class="btn btn-outline-secondary w-100 check-btn"
-                      @click="checkEmailExists"
-                    >
-                      중복 확인
-                    </button>
-                  </div>
-                </div>
-                <div class="mb-3">
-                  <label class="form-label"
-                    >비밀번호 <span class="text-danger">(필수)</span></label
-                  >
-                  <input
-                    type="password"
-                    class="form-control"
-                    placeholder="비밀번호 입력"
-                    v-model="regPassword"
-                  />
-                </div>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label"
-                  >비밀번호 확인 <span class="text-danger">(필수)</span></label
-                >
-                <input
-                  type="password"
-                  class="form-control"
-                  placeholder="비밀번호 확인"
-                  v-model="regConfirm"
-                  :class="{
-                    'is-invalid': regConfirmTouched && !isPasswordMatch,
-                  }"
-                  @blur="regConfirmTouched = true"
-                />
-                <div class="invalid-feedback">
-                  비밀번호가 일치하지 않습니다.
-                </div>
-              </div>
-
-              <div class="mb-3 d-grid justify-content-center">
-                <label class="form-label">이름 (선택)</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  placeholder="이름 입력"
-                  v-model="regName"
-                  style="max-width: 200px"
-                />
-              </div>
-            </form>
+          <div
+            v-else-if="regEmailTouched && isDuplicateEmail"
+            class="invalid-feedback"
+          >
+            이미 등록된 이메일입니다.
           </div>
-          <div class="modal-footer">
-            <button class="btn btn-secondary" @click="closeModal">닫기</button>
-            <button
-              class="btn btn-primary"
-              @click="handleRegister"
-              :disabled="!isEmailValid || isDuplicateEmail"
-            >
-              회원가입
-            </button>
+          <div v-if="isEmailValid && !isDuplicateEmail" class="valid-feedback">
+            사용 가능한 이메일입니다.
           </div>
-        </div>
+          <input type="password" placeholder="Password" v-model="regPassword" />
+          <input
+            type="password"
+            placeholder="rePassword"
+            v-model="regConfirm"
+            @blur="regConfirmTouched = true"
+            :class="{ 'is-invalid': regConfirmTouched && !isPasswordMatch }"
+          />
+          <div
+            class="invalid-feedback"
+            v-if="regConfirmTouched && !isPasswordMatch"
+          >
+            비밀번호가 일치하지 않습니다.
+          </div>
+          <button
+            class="control-button up"
+            type="submit"
+            :disabled="!isEmailValid || isDuplicateEmail || !isPasswordMatch"
+          >
+            Sign Up
+          </button>
+        </form>
       </div>
     </div>
   </div>
+
+  <!-- 여기 위에서부터 내가 커스텀 -->
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { Modal } from "bootstrap";
-import { useAuthStore } from "@/stores/auth";
-import { useRouter } from "vue-router";
-import { computed } from "vue";
-import axios from "axios";
+import { ref, onMounted } from 'vue';
+import { Modal } from 'bootstrap';
+import { useAuthStore } from '@/stores/auth';
+import { useRouter } from 'vue-router';
+import { computed } from 'vue';
+import axios from 'axios';
 
 const modalRef = ref(null);
 let modalInstance = null;
 
-const regEmail = ref("");
-const regPassword = ref("");
-const regConfirm = ref("");
-const loginEmail = ref("");
-const loginPassword = ref("");
-const regName = ref("");
-
+const regEmail = ref('');
+const regPassword = ref('');
+const regConfirm = ref('');
+const loginEmail = ref('');
+const loginPassword = ref('');
+const regName = ref('');
+// 여기서부터
+const overlay = ref(null);
+const leftText = ref(null);
+const rightText = ref(null);
+const accountForm = ref(null); // sign-in-info
+const signinForm = ref(null); // sign-up-info
+const slideRightButton = ref(null);
+const slideLeftButton = ref(null);
+// 여기까지 asd1.html script
 const router = useRouter();
 const authStore = useAuthStore();
 
+// onMounted(() => {
+//   // modalInstance = new Modal(modalRef.value); 아마도 기존의 modal 창
+// });
+//여기서 부터
 onMounted(() => {
-  modalInstance = new Modal(modalRef.value);
+  const overlayEl = overlay.value;
+  const leftTextEl = leftText.value;
+  const rightTextEl = rightText.value;
+  const accountFormEl = accountForm.value;
+  const signinFormEl = signinForm.value;
+
+  const openSignUp = () => {
+    leftTextEl.classList.remove('overlay-text-left-animation-out');
+    overlayEl.classList.remove('open-sign-in');
+    rightTextEl.classList.remove('overlay-text-right-animation');
+
+    accountFormEl.classList.add('form-left-slide-out');
+    rightTextEl.classList.add('overlay-text-right-animation-out');
+    overlayEl.classList.add('open-sign-up');
+    leftTextEl.classList.add('overlay-text-left-animation');
+
+    setTimeout(() => {
+      accountFormEl.classList.remove('form-left-slide-in');
+      accountFormEl.style.display = 'none';
+      accountFormEl.classList.remove('form-left-slide-out');
+    }, 700);
+
+    setTimeout(() => {
+      signinFormEl.style.display = 'flex';
+      signinFormEl.classList.add('form-right-slide-in');
+    }, 200);
+  };
+
+  const openSignIn = () => {
+    leftTextEl.classList.remove('overlay-text-left-animation');
+    overlayEl.classList.remove('open-sign-up');
+    rightTextEl.classList.remove('overlay-text-right-animation-out');
+
+    signinFormEl.classList.add('form-right-slide-out');
+    leftTextEl.classList.add('overlay-text-left-animation-out');
+    overlayEl.classList.add('open-sign-in');
+    rightTextEl.classList.add('overlay-text-right-animation');
+
+    setTimeout(() => {
+      signinFormEl.classList.remove('form-right-slide-in');
+      signinFormEl.style.display = 'none';
+      signinFormEl.classList.remove('form-right-slide-out');
+    }, 700);
+
+    setTimeout(() => {
+      accountFormEl.style.display = 'flex';
+      accountFormEl.classList.add('form-left-slide-in');
+    }, 200);
+  };
+  slideRightButton.value?.addEventListener('click', openSignIn);
+  slideLeftButton.value?.addEventListener('click', openSignUp);
 });
+//여기까지가 asd1.html script
 
-function openModal() {
-  modalInstance.show();
-}
+// 이거를 모달로 나왔을 때는 사용하지만 지금은 사용하지 않으니까 주석처리함. 안하면 회원가입 안됨.
+// function openModal() { openModal(),closeModal() 이거를 모달로 나왔을 때는 사용하지만 지금은 사용하지 않으니까 주석처리함.
+//   modalInstance.show();
+// }
 
-function closeModal() {
-  modalInstance.hide();
+// function closeModal() {
+//   modalInstance.hide();
 
-  // 초기화
-  regEmail.value = "";
-  regPassword.value = "";
-  regConfirm.value = "";
-  regName.value = "";
+//   // 초기화
+//   regEmail.value = '';
+//   regPassword.value = '';
+//   regConfirm.value = '';
+//   regName.value = '';
 
-  regEmailTouched.value = false;
-  regConfirmTouched.value = false;
-}
+//   regEmailTouched.value = false;
+//   regConfirmTouched.value = false;
+// }
 
 // 로그인 버튼 핸들러
 async function handleLogin(e) {
@@ -229,10 +206,10 @@ async function handleLogin(e) {
 
   try {
     await authStore.login(loginEmail.value, loginPassword.value);
-    alert("로그인 성공!");
-    router.push("/dashboard");
+    alert('로그인 성공!');
+    router.push('/dashboard');
   } catch (err) {
-    alert("이메일 또는 비밀번호가 올바르지 않습니다.");
+    alert('이메일 또는 비밀번호가 올바르지 않습니다.');
   }
 }
 
@@ -250,24 +227,26 @@ async function handleRegister() {
   regConfirmTouched.value = true;
 
   if (!isEmailValid.value || isDuplicateEmail.value) {
-    alert("이메일 형식이 잘못됐거나 이미 등록된 이메일입니다.");
+    alert('이메일 형식이 잘못됐거나 이미 등록된 이메일입니다.');
     return;
   }
 
   if (!isPasswordMatch.value) {
-    alert("비밀번호가 일치하지 않습니다.");
+    alert('비밀번호가 일치하지 않습니다.');
     return;
   }
+  console.log('try 들어오기 전');
   try {
     await authStore.register(
       regName.value.trim(),
       regEmail.value.trim(),
       regPassword.value.trim()
     );
+    console.log('try 들어오기 후');
     loginEmail.value = regEmail.value;
-    closeModal();
+    // closeModal(); 이거를 모달로 나왔을 때는 사용하지만 지금은 사용하지 않으니까 주석처리함. 안하면 회원가입 안됨.
   } catch (e) {
-    alert("회원가입 중 오류가 발생했습니다.");
+    alert('회원가입 중 오류가 발생했습니다.');
     console.error(e);
   }
 }
@@ -301,272 +280,410 @@ async function checkEmailExists() {
     );
     isDuplicateEmail.value = res.data.length > 0;
   } catch (err) {
-    console.error("이메일 확인 오류:", err);
+    console.error('이메일 확인 오류:', err);
   } finally {
     checkingEmail.value = false;
   }
 }
 </script>
 
+<style>
+:root {
+  --form-height: 550px;
+  --form-width: 900px;
+  /*  Sea Green */
+  --left-color: #9fdeaf;
+  /*  Light Blue  */
+  --right-color: #96dbe2;
+}
+</style>
+
 <style scoped>
-.logo {
-  width: 100%;
-  max-width: 200px; /* 카드 안에서 너무 커지지 않도록 제한 */
-  height: auto;
-  display: block;
-  margin: 0 auto;
-}
-.desc {
-  font-size: 2rem;
-  color: #555;
-  text-align: center;
-}
-.card-body {
-  padding: 2rem 2rem;
-}
-form label {
-  display: block; /* 세로로 정렬되도록 유지 */
-  text-align: left !important; /* 가운데 정렬을 확실히 덮어쓰기 */
-  margin-bottom: 0.4rem;
-  font-size: 1rem;
-  font-weight: 500;
-  color: #333;
-}
-
-.form-control {
-  height: 40px;
-  font-size: 0.95rem;
-  padding: 0.7rem 0.9rem;
-}
-.check-btn {
-  padding: 0.35rem !important;
-  font-size: 0.85rem !important;
-  font-weight: bold !important;
-  border-radius: 15px !important;
-  height: 40px !important;
-  white-space: nowrap;
-}
-
-.btn {
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  border-radius: 12px;
-}
-
-.d-flex.gap-2.mt-4 {
-  margin-top: 2rem !important;
-  gap: 1rem !important;
-}
-
-.invalid-feedback,
-.valid-feedback {
-  margin-top: -0.8rem;
-  margin-bottom: 1rem;
-  font-size: 0.85rem;
-  color: #d9534f;
-}
-
-.modal-body {
-  padding: 2rem 2rem;
-}
-.modal-body form {
-  align-items: center;
-}
-
-.modal-body .form-label {
-  font-size: 1rem;
-  margin-bottom: 0.3rem;
-}
-
-.modal-body input.form-control {
-  padding: 0.8rem 1rem;
-  font-size: 0.95rem;
-  margin-bottom: 1.2rem;
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-direction: row;
-  padding: 1rem 1.5rem;
-  gap: 1rem; /* 버튼 간격 */
-}
-
-.modal {
-  z-index: 2000 !important;
-}
-
-.modal-backdrop.show {
-  z-index: 1500 !important;
-}
-
-html,
-body {
+/* 여기 body,html이렇게 되어있었음, 근데 내가 * 로 해볼라고 */
+/* body,
+html {
   width: 100%;
   height: 100%;
   margin: 0;
+  font-family: 'Helvetica Neue', sans-serif;
+  letter-spacing: 0.5px;
+} */
+.container {
+  width: var(--form-width);
+  height: var(--form-height);
+  position: relative;
+  margin: auto;
+  box-shadow: 2px 10px 40px rgba(22, 20, 19, 0.4);
+  border-radius: 10px;
+  margin-top: 50px;
 }
-
-.bg-img {
-  position: fixed;
+/* Overlay*/
+.overlay {
   width: 100%;
   height: 100%;
-  background: url("https://unsplash.it/1200x800") center center no-repeat;
-  background-size: cover;
-  z-index: 0;
-}
-
-.bg-img::before {
-  content: "";
   position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background: linear-gradient(to bottom right, #002f4b, #dc4225);
-  opacity: 0.6;
-  z-index: 0; /* 가장 낮게 유지 */
-}
-
-.content {
-  position: relative;
-}
-
-.main-card {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 16px;
-  padding: 2rem 2.5rem;
-  max-width: 400px;
-  min-width: 300px;
-  min-height: 400px;
-  width: 100%;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-  z-index: 2;
-}
-
-.login-label {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #fff;
-  background-color: #129d72;
-  padding: 0.5rem 1.5rem;
+  z-index: 100;
+  background-image: linear-gradient(
+    to right,
+    var(--left-color),
+    var(--right-color)
+  );
   border-radius: 10px;
-  margin-top: 1rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  opacity: 0.8; /* 비활성화된 느낌 주기 (선택사항) */
-}
-
-label {
-  font-size: 1em !important;
-  font-weight: 600;
-}
-
-.btn-primary {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  /* 기존 스타일 유지 */
-  background: linear-gradient(
-    0deg,
-    rgba(0, 172, 238, 1) 0%,
-    rgba(2, 126, 251, 1) 100%
-  );
-  border: none;
   color: white;
-  width: 80px;
-  height: 40px;
-  border-radius: 50px;
-  font-weight: 600;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  clip: rect(0, 385px, var(--form-height), 0);
 }
 
-/* hover 스타일 */
-.btn-primary:hover {
-  background: transparent;
-  color: rgba(2, 126, 251, 1);
-  box-shadow: none;
-  border: 2px solid rgba(2, 126, 251, 1);
+.open-sign-up {
+  animation: slideleft 1s linear forwards;
 }
 
-.btn-secondary {
+.open-sign-in {
+  animation: slideright 1s linear forwards;
+}
+
+.overlay .sign-in,
+.overlay .sign-up {
+  /*  Width is 385px - padding  */
+  --padding: 50px;
+  width: calc(385px - var(--padding) * 2);
+  height: 100%;
   display: flex;
-  align-items: center;
   justify-content: center;
-  background: linear-gradient(
-    0deg,
-    rgb(135, 125, 216) 0%,
-    rgb(160, 148, 180) 100%
-  );
-  border: none;
-  color: white;
-  width: 80px;
-  height: 40px;
-  border-radius: 50px;
-  font-weight: 600;
-  padding: 0 1rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-.btn-secondary:hover {
-  background: transparent;
-  color: rgba(103, 58, 183, 1);
-  box-shadow: none;
-  border: 2px solid rgba(103, 58, 183, 1);
-}
-/* 모달 크기 & 반응형 스타일 개선 */
-.modal-dialog {
-  max-width: 400px;
-  min-width: 360px;
-
-  width: 90%;
-  margin: 2rem auto;
-  transition: all 0.3s ease-in-out;
-}
-
-.modal-body {
-  padding-left: 2em;
-  padding-right: 2em;
-}
-
-.modal-body .form-label {
-  font-size: 0.95rem;
-  margin-bottom: 0.3rem;
-  color: #444;
-  font-weight: 500;
-}
-
-.modal-body input.form-control {
-  padding: 0.5rem 1rem;
-  font-size: 0.95rem;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  flex-direction: row;
-  gap: 1rem;
+  padding: 0px var(--padding);
+  text-align: center;
 }
 
-.modal-footer .btn {
-  width: 30%;
-  min-width: 100px;
+.overlay .sign-in {
+  float: left;
+}
+
+.overlay-text-left-animation {
+  animation: text-slide-in-left 1s linear;
+}
+.overlay-text-left-animation-out {
+  animation: text-slide-out-left 1s linear;
+}
+
+.overlay .sign-up {
+  float: right;
+}
+
+.overlay-text-right-animation {
+  animation: text-slide-in-right 1s linear;
+}
+
+.overlay-text-right-animation-out {
+  animation: text-slide-out-right 1s linear;
+}
+
+.overlay h1 {
+  margin: 0px 5px;
+  font-size: 2.1rem;
+}
+
+.overlay p {
+  margin: 20px 0px 30px;
+  font-weight: 200;
+}
+/* Buttons*/
+.switch-button,
+.control-button {
+  cursor: pointer;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 140px;
+  height: 40px;
+  font-size: 14px;
+  text-transform: uppercase;
+  background: none;
   border-radius: 20px;
+  color: white;
 }
 
-.modal.fade .modal-dialog {
-  transform: translateY(-30px);
-  opacity: 0;
-  transition: all 0.3s ease-in-out;
+.switch-button {
+  border: 2px solid;
 }
 
-.modal.fade.show .modal-dialog {
-  transform: translateY(0);
-  opacity: 1;
+.control-button {
+  border: none;
+  margin-top: 15px;
+}
+
+.switch-button:focus,
+.control-button:focus {
+  outline: none;
+}
+
+.control-button.up {
+  background-color: var(--left-color);
+}
+
+.control-button.in {
+  background-color: var(--right-color);
+}
+
+/*Forms*/
+.form {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  border-radius: 10px;
+}
+
+.form .sign-in,
+.form .sign-up {
+  --padding: 50px;
+  position: absolute;
+  /*  Width is 100% - 385px - padding  */
+  width: calc(var(--form-width) - 385px - var(--padding) * 2);
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  padding: 0px var(--padding);
+  text-align: center;
+}
+
+/* Sign in is initially not displayed */
+.form .sign-in {
+  display: none;
+}
+
+.form .sign-in {
+  left: 0;
+}
+
+.form .sign-up {
+  right: 0;
+}
+
+.form-right-slide-in {
+  animation: form-slide-in-right 1s;
+}
+
+.form-right-slide-out {
+  animation: form-slide-out-right 1s;
+}
+
+.form-left-slide-in {
+  animation: form-slide-in-left 1s;
+}
+
+.form-left-slide-out {
+  animation: form-slide-out-left 1s;
+}
+
+.form .sign-in h1 {
+  color: var(--right-color);
+  margin: 0;
+}
+
+.form .sign-up h1 {
+  color: var(--left-color);
+  margin: 0;
+}
+
+.social-media-buttons {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 15px;
+}
+
+.social-media-buttons .icon {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #dadada;
+  border-radius: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 7px;
+}
+
+.small {
+  font-size: 13px;
+  color: grey;
+  font-weight: 200;
+  margin: 5px;
+}
+
+.social-media-buttons .icon svg {
+  width: 25px;
+  height: 25px;
+}
+
+#sign-in-form input,
+#sign-up-form input {
+  margin: 12px;
+  font-size: 14px;
+  padding: 15px;
+  width: 260px;
+  font-weight: 300;
+  border: none;
+  background-color: #e4e4e494;
+  font-family: 'Helvetica Neue', sans-serif;
+  letter-spacing: 1.5px;
+  padding-left: 20px;
+}
+
+#sign-in-form input::placeholder {
+  letter-spacing: 1px;
+}
+
+.forgot-password {
+  font-size: 12px;
+  display: inline-block;
+  border-bottom: 2px solid #efebeb;
+  padding-bottom: 3px;
+}
+
+.forgot-password:hover {
+  cursor: pointer;
+}
+
+/* Animation*/
+@keyframes slideright {
+  0% {
+    clip: rect(0, 385px, var(--form-height), 0);
+  }
+  30% {
+    clip: rect(0, 480px, var(--form-height), 0);
+  }
+  /*  we want the width to be slightly larger here  */
+  50% {
+    clip: rect(
+      0px,
+      calc(var(--form-width) / 2 + 480px / 2),
+      var(--form-height),
+      calc(var(--form-width) / 2 - 480px / 2)
+    );
+  }
+  80% {
+    clip: rect(
+      0px,
+      var(--form-width),
+      var(--form-height),
+      calc(var(--form-width) - 480px)
+    );
+  }
+  100% {
+    clip: rect(
+      0px,
+      var(--form-width),
+      var(--form-height),
+      calc(var(--form-width) - 385px)
+    );
+  }
+}
+
+@keyframes slideleft {
+  100% {
+    clip: rect(0, 385px, var(--form-height), 0);
+  }
+  70% {
+    clip: rect(0, 480px, var(--form-height), 0);
+  }
+  /*  we want the width to be slightly larger here  */
+  50% {
+    clip: rect(
+      0px,
+      calc(var(--form-width) / 2 + 480px / 2),
+      var(--form-height),
+      calc(var(--form-width) / 2 - 480px / 2)
+    );
+  }
+  30% {
+    clip: rect(
+      0px,
+      var(--form-width),
+      var(--form-height),
+      calc(var(--form-width) - 480px)
+    );
+  }
+  0% {
+    clip: rect(
+      0px,
+      var(--form-width),
+      var(--form-height),
+      calc(var(--form-width) - 385px)
+    );
+  }
+}
+
+@keyframes text-slide-in-left {
+  0% {
+    padding-left: 20px;
+  }
+  100% {
+    padding-left: 50px;
+  }
+}
+
+@keyframes text-slide-in-right {
+  0% {
+    padding-right: 20px;
+  }
+  100% {
+    padding-right: 50px;
+  }
+}
+
+@keyframes text-slide-out-left {
+  0% {
+    padding-left: 50px;
+  }
+  100% {
+    padding-left: 20px;
+  }
+}
+
+@keyframes text-slide-out-right {
+  0% {
+    padding-right: 50px;
+  }
+  100% {
+    padding-right: 20px;
+  }
+}
+
+@keyframes form-slide-in-right {
+  0% {
+    padding-right: 100px;
+  }
+  100% {
+    padding-right: 50px;
+  }
+}
+
+@keyframes form-slide-in-left {
+  0% {
+    padding-left: 100px;
+  }
+  100% {
+    padding-left: 50px;
+  }
+}
+
+@keyframes form-slide-out-right {
+  0% {
+    padding-right: 50px;
+  }
+  100% {
+    padding-right: 80px;
+  }
+}
+
+@keyframes form-slide-out-left {
+  0% {
+    padding-left: 50px;
+  }
+  100% {
+    padding-left: 80px;
+  }
 }
 </style>
