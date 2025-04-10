@@ -1,10 +1,9 @@
 <template>
-  <div class="container">
+  <div class="container-fluid">
     <header class="navbar navbar-expand-lg px-5 py-3">
-    
       <!-- 로고 -->
       <RouterLink to="/">
-        <img src="@/assets/logo.png" alt="Logo" class="logo-img" />
+        <img src="@/assets/logo2.png" alt="Logo" class="logo-img" />
       </RouterLink>
 
       <!-- 햄버거 버튼 -->
@@ -44,8 +43,9 @@
           <li class="nav-item">
             <a
               href="#"
-              class="nav-link text-danger fw-bold"
+              class="nav-link fw-bold"
               @click.prevent="handleLogout"
+              style="color: #FF6384;"
             >
               <i class="fas fa-sign-out-alt me-1"></i>
             </a>
@@ -87,7 +87,7 @@ const handleLogout = () => {
 
 .nav-link.active,
 .nav-link:hover {
-  color: #0d6efd;
+  color: #1790a0;
 }
 
 .navbar-toggler {

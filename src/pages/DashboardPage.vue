@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="container-fluid">
 
       <div class="card p-3 m-3">
 
@@ -54,62 +54,63 @@
       </div>
       
       <div class="top-filter-bar d-flex justify-content-between">
-        <div class="category-filter">
-          <select v-model="selectedType" class="simple-select">
-            <option value="">내역 전체보기</option>
-            <option value="expense">지출</option>
-            <option value="income">수입</option>
-          </select>
-        </div>
-        <div class="category-filter">
-          <select v-model="selectedCategory" class="simple-select">
-            <option value="">카테고리 전체보기</option>
-            <option
-              v-for="option in categoryOptions"
-              :key="option"
-              :value="option"
-            >
-              {{ option }}
-            </option>
-          </select>
-        </div>
-
-        <!-- 날짜별 전체보기 -->
-        <div class="category-filter">
-          <select
-            v-model="selectedDateRange"
-            class="simple-select"
-            @change="onDateRangeChange"
-          >
-            <option value="">요일 전체보기</option>
-            <option value="7days">최근 1주일</option>
-            <option value="1month">최근 1개월</option>
-            <option value="thisMonth">이번 달</option>
-            <option value="custom">기간 설정</option>
-          </select>
-        </div>
-
-        <!-- 날짜 팝업 -->
-        <div v-if="showCustomPopup" class="custom-popup" :style="popupStyle">
-          <label>
-            시작일:
-            <input type="date" v-model="startDate" />
-          </label>
-          <label>
-            종료일:
-            <input type="date" v-model="endDate" />
-          </label>
-          <div class="popup-buttons">
-            <button @click="applyCustomDate">적용</button>
-            <button @click="closeCustomPopup">취소</button>
+        <div>
+          <div class="category-filter">
+            <select v-model="selectedType" class="simple-select">
+              <option value="">내역 전체보기</option>
+              <option value="expense">지출</option>
+              <option value="income">수입</option>
+            </select>
           </div>
+          <div class="category-filter">
+            <select v-model="selectedCategory" class="simple-select">
+              <option value="">카테고리 전체보기</option>
+              <option
+                v-for="option in categoryOptions"
+                :key="option"
+                :value="option"
+              >
+                {{ option }}
+              </option>
+            </select>
+          </div>
+
+          <!-- 날짜별 전체보기 -->
+          <div class="category-filter">
+            <select
+              v-model="selectedDateRange"
+              class="simple-select"
+              @change="onDateRangeChange"
+            >
+              <option value="">요일 전체보기</option>
+              <option value="7days">최근 1주일</option>
+              <option value="1month">최근 1개월</option>
+              <option value="thisMonth">이번 달</option>
+              <option value="custom">기간 설정</option>
+            </select>
+          </div>
+
+          <!-- 날짜 팝업 -->
+          <div v-if="showCustomPopup" class="custom-popup" :style="popupStyle">
+            <label>
+              시작일:
+              <input type="date" v-model="startDate" />
+            </label>
+            <label>
+              종료일:
+              <input type="date" v-model="endDate" />
+            </label>
+            <div class="popup-buttons">
+              <button @click="applyCustomDate">적용</button>
+              <button @click="closeCustomPopup">취소</button>
+            </div>
+          </div>
+
         </div>
-
-
           <!-- !!! 여기에 total 개수 추가 -->
-          <div class="total-number ml-auto">
+        <div class="total-number ml-auto">
           전체 거래 : {{ useStore.totalTransaction }}건
-         </div>
+        </div>
 
       </div>
 
@@ -140,7 +141,7 @@
               </td>
               <td>{{ formatDate(tx.date) }}</td>
               <td>{{ tx.category }}</td>
-              <td class="amount">{{ tx.amount.toLocaleString() }} 원</td>
+              <td :class="tx.type === 'income' ? 'income':'expense'">{{ tx.amount.toLocaleString() }} 원</td>
               <td>
                 {{
                   tx.memo.length > 8
@@ -477,29 +478,14 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.category-select {
-  appearance: none;
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background-color: white;
-  font-size: 14px;
-  color: #333;
-  min-width: 160px;
-  background-image: url("data:image/svg+xml;utf8,<svg fill='gray' height='16' viewBox='0 0 24 24' width='16' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  background-size: 16px 16px;
-}
-
-/* ✅ 테이블 감싸는 wrapper */
+/* 테이블 감싸는 wrapper */
 .table-wrapper {
-  max-width: 1000px; /* 원하는 최대 너비 */
+  max-width: 100%; /* 원하는 최대 너비 */
   margin: 0 auto; /* 가운데 정렬 */
   padding: 20px;
 }
 
-/* ✅ 테이블 기본 스타일 */
+/* 테이블 기본 스타일 */
 .custom-table {
   width: 100%;
   border-collapse: collapse;
@@ -508,7 +494,7 @@ onMounted(async () => {
   text-align: center;
 }
 
-/* ✅ 테이블 헤더 */
+/* 테이블 헤더 */
 .table-head th {
   padding: 12px;
   background-color: #f9fafb;
@@ -516,21 +502,25 @@ onMounted(async () => {
   border-bottom: 1px solid #e5e7eb;
 }
 
-/* ✅ 테이블 내용 행 */
+/* 테이블 내용 행 */
 .table-row td {
   padding: 12px;
   border-bottom: 1px solid #f0f0f0;
-  transition: background 0.2s;
+  /* transition: backround 0.2s; */
 }
 
 .table-row:hover {
-  background-color: #f9f9f9;
+  background-color: rgba(0, 0, 0, 0.01);
 }
 
-/* ✅ 금액 컬럼 강조 */
-.amount {
+/* ✅ 금액 컬럼 강조 지출 / 수입 */
+.income {
   font-weight: bold;
-  color: #2563eb;
+  color: #42aaaa;
+}
+.expense {
+  font-weight: bold;
+  color: #FF6384;
 }
 
 /* ✅ 수입/지출 라벨 */
@@ -543,24 +533,25 @@ onMounted(async () => {
 }
 
 .type-label.income {
-  background-color: #d1fae5;
-  color: #065f46;
+  background-color: #ddf9ea;
+  color: #42aaaa;
 }
 
 .type-label.expense {
-  background-color: #fee2e2;
-  color: #b91c1c;
+  background-color: #ffeaea;
+  color: #FF6384;
 }
 
 /* ✅ 수정/삭제 버튼 */
 .action-btn {
   background: none;
   border: none;
-  color: #3b82f6;
+  color: #36A2EB;
   cursor: pointer;
   padding: 4px 8px;
-  font-size: 13px;
   margin-right: 4px;
+  font-size: 13px;
+  font-weight: bold;
 }
 
 .action-btn:hover {
@@ -568,7 +559,7 @@ onMounted(async () => {
 }
 
 .action-btn.text-red {
-  color: #ef4444;
+  color: #FF6384;
 }
 
 /* ✅ 페이지네이션 */
@@ -585,18 +576,18 @@ onMounted(async () => {
   border-radius: 50%;
   background: #f3f4f6;
   border: none;
-  color: #374151;
+  color: #333;
   font-size: 14px;
   cursor: pointer;
 }
 
 .page-btn.active {
-  background: #2563eb;
+  background: #36A2EB;
   color: white;
 }
 
 .page-btn:hover {
-  background: #e5e7eb;
+  background: #a3a5a9;
 }
 
 .pagination-container {
@@ -612,9 +603,9 @@ onMounted(async () => {
 }
 /* 현재 선택된 페이지 스타일 */
 .pagination-button.active {
-  background-color: #007bff;
+  background-color: #36A2EB;
   color: #fff;
-  border-color: #007bff;
+  border-color: #36A2EB;
   font-weight: bold;
 }
 
