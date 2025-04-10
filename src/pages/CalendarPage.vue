@@ -1,6 +1,6 @@
 <!-- CalendarTest.vue -->
 <template>
-  <div class="container-fluid py-4 bg-light" style="min-height: 100vh">
+  <div class="container-fluid py-4 bg-light">
     <div class="row">
       <!-- 캘린더 영역 (넓은 비율) -->
       <div class="col-12 col-lg-9 mb-4">
@@ -231,7 +231,7 @@ const form = ref({
   memo: "",
   fixedCost: false,
   // 🐷 여기서 userId 받아와서 추가해줘야돼!!
-  userId: "6c9d"
+  userId: "6c9d",
 });
 
 // 거래 필터링
@@ -359,7 +359,7 @@ function closeForm(resetAll = false) {
     category: "",
     memo: "",
     fixedCost: false,
-    userId: "6c9d",
+    userId: "d3e6",
   };
 }
 
@@ -409,7 +409,9 @@ const calendarOptions = computed(() => ({
   initialView: "dayGridMonth",
   eventColor: "transparent",
   locale: koLocale,
-  contentHeight: "auto",
+  // contentHeight: 650,
+
+  fixedWeekCount: false,
 
   // 상단 헤더
   headerToolbar: {
@@ -454,17 +456,20 @@ const calendarOptions = computed(() => ({
 </script>
 
 <style>
+.fc-day-other .fc-daygrid-day-number {
+  visibility: hidden;
+}
 /* 다가오는 결제일 색상 변경 */
 .bg-danger-soft {
-  background-color: #f76871; /* 연한 붉은색 */
+  background-color: #ff6384;
 }
 
 .bg-warning-soft {
-  background-color: #f8d15a; /* 연한 노랑 */
+  background-color: #ffce56;
 }
 
 .bg-success-soft {
-  background-color: #61f061; /* 연한 초록 */
+  background-color: #9fdeaf;
 }
 
 /* 캘린더 전체 */
@@ -484,7 +489,7 @@ const calendarOptions = computed(() => ({
 }
 
 .fc-button {
-  background-color: #0dcaf0;
+  background-color: #96dbe2;
   border: none;
   color: white;
   padding: 6px 12px;
@@ -494,15 +499,23 @@ const calendarOptions = computed(() => ({
 }
 
 .fc-button:hover {
-  background-color: #31d2f2;
+  background-color: #96dbe2;
 }
 
 .fc-button:disabled {
   background-color: #adb5bd;
 }
-.fc-daygrid-day-frame {
-  margin: 2px;
-  border-radius: 4px;
+.fc-daygrid-day {
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid #96dbe2 !important;
+  transition: 0.2s ease-in-out;
+}
+
+.fc-daygrid-day:hover {
+  background-color: #f1f9fb;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
 }
 
 /* 헤더 버튼 간격 */
@@ -518,7 +531,10 @@ const calendarOptions = computed(() => ({
   background-color: #e9f7fd;
   padding: 10px 0;
   font-weight: 600;
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 1px solid #a7d0e4 !important; /* 💙 파란색 테두리 */
+  border-top: 1px solid #a7d0e4 !important;
+  border-left: 1px solid #a7d0e4 !important;
+  border-right: 1px solid #a7d0e4 !important;
 }
 
 /* 날짜 칸 (일자 영역) */
@@ -527,30 +543,33 @@ const calendarOptions = computed(() => ({
   font-weight: 600;
   margin: 2px 4px;
   color: #212529;
+  text-decoration: none !important;
 }
-.fc-day-con .fc-day-today {
-  background-color: transparent !important;
+.fc .fc-day-today {
+  background: transparent !important;
   border: none !important;
+  box-shadow: none !important;
 }
-
+.fc .fc-daygrid-day {
+  cursor: default !important;
+}
 /* 이벤트 카드 영역 */
 .fc-event {
   font-size: 12px;
-  padding: 2px 4px;
-  border-radius: 4px;
+  padding: 3px 6px;
+  border-radius: 10px;
   background-color: #d1ecf1;
   color: #0c5460;
-  margin-top: 4px;
-  text-align: left;
+  margin-top: 6px;
 }
 
 /* 요일별 색상 */
 .fc-day-sun .fc-daygrid-day-number {
-  color: #dc3545 !important;
+  color: #ff6384 !important;
 }
 
 .fc-day-sat .fc-daygrid-day-number {
-  color: #0d6efd !important;
+  color: #36a2eb !important;
 }
 
 .fc-day-else .fc-daygrid-day-number {
@@ -559,27 +578,26 @@ const calendarOptions = computed(() => ({
 
 /* 요일 헤더 (한글 요일 텍스트) */
 .fc-col-header-cell.fc-day-sun .fc-col-header-cell-cushion {
-  color: #dc3545 !important;
+  color: #ff6384 !important;
   font-weight: bold;
+  text-decoration: none !important;
 }
 
 .fc-col-header-cell.fc-day-sat .fc-col-header-cell-cushion {
-  color: #0d6efd !important;
+  color: #36a2eb !important;
   font-weight: bold;
+  text-decoration: none !important;
 }
 
 .fc-col-header-cell:not(.fc-day-sat):not(.fc-day-sun)
   .fc-col-header-cell-cushion {
   color: #6c757d !important;
   font-weight: bold;
+  text-decoration: none !important;
 }
 .fc-day-selected {
   background-color: #e0f7fa !important;
-  border: 2px solid #a0deeb !important;
-  border-radius: 8px;
-  transition: 0.3s ease-in-out;
-}
-.fc-daygrid-day {
-  border-bottom: 1px solid #dee2e6;
+  border-radius: 12px;
+  border: 2px solid #96dbe2;
 }
 </style>
