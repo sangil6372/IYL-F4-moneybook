@@ -31,6 +31,7 @@
         <option value="기타">기타</option>
       </select>
     </div>
+
     <!-- 금액 -->
     <div class="col">
       <label class="form-label text-muted small fw-semibold text-center d-block">금액</label>
@@ -195,12 +196,13 @@
       aria-hidden="true"
       ref="editModalRef"
     >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+      <div class="modal-dialog">
+        <div class="modal-content p-3">
           <div class="modal-header">
             <h5 class="modal-title" id="editModalLabel">거래 수정</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
+          
           <div class="modal-body">
             <!-- 여기에 InputForm 컴포넌트 삽입 -->
             <InputForm
@@ -276,6 +278,13 @@ import { useCalendar } from "@/stores/calendar";
 // 🐷 스토어 등록
 const useStore = useCalendar();
 
+// 🐷 userID 쓰기 위해 피니아 임포트
+import { useAuthStore } from '@/stores/auth';
+const authStore = useAuthStore();
+
+// 🐷 userId 가져오기
+const userId = authStore.user.id;
+
 // 지출 수입은 이걸로 관리 'all', 'expense', 'income'
 const selectedType = ref('');
 
@@ -301,7 +310,7 @@ const editForm = reactive({
   memo: "",
   fixedCost: "false",
   // 임시 하드코딩
-  userId: "6c9d",
+  userId: userId,
 });
 
 const startDate = ref(""); //시작 날짜 필터
@@ -432,7 +441,6 @@ async function updateCheck(tx) {
   editForm.memo = tx.memo;
   editForm.fixedCost = tx.fixedCost;
 
-
   // 모달 인스턴스 열기
   if (editModalInstance) {
     editModalInstance.show();
@@ -465,6 +473,7 @@ function resetForm() {
 // 모달이 저장 클릭하면 핸들러 작동
 function handleUpdate(formFromChild) {
   useStore.updateTransaction(formFromChild.id, formFromChild);
+  resetForm();
 
   if (editModalInstance) {
     editModalInstance.hide(); // 모달 닫기
@@ -711,32 +720,6 @@ onMounted(async () => {
   margin: 0 auto;
 }
 
-/* 모달창 css 시작 부분*/
-/* 모달창 배경 오버레이 */
-.edit-modal-box {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999; /* 더 확실한 우선순위 */
-}
-
-/* 모달 컨텐츠 박스 */
-.modal {
-  background-color: #fff;
-  padding: 24px 20px;
-  border-radius: 10px;
-  width: 90%;
-  max-width: 420px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
-  animation: fadeIn 0.3s ease-in-out;
-}
-
 /* 폼 요소 스타일 */
 .edit-form input,
 .edit-form textarea {
@@ -747,18 +730,6 @@ onMounted(async () => {
   border: 1px solid #ccc;
   border-radius: 6px;
   box-sizing: border-box;
-}
-
-/* 모달 애니메이션 (선택사항) */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 /* 카테고리 css부분 */
