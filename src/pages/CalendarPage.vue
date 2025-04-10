@@ -409,7 +409,7 @@ const calendarOptions = computed(() => ({
   initialView: "dayGridMonth",
   eventColor: "transparent",
   locale: koLocale,
-  // contentHeight: 650,
+  contentHeight: 650,
 
   fixedWeekCount: false,
 
