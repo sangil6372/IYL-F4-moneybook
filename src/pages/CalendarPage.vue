@@ -6,7 +6,7 @@
       <div class="col-12 col-lg-9 mb-4">
         <div class="card shadow-sm">
           <div class="card-body">
-            <FullCalendar :options="calendarOptions" />
+            <FullCalendar :options="calendarOptions" :key="calendarKey" />
           </div>
         </div>
       </div>
@@ -14,7 +14,7 @@
       <!-- 우측 결제일/입력폼 영역 -->
       <div class="col-12 col-lg-3">
         <!-- 초기 상태: 다가오는 결제일 -->
-        <div v-if="!selectedDate" class="card shadow-sm card w-100">
+        <div v-if="!selectedDate || resizeWidth" class="card shadow-sm w-100">
           <div class="card-header bg-white">
             <h5 class="mb-0">
               <i class="fa-solid fa-calendar-check me-2 text-primary"></i>
@@ -65,7 +65,7 @@
               @delete="storeCalendar.deleteTransaction"
             />
             <button
-              class="btn btn-outline-success w-100"
+              class="btn btn-outline-success w-100 text-nowrap"
               @click="formView = true"
             >
               거래 추가
@@ -89,10 +89,6 @@
               ></i>
             </h5>
             <InputForm :form="form" @save="saveForm" />
-
-            <button class="btn btn-success w-100" @click="saveForm">
-              <i class="fa-solid fa-floppy-disk me-2"></i> 저장
-            </button>
           </div>
         </div>
       </div>
@@ -106,32 +102,46 @@
     aria-labelledby="transactionModalLabel"
     aria-hidden="true"
   >
-    <div class="modal-dialog modal-dialog-scrollable modal-fullscreen-sm-down">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="transactionModalLabel">
-            {{ selectedDate }} 거래 내역
+            <template v-if="formView">
+              <i class="fa-solid fa-calendar-day me-2 text-primary"></i>
+              {{ selectedDate }} 입력
+            </template>
+            <template v-else>
+              <i class="fa-solid fa-pen-to-square me-2 text-primary"></i>
+              {{ selectedDate }} 거래 내역
+            </template>
           </h5>
           <button
             type="button"
             class="btn-close"
-            data-bs-dismiss="modal"
             aria-label="Close"
-            @click="closeForm(true)"
+            @click.stop="handleModalClose"
           ></button>
         </div>
         <div class="modal-body">
-          <TransactionList
-            :transactions="selectedDateforEach"
-            @edit="editTransaction"
-            @delete="storeCalendar.deleteTransaction"
-          />
-          <button
-            class="btn btn-outline-success w-100 mt-3"
-            @click="showFormModal"
-          >
-            거래 추가
-          </button>
+          <template v-if="formView">
+            <InputForm :form="form" @save="saveForm" />
+          </template>
+          <template v-else>
+            <TransactionList
+              :transactions="selectedDateforEach"
+              @edit="editTransaction"
+              @delete="storeCalendar.deleteTransaction"
+            />
+            <button
+              class="btn btn-outline-success w-100 mt-3"
+              @click="
+                closeForm(false);
+                formView = true;
+              "
+            >
+              거래 추가
+            </button>
+          </template>
         </div>
       </div>
     </div>
@@ -139,7 +149,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, nextTick, onUnmounted, watch } from "vue";
 import FullCalendar from "@fullcalendar/vue3";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -151,7 +161,6 @@ import { useCalendar } from "@/stores/calendar";
 import InputForm from "@/components/InputForm.vue";
 import TransactionList from "@/components/TransactionList.vue";
 import { Modal } from "bootstrap";
-import { nextTick } from "vue";
 
 // pinia 연결
 const storeCalendar = useCalendar();
@@ -176,7 +185,7 @@ const form = ref({
   memo: "",
   fixedCost: false,
   // 🐷 여기서 userId 받아와서 추가해줘야돼!!
-  userId: "6c9d"
+  userId: "6c9d",
 });
 
 // 거래 필터링
@@ -193,17 +202,82 @@ const remindFixedCost = computed(() => {
     .sort((a, b) => getDate(a.date) - getDate(b.date));
 });
 
+// 화면 크기 조절을 위한 변수 설정
+const width = ref(window.innerWidth);
+
+// 브라우저 크기가 달라질때 마다 resize 값 변경 및 삭제
+onMounted(() => {
+  window.addEventListener("resize", updateWidth);
+});
+onUnmounted(() => {
+  window.removeEventListener("resize", updateWidth);
+});
+
+// 버튼 깨짐 방지 함수 설정
+const resizeWidth = computed(() => width.value < 1200);
+
+// 모바일일때 '원' 빼기 위한 변수 선언
+const calendarKey = ref(0);
+
+watch(resizeWidth, (newVal, oldVal) => {
+  // PC → 모바일 모달 열리기
+  if (oldVal === false && newVal === true) {
+    if (selectedDate.value) {
+      nextTick(() => {
+        const el = document.getElementById("transactionModal");
+        if (el) {
+          const modal = Modal.getInstance(el) || new Modal(el);
+          modal.show();
+        }
+      });
+    }
+    calendarKey.value++;
+  }
+
+  // 모바일 → PC 변경시 모달 닫기
+  if (oldVal === true && newVal === false) {
+    nextTick(() => {
+      const el = document.getElementById("transactionModal");
+      if (el) {
+        const modal = Modal.getInstance(el);
+        modal?.hide(); // 모달도 닫음
+      }
+    });
+    calendarKey.value++;
+  }
+  // 원 표시 제거 및 생성
+});
 /* function 들 */
+
+// 모달 닫기 함수
+function handleModalClose() {
+  const el = document.getElementById("transactionModal");
+  const modal = Modal.getOrCreateInstance(el);
+  if (formView.value) {
+    formView.value = false;
+    editId.value = null;
+  } else {
+    modal.hide(); // 모달 닫기
+
+    // 선택 날짜 및 상태 초기화
+    closeForm(true);
+  }
+}
+
+// 화면 변경시 작동
+function updateWidth() {
+  width.value = window.innerWidth;
+}
 
 // 고정 지출 날짜 계산 후 bootstrap 넣기
 function getClass(dateStr) {
   const date = getDate(dateStr);
   if (date <= 7) {
-    return "bg-danger text-white";
+    return "bg-danger-soft fw-bold text-white";
   } else if (date <= 14) {
-    return "bg-warning text-dark";
+    return "bg-warning-soft fw-bold text-white";
   } else {
-    return "bg-success text-white";
+    return "bg-success-soft fw-bold text-white";
   }
 }
 
@@ -217,7 +291,7 @@ function getDate(dateStr) {
 
 // 날짜 포맷
 function formatDate(dateStr) {
-  return format(new Date(dateStr), "dd일", { locale: ko });
+  return format(new Date(dateStr), "d일", { locale: ko });
 }
 
 // 다가오는 결제일에 있는 목록 클릭시 -> 해당하는 날짜의 목록으로 이동
@@ -225,7 +299,17 @@ function goTransaction(date) {
   selectedDate.value = date;
   formView.value = false;
   editId.value = null;
+
   highlight(date);
+  if (resizeWidth.value) {
+    nextTick(() => {
+      const el = document.getElementById("transactionModal");
+      if (el) {
+        const modal = new Modal(el);
+        modal.show();
+      }
+    });
+  }
 }
 
 // 날짜 클릭시 얻어오는 것들
@@ -235,7 +319,7 @@ function handleDateClick(info) {
   editId.value = null;
   highlight(info.dateStr);
 
-  if (window.innerWidth < 768) {
+  if (resizeWidth.value) {
     nextTick(() => {
       const el = document.getElementById("transactionModal");
       if (el) {
@@ -266,6 +350,7 @@ function closeForm(resetAll = false) {
     selectedDate.value = null;
     removeHighlight();
   }
+  document.activeElement?.blur?.();
   formView.value = false;
   editId.value = null;
   form.value = {
@@ -274,6 +359,7 @@ function closeForm(resetAll = false) {
     category: "",
     memo: "",
     fixedCost: false,
+    userId: "6c9d",
   };
 }
 
@@ -342,13 +428,18 @@ const calendarOptions = computed(() => ({
 
   events: storeCalendar.calendarEvents,
   eventContent(info) {
+    const width = resizeWidth.value;
     const { income, expense } = info.event.extendedProps;
 
     const plus = income
-      ? `<div class="text-success fw-bold">+${income.toLocaleString()}원</div>`
+      ? `<div class="text-success fw-bold">+${income.toLocaleString()}${
+          width ? "" : "원"
+        }</div>`
       : "";
     const minus = expense
-      ? `<div class="text-danger fw-bold">-${expense.toLocaleString()}원</div>`
+      ? `<div class="text-danger fw-bold">-${expense.toLocaleString()}${
+          width ? "" : "원"
+        }</div>`
       : "";
 
     return { html: plus + minus };
@@ -363,6 +454,19 @@ const calendarOptions = computed(() => ({
 </script>
 
 <style>
+/* 다가오는 결제일 색상 변경 */
+.bg-danger-soft {
+  background-color: #f76871; /* 연한 붉은색 */
+}
+
+.bg-warning-soft {
+  background-color: #fcdc7b; /* 연한 노랑 */
+}
+
+.bg-success-soft {
+  background-color: #85f185; /* 연한 초록 */
+}
+
 /* 캘린더 전체 */
 .fc {
   font-family: "Noto Sans KR", sans-serif;
@@ -478,20 +582,5 @@ const calendarOptions = computed(() => ({
 }
 .fc-daygrid-day {
   border-bottom: 1px solid #dee2e6;
-}
-
-/* 반응형 대응 */
-@media (max-width: 768px) {
-  .fc-toolbar-title {
-    font-size: 1.2rem;
-  }
-
-  .fc-button {
-    font-size: 12px;
-    padding: 4px 10px;
-  }
-  .fc-event-main {
-    font-size: 0.7em;
-  }
 }
 </style>

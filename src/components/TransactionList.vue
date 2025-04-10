@@ -3,7 +3,7 @@
     <li
       v-for="item in transactions"
       :key="item.id"
-      class="list-group-item d-flex justify-content-between align-items-center"
+      class="list-group-item d-flex justify-content-between align-items-center flex-wrap"
     >
       <div>
         <span

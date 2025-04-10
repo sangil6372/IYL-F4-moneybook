@@ -85,6 +85,9 @@
       placeholder="자세한 내용을 입력해 주세요"
     ></textarea>
   </div>
+  <button class="btn btn-success w-100 mt-3" @click="saveForm">
+    <i class="fa-solid fa-floppy-disk me-2"></i> 저장
+  </button>
 </template>
 
 <script setup>
