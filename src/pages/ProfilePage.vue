@@ -145,7 +145,7 @@ async function saveUserInfo() {
   }
   user.value.password = newPassword;
 
-  await axios.patch(`http://localhost:3000/users/${user.value.id}`, {
+  await axios.patch(`/api/users/${user.value.id}`, {
     name: user.value.name,
     email: user.value.email,
     password: user.value.password,
@@ -155,7 +155,7 @@ async function saveUserInfo() {
 }
 
 async function saveUserSettings() {
-  await axios.patch(`http://localhost:3000/users/${user.value.id}`, {
+  await axios.patch(`/api/users/${user.value.id}`, {
     settings: user.value.settings,
   });
   alert('설정이 저장되었습니다.');
@@ -168,7 +168,7 @@ async function deleteUser() {
   if (!confirmed) return;
 
   try {
-    await axios.delete(`http://localhost:3000/users/${user.value.id}`);
+    await axios.delete(`/api/users/${user.value.id}`);
     localStorage.removeItem('user');
     alert('회원 탈퇴가 완료되었습니다.');
     window.location.href = '/';
