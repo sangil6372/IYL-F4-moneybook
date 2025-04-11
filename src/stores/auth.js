@@ -71,7 +71,7 @@ export const useAuthStore = defineStore("auth", {
       }
       try {
         const response = await axios.get(
-          `http://localhost:3000/users?email=${email}&password=${password}`
+          `/api/users?email=${email}&password=${password}`
         );
 
         if (response.data.length > 0) {
