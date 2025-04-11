@@ -401,9 +401,6 @@ function toggleType(type) {
 watch([selectedType, selectedCategory, startDate, endDate], () => {
   currentPage.value = 1;
 });
-watch(editModalInstance, () => {
-  if (editModalInstance === null) resetForm();
-});
 
 // 빠른 날짜 설정 (Ex: 최근 7일 최근 30일)
 // startDate 와 endDate를 조작함
@@ -589,6 +586,9 @@ onMounted(async () => {
   // 🐷 모달 인스턴스 초기화
   if (editModalRef.value) {
     editModalInstance = new Modal(editModalRef.value);
+    editModalRef.value.addEventListener("hide.bs.modal", () => {
+      resetForm();
+    });
   }
 });
 </script>
