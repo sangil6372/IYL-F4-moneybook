@@ -273,7 +273,7 @@ async function checkEmailExists() {
 
   try {
     const res = await axios.get(
-      `http://localhost:3000/users?email=${regEmail.value}`
+      `/api/users?email=${regEmail.value}`
     );
     isDuplicateEmail.value = res.data.length > 0;
   } catch (err) {
