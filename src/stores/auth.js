@@ -15,7 +15,7 @@ export const useAuthStore = defineStore("auth", {
     async register(name, email, password) {
       // 회원 가입 로직
       try {
-        const response = await axios.post("http://localhost:3000/users", {
+        const response = await axios.post("/api/users", {
           name,
           email,
           password,
