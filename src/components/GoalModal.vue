@@ -151,7 +151,7 @@ const saveGoals = async () => {
 
   // 2. 서버 반영 (axios로 전환)
   try {
-    await axios.patch(`http://localhost:3000/users/${user.value.id}`, {
+    await axios.patch(`/api/users/${user.value.id}`, {
       goals: updatedGoals,
     });
     alert('목표 설정을 완료했습니다.');
