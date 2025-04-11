@@ -503,7 +503,7 @@ const calendarOptions = computed(() => ({
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   padding: 20px;
-  border: 1px solid #a7d0e4;
+  border: 1px solid #a7d0e4 !important;
 }
 .fc .fc-daygrid-day-frame {
   height: 95px;
@@ -511,6 +511,14 @@ const calendarOptions = computed(() => ({
   flex-direction: column;
   justify-content: flex-start;
   padding-top: 0.25rem;
+}
+.fc-scrollgrid {
+  border-collapse: collapse !important;
+}
+/* 테두리 색상 통일 */
+.fc-theme-standard td,
+.fc-theme-standard th {
+  border: 1px solid #a7d0e4 !important;
 }
 
 /* 헤더 (제목 및 네비게이션) */
@@ -546,7 +554,7 @@ const calendarOptions = computed(() => ({
 .fc-daygrid-day {
   padding: 4px;
   border-radius: 12px;
-  border: 1px solid #96dbe2 !important;
+
   transition: 0.2s ease-in-out;
 }
 
@@ -653,6 +661,20 @@ const calendarOptions = computed(() => ({
 }
 .transaction-label {
   white-space: nowrap;
+}
+/* 날짜 셀 테두리 기본값 */
+.fc-theme-standard td {
+  border: 1px solid #a7d0e4 !important;
+}
+
+/* 날짜 셀 내부에서 숫자 위쪽 선 제거 */
+.fc .fc-daygrid-day-frame {
+  border-top: none !important;
+}
+
+/* 요일 셀 하단선 유지 */
+.fc-scrollgrid thead tr:last-child th {
+  border-bottom: 1px solid #a7d0e4 !important;
 }
 
 @media (max-width: 400px) {
