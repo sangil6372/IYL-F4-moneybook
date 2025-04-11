@@ -90,13 +90,9 @@
       required
     >
       <option disabled value="">카테고리를 선택하세요</option>
-      <option>식비</option>
-      <option>의료</option>
-      <option>교통</option>
-      <option>여가</option>
-      <option>통신</option>
-      <option>급여</option>
-      <option>기타</option>
+      <option v-for="item in categories" :key="item.label" :value="item.label">
+        {{ item.emoji }} {{ item.label }}
+      </option>
     </select>
   </div>
 
@@ -119,11 +115,11 @@
       <i class="fa-solid fa-floppy-disk me-2"></i> 저장
     </button>
   </div>
-  
 </template>
 
 <script setup>
 import { useId } from "vue";
+import { categories } from "@/utils/categoryEmoji";
 const props = defineProps({
   form: {
     type: Object,

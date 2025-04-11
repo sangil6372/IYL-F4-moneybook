@@ -1,92 +1,162 @@
 <template>
   <div class="container-fluid">
-    <div class="card p-4 m-3 my-5 border-0 shadow-sm rounded-4 bg-custom">
-      <div class="row g-4 align-items-end">
-        <!-- 수입/지출 선택 -->
-        <div class="col-auto">
-          <label
-            class="form-label text-muted small fw-semibold text-center d-block"
-            >분류</label
+    <form>
+      <div class="card p-4 m-3 my-5 border-0 shadow-sm rounded-4 bg-custom">
+        <div class="row g-4 align-items-end">
+          <!-- 고정 여부 버튼 -->
+          <div
+            class="col-auto d-flex flex-column align-items-center justify-content-end"
           >
-          <select class="form-select text-center" v-model="editForm.type">
-            <option value="income">수입</option>
-            <option value="expense">지출</option>
-          </select>
-        </div>
+            <label
+              for="fixedCostToggle"
+              class="form-label text-muted small fw-semibold"
+              >고정</label
+            >
+            <button
+              id="fixedCostToggle"
+              name="fixedCostToggle"
+              type="button"
+              @click="
+                addForm.fixedCost =
+                  addForm.fixedCost === 'true' ? 'false' : 'true'
+              "
+              class="btn"
+              :class="
+                addForm.fixedCost === 'true'
+                  ? 'btn-dark text-white'
+                  : 'btn-outline-secondary'
+              "
+              style="padding: 6px 10px"
+              title="고정 여부"
+            >
+              <i class="fa-solid fa-thumbtack"></i>
+            </button>
+          </div>
 
-        <!-- 날짜 -->
-        <div class="col-auto">
-          <label
-            class="form-label text-muted small fw-semibold text-center d-block"
-            >날짜</label
-          >
-          <input
-            type="date"
-            class="form-control text-center"
-            v-model="editForm.date"
-          />
-        </div>
+          <!-- 수입/지출 선택 -->
+          <div class="col-auto">
+            <label
+              for="formType"
+              class="form-label text-muted small fw-semibold text-center d-block"
+              >분류</label
+            >
+            <select
+              id="formType"
+              name="type"
+              class="form-select text-center"
+              v-model="addForm.type"
+            >
+              <option value="income">수입</option>
+              <option value="expense">지출</option>
+            </select>
+          </div>
 
-        <!-- 카테고리 선택 -->
-        <div class="col-auto">
-          <label
-            class="form-label text-muted small fw-semibold text-center d-block"
-            >카테고리</label
-          >
-          <select class="form-select text-center" v-model="editForm.category">
-            <option value="">선택</option>
-            <option value="식비">식비</option>
-            <option value="교통">교통</option>
-            <option value="주거">주거</option>
-            <option value="기타">기타</option>
-          </select>
-        </div>
-
-        <!-- 금액 -->
-        <div class="col">
-          <label
-            class="form-label text-muted small fw-semibold text-center d-block"
-            >금액</label
-          >
-          <div class="d-flex align-items-center">
+          <!-- 날짜 -->
+          <div class="col-auto">
+            <label
+              for="formDate"
+              class="form-label text-muted small fw-semibold text-center d-block"
+              >날짜</label
+            >
             <input
-              type="number"
-              class="form-control"
-              v-model="editForm.amount"
-              placeholder="Price..."
+              id="formDate"
+              name="date"
+              type="date"
+              class="form-control text-center"
+              v-model="addForm.date"
             />
           </div>
-        </div>
 
-        <!-- 메모 -->
-        <div class="col flex-grow-1">
-          <label
-            class="form-label text-muted small fw-semibold text-center d-block"
-            >메모</label
-          >
-          <input
-            type="text"
-            class="form-control"
-            v-model="editForm.memo"
-            placeholder="Enter..."
-          />
-        </div>
+          <!-- 카테고리 선택 -->
+          <div class="col-auto">
+            <label
+              for="formCategory"
+              class="form-label text-muted small fw-semibold text-center d-block"
+              >카테고리</label
+            >
+            <select
+              id="formCategory"
+              name="category"
+              class="form-select text-center"
+              v-model="addForm.category"
+            >
+              <option value="">선택</option>
+              <option
+                v-for="item in categoryOptions"
+                :key="item.label"
+                :value="item.label"
+              >
+                {{ item.emoji }} {{ item.label }}
+              </option>
+            </select>
+          </div>
 
-        <!-- 추가 버튼 -->
-        <div class="col-auto text-center">
-          <label
-            class="form-label text-muted small fw-semibold text-center d-block"
-            >추가</label
-          >
-          <button class="btn btn-outline-secondary px-3 py-2" @click="addCheck">
-            <i class="fa-solid fa-plus"></i>
-          </button>
+          <!-- 금액 -->
+          <div class="col">
+            <label
+              for="formAmount"
+              class="form-label text-muted small fw-semibold text-center d-block"
+              >금액</label
+            >
+            <div class="d-flex align-items-center">
+              <input
+                id="formAmount"
+                name="amount"
+                type="number"
+                class="form-control"
+                v-model="addForm.amount"
+                placeholder="Price..."
+              />
+            </div>
+          </div>
+
+          <!-- 메모 -->
+          <div class="col flex-grow-1">
+            <label
+              for="formMemo"
+              class="form-label text-muted small fw-semibold text-center d-block"
+              >메모</label
+            >
+            <input
+              id="formMemo"
+              name="memo"
+              type="text"
+              class="form-control"
+              v-model="addForm.memo"
+              placeholder="Enter..."
+            />
+          </div>
+
+          <!-- 추가 버튼 -->
+          <div class="col-auto text-center">
+            <label
+              for="formSubmit"
+              class="form-label text-muted small fw-semibold text-center d-block"
+              >추가</label
+            >
+            <button
+              id="formSubmit"
+              name="submit"
+              type="button"
+              class="btn btn-outline-secondary px-3 py-2"
+              @click="addCheck"
+            >
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </form>
 
     <div class="top-filter-bar d-flex justify-content-between">
       <div>
+        <div class="category-filter">
+          <select v-model="selectedFixed" class="simple-select">
+            <option value="">고정 전체보기</option>
+            <option value="true">고정</option>
+            <option value="false">일반</option>
+          </select>
+        </div>
         <div class="category-filter">
           <select v-model="selectedType" class="simple-select">
             <option value="">내역 전체보기</option>
@@ -98,17 +168,17 @@
           <select v-model="selectedCategory" class="simple-select">
             <option value="">카테고리 전체보기</option>
             <option
-              v-for="option in categoryOptions"
-              :key="option"
-              :value="option"
+              v-for="item in categoryOptions"
+              :key="item.label"
+              :value="item.label"
             >
-              {{ option }}
+              {{ item.emoji }} {{ item.label }}
             </option>
           </select>
         </div>
 
         <!-- 날짜별 전체보기 -->
-        <div class="category-filter">
+        <div class="category-filter position-relative">
           <select
             v-model="selectedDateRange"
             class="simple-select"
@@ -120,35 +190,40 @@
             <option value="thisMonth">이번 달</option>
             <option value="custom">기간 설정</option>
           </select>
-        </div>
 
-        <!-- 날짜 팝업 -->
-        <div
-          v-if="showCustomPopup"
-          class="dropdown-menu show p-3 shadow border rounded"
-          style="
-            position: absolute;
-            top: 100%;
-            left: 0;
-            z-index: 1050;
-            min-width: 250px;
-          "
-        >
-          <label class="form-label">
-            시작일:
-            <input type="date" v-model="startDate" class="form-control" />
-          </label>
-          <label class="form-label mt-2">
-            종료일:
-            <input type="date" v-model="endDate" class="form-control" />
-          </label>
-          <div class="d-flex justify-content-end gap-2 mt-3">
-            <button class="btn btn-primary btn-sm" @click="applyCustomDate">
-              적용
-            </button>
-            <button class="btn btn-secondary btn-sm" @click="closeCustomPopup">
-              취소
-            </button>
+          <!-- 👇 이 안에 팝업 포함시키기 -->
+          <div v-if="showCustomPopup" class="custom-popup">
+            <label class="form-label">
+              시작일:
+              <input
+                type="date"
+                id="customStartDate"
+                name="startDate"
+                v-model="startDate"
+                class="form-control"
+              />
+            </label>
+            <label class="form-label mt-2">
+              종료일:
+              <input
+                type="date"
+                id="customEndDate"
+                name="endDate"
+                v-model="endDate"
+                class="form-control"
+              />
+            </label>
+            <div class="d-flex justify-content-end gap-2 mt-3">
+              <button class="btn btn-primary btn-sm" @click="applyCustomDate">
+                적용
+              </button>
+              <button
+                class="btn btn-secondary btn-sm"
+                @click="closeCustomPopup"
+              >
+                취소
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -163,6 +238,7 @@
       <table class="custom-table">
         <thead>
           <tr class="table-head">
+            <th class="fixed-col">고정</th>
             <th class="py-2 px-2">분류</th>
             <th class="py-2 px-2">날짜</th>
             <th class="py-2 px-2">카테고리</th>
@@ -173,6 +249,11 @@
         </thead>
         <tbody>
           <tr v-for="tx in pagedTransaction" :key="tx.id" class="table-row">
+            <td class="fixed-col">
+              <span v-if="tx.fixedCost === 'true'">
+                <i class="fa-solid fa-thumbtack me-1"></i>
+              </span>
+            </td>
             <td>
               <span
                 :class="[
@@ -184,7 +265,11 @@
               </span>
             </td>
             <td>{{ formatDate(tx.date) }}</td>
-            <td>{{ tx.category }}</td>
+            <td>
+              <span>
+                {{ categoryEmoji[tx.category] || "" }} {{ tx.category }}
+              </span>
+            </td>
             <td :class="tx.type === 'income' ? 'income' : 'expense'">
               {{ tx.amount.toLocaleString() }} 원
             </td>
@@ -240,6 +325,7 @@
             class="btn-close"
             data-bs-dismiss="modal"
             aria-label="Close"
+            @click="resetForm"
           ></button>
         </div>
 
@@ -310,6 +396,12 @@ import InputForm from "@/components/InputForm.vue";
 // 🐷 원래 있던 피니아 가지고 와서 삭제 및 수정 기능 구현으로 바꾸기
 import { useCalendar } from "@/stores/calendar";
 
+// 이모지 가져오기
+import { categoryEmoji, categories } from "@/utils/categoryEmoji";
+
+// 고정 셀렉트 이용하기 위함
+const selectedFixed = ref("");
+
 // 🐷 스토어 등록
 const useStore = useCalendar();
 
@@ -325,20 +417,23 @@ const selectedType = ref("");
 
 // 카테고리는 배열로 다중 선택 가능하도록
 const selectedCategory = ref("");
-const categoryOptions = [
-  "식비",
-  "의료",
-  "교통",
-  "여가",
-  "통신",
-  "급여",
-  "기타",
-];
+const categoryOptions = categories;
 
 //수정 중인 데이터 임시 보관
 const editForm = reactive({
   // id: null,
   date: "",
+  amount: 0,
+  type: "expense",
+  category: "",
+  memo: "",
+  fixedCost: "false",
+  userId: userId,
+});
+
+// 입력폼 데이터 보관
+const addForm = reactive({
+  date: new Date().toISOString().slice(0, 10),
   amount: 0,
   type: "expense",
   category: "",
@@ -437,11 +532,13 @@ const filteredTransaction = computed(() => {
       const matchCategory =
         selectedCategory.value.length === 0 ||
         selectedCategory.value.includes(tx.category);
+      const matchFixed =
+        !selectedFixed.value || tx.fixedCost === selectedFixed.value;
       const txDate = new Date(tx.date);
       const start = startDate.value ? new Date(startDate.value) : null;
       const end = endDate.value ? new Date(endDate.value) : null;
       const matchDate = (!start || txDate >= start) && (!end || txDate <= end);
-      return matchType && matchCategory && matchDate;
+      return matchType && matchCategory && matchFixed && matchDate;
     })
     .sort((a, b) => new Date(a.date) - new Date(b.date));
 });
@@ -513,33 +610,38 @@ async function updateCheck(tx) {
 }
 
 async function addCheck() {
-  const newTransaction = {
-    ...editForm,
-  };
+  const { category, amount } = addForm;
+
+  // 올바른 유효성 검사
+  if (!category || !amount || amount <= 0) {
+    alert("금액과 카테고리는 반드시 작성해주세요.");
+    return;
+  }
+
+  const newTransaction = { ...addForm };
   delete newTransaction.id;
 
-  // 예: Pinia 스토어에 추가
   await useStore.addTransaction(newTransaction);
-  // 입력값 초기화
   await resetForm();
 }
 
 function resetForm() {
-  editForm.type = "expense";
-  editForm.date = new Date().toISOString().slice(0, 10);
-  editForm.amount = 0;
-  editForm.category = "";
-  editForm.memo = "";
-  editForm.fixedCost = "false";
+  addForm.type = "expense";
+  addForm.date = new Date().toISOString().slice(0, 10);
+  addForm.amount = 0;
+  addForm.category = "";
+  addForm.memo = "";
+  addForm.fixedCost = "false";
 }
 
 // 모달이 저장 클릭하면 핸들러 작동
 async function handleUpdate(formFromChild) {
   await useStore.updateTransaction(formFromChild.id, formFromChild);
-  await resetForm();
+  resetForm();
 
   if (editModalInstance) {
-    editModalInstance.hide(); // 모달 닫기
+    editModalInstance.hide();
+    resetForm(); // 모달 닫기
   }
 }
 
@@ -549,6 +651,10 @@ onMounted(async () => {
   // 🐷 모달 인스턴스 초기화
   if (editModalRef.value) {
     editModalInstance = new Modal(editModalRef.value);
+    editModalRef.value.addEventListener("hide.bs.modal", () => {
+      document.activeElement.blur();
+      resetForm();
+    });
   }
 });
 </script>
@@ -582,6 +688,15 @@ onMounted(async () => {
   padding: 12px;
   border-bottom: 1px solid #f0f0f0;
   /* transition: backround 0.2s; */
+}
+/* 고정칸 넓이 줄이기 */
+th.fixed-col,
+td.fixed-col {
+  width: 40px;
+  min-width: 40px;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap; /* ✅ 줄바꿈 방지 */
 }
 
 .table-row:hover {
@@ -667,7 +782,7 @@ onMounted(async () => {
 
 .pagination-container {
   position: fixed;
-  bottom: 0;
+  bottom: 20px;
   left: 0;
   width: 100%;
   padding: 12px 0;

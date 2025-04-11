@@ -36,7 +36,9 @@
                 {{ getDate(item.date) }}일
               </div>
               <div class="d-flex flex-column">
-                <div class="fw-bold">{{ item.category }}</div>
+                <div class="fw-bold">
+                  {{ `${categoryEmoji[item.category] || ""} ${item.category}` }}
+                </div>
                 <div class="text-muted">
                   {{ formatDate(item.date) }},
                   {{ item.amount.toLocaleString() }}원
@@ -49,16 +51,25 @@
         <!-- 거래 내역 보기 -->
         <div v-else-if="selectedDate && !formView" class="card shadow-sm mt-3">
           <div class="card-body">
-            <h5 class="card-title mb-4">
-              <i class="fa-solid fa-calendar-day me-2 text-primary"></i>
-              {{ selectedDate }} 거래 내역
-            </h5>
-            <i
-              class="fa-solid fa-xmark text-secondary position-absolute"
-              @click="closeForm(true)"
-              style="top: 12px; right: 16px; cursor: pointer; font-size: 1.2rem"
-              title="입력 닫기"
-            ></i>
+            <div class="position-relative mb-3">
+              <!-- 아이콘 + 날짜 + 거래내역 -->
+              <div class="d-flex flex-wrap align-items-center gap-2 pe-4">
+                <i class="fa-solid fa-calendar-day text-primary"></i>
+                <span class="fw-bold">{{ selectedDate }}</span>
+                <span
+                  class="text-muted flex-shrink-0 flex-grow-1 transaction-label"
+                  >거래 내역</span
+                >
+              </div>
+
+              <!-- X 버튼은 오른쪽 위 고정 -->
+              <i
+                class="fa-solid fa-xmark position-absolute top-0 end-0 text-secondary"
+                style="cursor: pointer; font-size: 1.2rem"
+                @click="closeForm(true)"
+                title="입력 닫기"
+              ></i>
+            </div>
             <TransactionList
               :transactions="selectedDateforEach"
               @edit="editTransaction"
@@ -161,9 +172,12 @@ import { useCalendar } from "@/stores/calendar";
 import InputForm from "@/components/InputForm.vue";
 import TransactionList from "@/components/TransactionList.vue";
 import { Modal } from "bootstrap";
+import { useAuthStore } from "@/stores/auth";
+import { categoryEmoji } from "@/utils/categoryEmoji";
 
 // pinia 연결
 const storeCalendar = useCalendar();
+const authStore = useAuthStore();
 onMounted(() => {
   storeCalendar.fetchTransaction();
 });
@@ -231,7 +245,7 @@ const form = ref({
   memo: "",
   fixedCost: false,
   // 🐷 여기서 userId 받아와서 추가해줘야돼!!
-  userId: "6c9d",
+  userId: authStore.user.id,
 });
 
 // 거래 필터링
@@ -359,7 +373,7 @@ function closeForm(resetAll = false) {
     category: "",
     memo: "",
     fixedCost: false,
-    userId: "d3e6",
+    userId: authStore.user.id,
   };
 }
 
@@ -409,7 +423,8 @@ const calendarOptions = computed(() => ({
   initialView: "dayGridMonth",
   eventColor: "transparent",
   locale: koLocale,
-  contentHeight: 650,
+  contentHeight: "auto",
+  aspectRatio: 1.6,
 
   fixedWeekCount: false,
 
@@ -434,14 +449,19 @@ const calendarOptions = computed(() => ({
     const { income, expense } = info.event.extendedProps;
 
     const plus = income
-      ? `<div class="text-success fw-bold">+${income.toLocaleString()}${
-          width ? "" : "원"
-        }</div>`
+      ? `<div class="text-success fw-bold" style="font-size:${
+          width ? "10px" : "13px"
+        }">
+        +${income.toLocaleString()}${width ? "" : "원"}
+      </div>`
       : "";
+
     const minus = expense
-      ? `<div class="text-danger fw-bold">-${expense.toLocaleString()}${
-          width ? "" : "원"
-        }</div>`
+      ? `<div class="text-danger fw-bold" style="font-size:${
+          width ? "10px" : "13px"
+        }">
+        -${expense.toLocaleString()}${width ? "" : "원"}
+      </div>`
       : "";
 
     return { html: plus + minus };
@@ -458,6 +478,9 @@ const calendarOptions = computed(() => ({
 <style>
 .fc-day-other .fc-daygrid-day-number {
   visibility: hidden;
+}
+.fc-day-other .fc-event {
+  display: none !important;
 }
 /* 다가오는 결제일 색상 변경 */
 .bg-danger-soft {
@@ -480,6 +503,22 @@ const calendarOptions = computed(() => ({
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   padding: 20px;
+  border: 1px solid #a7d0e4 !important;
+}
+.fc .fc-daygrid-day-frame {
+  height: 95px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-top: 0.25rem;
+}
+.fc-scrollgrid {
+  border-collapse: collapse !important;
+}
+/* 테두리 색상 통일 */
+.fc-theme-standard td,
+.fc-theme-standard th {
+  border: 1px solid #a7d0e4 !important;
 }
 
 /* 헤더 (제목 및 네비게이션) */
@@ -489,8 +528,8 @@ const calendarOptions = computed(() => ({
 }
 
 .fc-button {
-  background-color: #96dbe2;
-  border: none;
+  background-color: #a7d0e4 !important;
+  border: 1px solid #e9f7fd !important;
   color: white;
   padding: 6px 12px;
   font-size: 14px;
@@ -499,16 +538,23 @@ const calendarOptions = computed(() => ({
 }
 
 .fc-button:hover {
-  background-color: #96dbe2;
+  background-color: #88bdd3 !important; /* 미디엄 블루 */
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: 0.2s ease;
 }
 
 .fc-button:disabled {
   background-color: #adb5bd;
 }
+.fc-button:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
 .fc-daygrid-day {
   padding: 4px;
   border-radius: 12px;
-  border: 1px solid #96dbe2 !important;
+
   transition: 0.2s ease-in-out;
 }
 
@@ -529,19 +575,27 @@ const calendarOptions = computed(() => ({
 /* 요일 헤더 색상 */
 .fc-col-header-cell {
   background-color: #e9f7fd;
-  padding: 10px 0;
+  padding: 12px 0;
   font-weight: 600;
+  font-size: 1.1rem;
   border-bottom: 1px solid #a7d0e4 !important; /* 💙 파란색 테두리 */
   border-top: 1px solid #a7d0e4 !important;
   border-left: 1px solid #a7d0e4 !important;
   border-right: 1px solid #a7d0e4 !important;
 }
+.fc .fc-scrollgrid-section-header > th {
+  padding-bottom: 12px !important;
+}
+.fc .fc-scrollgrid-sync-table tbody tr:first-child .fc-daygrid-day-frame {
+  border-top: 1px solid #a7d0e4;
+}
 
 /* 날짜 칸 (일자 영역) */
 .fc .fc-daygrid-day-number {
   font-size: 13px;
+  display: inline-block;
   font-weight: 600;
-  margin: 2px 4px;
+  margin-right: 6px;
   color: #212529;
   text-decoration: none !important;
 }
@@ -549,6 +603,11 @@ const calendarOptions = computed(() => ({
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
+}
+.fc .fc-day-today:hover {
+  background-color: #f1f9fb !important;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1) !important;
+  cursor: pointer;
 }
 .fc .fc-daygrid-day {
   cursor: default !important;
@@ -560,7 +619,7 @@ const calendarOptions = computed(() => ({
   border-radius: 10px;
   background-color: #d1ecf1;
   color: #0c5460;
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
 /* 요일별 색상 */
@@ -599,5 +658,29 @@ const calendarOptions = computed(() => ({
   background-color: #e0f7fa !important;
   border-radius: 12px;
   border: 2px solid #96dbe2;
+}
+.transaction-label {
+  white-space: nowrap;
+}
+/* 날짜 셀 테두리 기본값 */
+.fc-theme-standard td {
+  border: 1px solid #a7d0e4 !important;
+}
+
+/* 날짜 셀 내부에서 숫자 위쪽 선 제거 */
+.fc .fc-daygrid-day-frame {
+  border-top: none !important;
+}
+
+/* 요일 셀 하단선 유지 */
+.fc-scrollgrid thead tr:last-child th {
+  border-bottom: 1px solid #a7d0e4 !important;
+}
+
+@media (max-width: 400px) {
+  .transaction-label {
+    width: 100%;
+    margin-top: 0.25rem;
+  }
 }
 </style>
