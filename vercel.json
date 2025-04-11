@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://sadari-budget.glitch.me/"
+      "destination": "https://sadari-budget.glitch.me"
     }
   ]
 }
