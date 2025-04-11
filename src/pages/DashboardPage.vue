@@ -2,6 +2,28 @@
   <div class="container-fluid">
     <div class="card p-4 m-3 my-5 border-0 shadow-sm rounded-4 bg-custom">
       <div class="row g-4 align-items-end">
+        <!-- 고정 여부 버튼 -->
+        <div
+          class="col-auto d-flex flex-column align-items-center justify-content-end"
+        >
+          <span class="form-label text-muted small fw-semibold">고정</span>
+          <button
+            @click="
+              editForm.fixedCost =
+                editForm.fixedCost === 'true' ? 'false' : 'true'
+            "
+            class="btn"
+            :class="
+              editForm.fixedCost === 'true'
+                ? 'btn-dark text-white'
+                : 'btn-outline-secondary'
+            "
+            style="padding: 6px 10px"
+            title="고정 여부"
+          >
+            <i class="fa-solid fa-thumbtack"></i>
+          </button>
+        </div>
         <!-- 수입/지출 선택 -->
         <div class="col-auto">
           <label
@@ -35,10 +57,13 @@
           >
           <select class="form-select text-center" v-model="editForm.category">
             <option value="">선택</option>
-            <option value="식비">식비</option>
-            <option value="교통">교통</option>
-            <option value="주거">주거</option>
-            <option value="기타">기타</option>
+            <option
+              v-for="item in categoryOptions"
+              :key="item.label"
+              :value="item.label"
+            >
+              {{ item.emoji }} {{ item.label }}
+            </option>
           </select>
         </div>
 
@@ -88,6 +113,13 @@
     <div class="top-filter-bar d-flex justify-content-between">
       <div>
         <div class="category-filter">
+          <select v-model="selectedFixed" class="simple-select">
+            <option value="">고정 전체보기</option>
+            <option value="true">고정</option>
+            <option value="false">일반</option>
+          </select>
+        </div>
+        <div class="category-filter">
           <select v-model="selectedType" class="simple-select">
             <option value="">내역 전체보기</option>
             <option value="expense">지출</option>
@@ -98,17 +130,17 @@
           <select v-model="selectedCategory" class="simple-select">
             <option value="">카테고리 전체보기</option>
             <option
-              v-for="option in categoryOptions"
-              :key="option"
-              :value="option"
+              v-for="item in categoryOptions"
+              :key="item.label"
+              :value="item.label"
             >
-              {{ option }}
+              {{ item.emoji }} {{ item.label }}
             </option>
           </select>
         </div>
 
         <!-- 날짜별 전체보기 -->
-        <div class="category-filter">
+        <div class="category-filter position-relative">
           <select
             v-model="selectedDateRange"
             class="simple-select"
@@ -120,35 +152,28 @@
             <option value="thisMonth">이번 달</option>
             <option value="custom">기간 설정</option>
           </select>
-        </div>
 
-        <!-- 날짜 팝업 -->
-        <div
-          v-if="showCustomPopup"
-          class="dropdown-menu show p-3 shadow border rounded"
-          style="
-            position: absolute;
-            top: 100%;
-            left: 0;
-            z-index: 1050;
-            min-width: 250px;
-          "
-        >
-          <label class="form-label">
-            시작일:
-            <input type="date" v-model="startDate" class="form-control" />
-          </label>
-          <label class="form-label mt-2">
-            종료일:
-            <input type="date" v-model="endDate" class="form-control" />
-          </label>
-          <div class="d-flex justify-content-end gap-2 mt-3">
-            <button class="btn btn-primary btn-sm" @click="applyCustomDate">
-              적용
-            </button>
-            <button class="btn btn-secondary btn-sm" @click="closeCustomPopup">
-              취소
-            </button>
+          <!-- 👇 이 안에 팝업 포함시키기 -->
+          <div v-if="showCustomPopup" class="custom-popup">
+            <label class="form-label">
+              시작일:
+              <input type="date" v-model="startDate" class="form-control" />
+            </label>
+            <label class="form-label mt-2">
+              종료일:
+              <input type="date" v-model="endDate" class="form-control" />
+            </label>
+            <div class="d-flex justify-content-end gap-2 mt-3">
+              <button class="btn btn-primary btn-sm" @click="applyCustomDate">
+                적용
+              </button>
+              <button
+                class="btn btn-secondary btn-sm"
+                @click="closeCustomPopup"
+              >
+                취소
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -163,6 +188,7 @@
       <table class="custom-table">
         <thead>
           <tr class="table-head">
+            <th class="fixed-col">고정</th>
             <th class="py-2 px-2">분류</th>
             <th class="py-2 px-2">날짜</th>
             <th class="py-2 px-2">카테고리</th>
@@ -173,6 +199,11 @@
         </thead>
         <tbody>
           <tr v-for="tx in pagedTransaction" :key="tx.id" class="table-row">
+            <td class="fixed-col">
+              <span v-if="tx.fixedCost === 'true'">
+                <i class="fa-solid fa-thumbtack me-1"></i>
+              </span>
+            </td>
             <td>
               <span
                 :class="[
@@ -184,7 +215,11 @@
               </span>
             </td>
             <td>{{ formatDate(tx.date) }}</td>
-            <td>{{ tx.category }}</td>
+            <td>
+              <span>
+                {{ categoryEmoji[tx.category] || "" }} {{ tx.category }}
+              </span>
+            </td>
             <td :class="tx.type === 'income' ? 'income' : 'expense'">
               {{ tx.amount.toLocaleString() }} 원
             </td>
@@ -240,6 +275,7 @@
             class="btn-close"
             data-bs-dismiss="modal"
             aria-label="Close"
+            @click="resetForm"
           ></button>
         </div>
 
@@ -310,6 +346,12 @@ import InputForm from "@/components/InputForm.vue";
 // 🐷 원래 있던 피니아 가지고 와서 삭제 및 수정 기능 구현으로 바꾸기
 import { useCalendar } from "@/stores/calendar";
 
+// 이모지 가져오기
+import { categoryEmoji, categories } from "@/utils/categoryEmoji";
+
+// 고정 셀렉트 이용하기 위함
+const selectedFixed = ref("");
+
 // 🐷 스토어 등록
 const useStore = useCalendar();
 
@@ -325,15 +367,7 @@ const selectedType = ref("");
 
 // 카테고리는 배열로 다중 선택 가능하도록
 const selectedCategory = ref("");
-const categoryOptions = [
-  "식비",
-  "의료",
-  "교통",
-  "여가",
-  "통신",
-  "급여",
-  "기타",
-];
+const categoryOptions = categories;
 
 //수정 중인 데이터 임시 보관
 const editForm = reactive({
@@ -366,6 +400,9 @@ function toggleType(type) {
 // 선택 값 변경 시 페이지 1로 초기화
 watch([selectedType, selectedCategory, startDate, endDate], () => {
   currentPage.value = 1;
+});
+watch(editModalInstance, () => {
+  if (editModalInstance === null) resetForm();
 });
 
 // 빠른 날짜 설정 (Ex: 최근 7일 최근 30일)
@@ -437,11 +474,13 @@ const filteredTransaction = computed(() => {
       const matchCategory =
         selectedCategory.value.length === 0 ||
         selectedCategory.value.includes(tx.category);
+      const matchFixed =
+        !selectedFixed.value || tx.fixedCost === selectedFixed.value;
       const txDate = new Date(tx.date);
       const start = startDate.value ? new Date(startDate.value) : null;
       const end = endDate.value ? new Date(endDate.value) : null;
       const matchDate = (!start || txDate >= start) && (!end || txDate <= end);
-      return matchType && matchCategory && matchDate;
+      return matchType && matchCategory && matchFixed && matchDate;
     })
     .sort((a, b) => new Date(a.date) - new Date(b.date));
 });
@@ -536,10 +575,11 @@ function resetForm() {
 // 모달이 저장 클릭하면 핸들러 작동
 async function handleUpdate(formFromChild) {
   await useStore.updateTransaction(formFromChild.id, formFromChild);
-  await resetForm();
+  resetForm();
 
   if (editModalInstance) {
-    editModalInstance.hide(); // 모달 닫기
+    editModalInstance.hide();
+    resetForm(); // 모달 닫기
   }
 }
 
@@ -582,6 +622,15 @@ onMounted(async () => {
   padding: 12px;
   border-bottom: 1px solid #f0f0f0;
   /* transition: backround 0.2s; */
+}
+/* 고정칸 넓이 줄이기 */
+th.fixed-col,
+td.fixed-col {
+  width: 40px;
+  min-width: 40px;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap; /* ✅ 줄바꿈 방지 */
 }
 
 .table-row:hover {
