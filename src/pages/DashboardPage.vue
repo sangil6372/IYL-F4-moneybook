@@ -9,12 +9,12 @@
           <span class="form-label text-muted small fw-semibold">고정</span>
           <button
             @click="
-              editForm.fixedCost =
-                editForm.fixedCost === 'true' ? 'false' : 'true'
+              addForm.fixedCost =
+                addForm.fixedCost === 'true' ? 'false' : 'true'
             "
             class="btn"
             :class="
-              editForm.fixedCost === 'true'
+              addForm.fixedCost === 'true'
                 ? 'btn-dark text-white'
                 : 'btn-outline-secondary'
             "
@@ -30,7 +30,7 @@
             class="form-label text-muted small fw-semibold text-center d-block"
             >분류</label
           >
-          <select class="form-select text-center" v-model="editForm.type">
+          <select class="form-select text-center" v-model="addForm.type">
             <option value="income">수입</option>
             <option value="expense">지출</option>
           </select>
@@ -45,7 +45,7 @@
           <input
             type="date"
             class="form-control text-center"
-            v-model="editForm.date"
+            v-model="addForm.date"
           />
         </div>
 
@@ -55,7 +55,7 @@
             class="form-label text-muted small fw-semibold text-center d-block"
             >카테고리</label
           >
-          <select class="form-select text-center" v-model="editForm.category">
+          <select class="form-select text-center" v-model="addForm.category">
             <option value="">선택</option>
             <option
               v-for="item in categoryOptions"
@@ -77,7 +77,7 @@
             <input
               type="number"
               class="form-control"
-              v-model="editForm.amount"
+              v-model="addForm.amount"
               placeholder="Price..."
             />
           </div>
@@ -92,7 +92,7 @@
           <input
             type="text"
             class="form-control"
-            v-model="editForm.memo"
+            v-model="addForm.memo"
             placeholder="Enter..."
           />
         </div>
@@ -381,6 +381,17 @@ const editForm = reactive({
   userId: userId,
 });
 
+// 입력폼 데이터 보관
+const addForm = reactive({
+  date: new Date().toISOString().slice(0, 10),
+  amount: 0,
+  type: "expense",
+  category: "",
+  memo: "",
+  fixedCost: "false",
+  userId: userId,
+});
+
 const startDate = ref(""); //시작 날짜 필터
 const endDate = ref(""); // 마지막 날짜 필터
 
@@ -550,7 +561,7 @@ async function updateCheck(tx) {
 
 async function addCheck() {
   const newTransaction = {
-    ...editForm,
+    ...addForm,
   };
   delete newTransaction.id;
 
@@ -561,12 +572,12 @@ async function addCheck() {
 }
 
 function resetForm() {
-  editForm.type = "expense";
-  editForm.date = new Date().toISOString().slice(0, 10);
-  editForm.amount = 0;
-  editForm.category = "";
-  editForm.memo = "";
-  editForm.fixedCost = "false";
+  addForm.type = "expense";
+  addForm.date = new Date().toISOString().slice(0, 10);
+  addForm.amount = 0;
+  addForm.category = "";
+  addForm.memo = "";
+  addForm.fixedCost = "false";
 }
 
 // 모달이 저장 클릭하면 핸들러 작동
