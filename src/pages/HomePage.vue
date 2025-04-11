@@ -133,6 +133,13 @@ onMounted(() => {
   const accountFormEl = accountForm.value;
   const signinFormEl = signinForm.value;
 
+  accountFormEl.style.display = "flex";
+  signinFormEl.style.display = "none";
+
+  overlayEl.classList.add("open-sign-in");
+  leftTextEl.classList.add("overlay-text-left-animation");
+  rightTextEl.classList.add("overlay-text-right-animation");
+
   const openSignUp = () => {
     leftTextEl.classList.remove("overlay-text-left-animation-out");
     overlayEl.classList.remove("open-sign-in");
@@ -443,9 +450,9 @@ html {
 }
 
 /* Sign in is initially not displayed */
-.form .sign-in {
+/* .form .sign-in {
   display: none;
-}
+} */
 
 .form .sign-in {
   left: 0;
