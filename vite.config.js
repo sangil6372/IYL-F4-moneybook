@@ -23,7 +23,7 @@ export default defineConfig({
     proxy: {
       // '/api'로 시작하는 요청은 http://localhost:3000으로 보냄
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'https://sadari-budget.glitch.me',
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api/, '') // '/api' 접두사 제거
       }
