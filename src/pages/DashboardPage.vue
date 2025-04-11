@@ -14,6 +14,7 @@
             >
             <button
               id="fixedCostToggle"
+              name="fixedCostToggle"
               type="button"
               @click="
                 addForm.fixedCost =
@@ -44,7 +45,6 @@
               name="type"
               class="form-select text-center"
               v-model="addForm.type"
-              autocomplete="transaction-type"
             >
               <option value="income">수입</option>
               <option value="expense">지출</option>
@@ -64,7 +64,6 @@
               type="date"
               class="form-control text-center"
               v-model="addForm.date"
-              autocomplete="date"
             />
           </div>
 
@@ -80,7 +79,6 @@
               name="category"
               class="form-select text-center"
               v-model="addForm.category"
-              autocomplete="category"
             >
               <option value="">선택</option>
               <option
@@ -108,7 +106,6 @@
                 class="form-control"
                 v-model="addForm.amount"
                 placeholder="Price..."
-                autocomplete="amount"
               />
             </div>
           </div>
@@ -127,7 +124,6 @@
               class="form-control"
               v-model="addForm.memo"
               placeholder="Enter..."
-              autocomplete="memo"
             />
           </div>
 
@@ -140,6 +136,7 @@
             >
             <button
               id="formSubmit"
+              name="submit"
               type="button"
               class="btn btn-outline-secondary px-3 py-2"
               @click="addCheck"
@@ -198,11 +195,23 @@
           <div v-if="showCustomPopup" class="custom-popup">
             <label class="form-label">
               시작일:
-              <input type="date" v-model="startDate" class="form-control" />
+              <input
+                type="date"
+                id="customStartDate"
+                name="startDate"
+                v-model="startDate"
+                class="form-control"
+              />
             </label>
             <label class="form-label mt-2">
               종료일:
-              <input type="date" v-model="endDate" class="form-control" />
+              <input
+                type="date"
+                id="customEndDate"
+                name="endDate"
+                v-model="endDate"
+                class="form-control"
+              />
             </label>
             <div class="d-flex justify-content-end gap-2 mt-3">
               <button class="btn btn-primary btn-sm" @click="applyCustomDate">

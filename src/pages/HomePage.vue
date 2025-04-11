@@ -29,9 +29,19 @@
         <h1>Sign In</h1>
         <p class="small">or use your email account:</p>
         <form id="sign-in-form" @submit.prevent="handleLogin">
-          <input type="email" placeholder="Email" v-model="loginEmail" />
+          <input
+            type="email"
+            id="loginEmail"
+            name="email"
+            autocomplete="email"
+            placeholder="Email"
+            v-model="loginEmail"
+          />
           <input
             type="password"
+            id="loginPassword"
+            name="password"
+            autocomplete="current-password"
             placeholder="Password"
             v-model="loginPassword"
           />
@@ -42,9 +52,19 @@
         <h1>Create Account</h1>
         <p class="small">or use your email for registration:</p>
         <form id="sign-up-form" @submit.prevent="handleRegister">
-          <input type="text" placeholder="Name" v-model="regName" />
+          <input
+            type="text"
+            id="regName"
+            name="name"
+            autocomplete="name"
+            placeholder="Name"
+            v-model="regName"
+          />
           <input
             type="email"
+            id="regEmail"
+            name="email"
+            autocomplete="email"
             placeholder="Email"
             v-model="regEmail"
             @blur="regEmailTouched = true"
@@ -53,33 +73,24 @@
                 regEmailTouched && (!isEmailValid || isDuplicateEmail),
             }"
           />
-          <div v-if="regEmailTouched && !isEmailValid" class="invalid-feedback">
-            올바른 이메일 형식을 입력해주세요.
-          </div>
-          <div
-            v-else-if="regEmailTouched && isDuplicateEmail"
-            class="invalid-feedback"
-          >
-            이미 등록된 이메일입니다.
-          </div>
-          <div v-if="isEmailValid && !isDuplicateEmail" class="valid-feedback">
-            사용 가능한 이메일입니다.
-          </div>
-          <input type="password" placeholder="Password" v-model="regPassword" />
           <input
             type="password"
+            id="regPassword"
+            name="password"
+            autocomplete="new-password"
+            placeholder="Password"
+            v-model="regPassword"
+          />
+          <input
+            type="password"
+            id="regConfirm"
+            name="confirmPassword"
+            autocomplete="new-password"
             placeholder="rePassword"
             v-model="regConfirm"
             @blur="regConfirmTouched = true"
-            input="isDuplicateEmail = false"
             :class="{ 'is-invalid': regConfirmTouched && !isPasswordMatch }"
           />
-          <div
-            class="invalid-feedback"
-            v-if="regConfirmTouched && !isPasswordMatch"
-          >
-            비밀번호가 일치하지 않습니다.
-          </div>
           <button class="control-button up" type="submit">Sign Up</button>
         </form>
       </div>
