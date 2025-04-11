@@ -102,7 +102,7 @@ export const useAuthStore = defineStore("auth", {
       const userId = sessionStorage.getItem("userId");
       if (userId) {
         try {
-          const res = await axios.get(`http://localhost:3000/users/${userId}`);
+          const res = await axios.get(`/api/users/${userId}`);
           this.user = res.data;
         } catch (err) {
           console.error("유저 불러오기 실패", err);
